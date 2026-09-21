@@ -422,12 +422,6 @@ export default function CreateEvaluationScreen() {
 
   const handlePickImage = async (onPicked: (uri: string) => void) => {
     try {
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (!permissionResult.granted) {
-        showAlert('Permissão necessária', 'Precisamos de permissão para acessar suas fotos.');
-        return;
-      }
-
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,

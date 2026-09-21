@@ -34,6 +34,18 @@ export const changeLanguage = (lang: string) => {
 
 export const getCurrentLanguage = () => i18n.language;
 
+export const getLanguageTag = (lang?: string) => {
+  const code = String(lang || i18n.language || 'pt').split('-')[0].toLowerCase();
+  const tags: Record<string, string> = {
+    pt: 'pt-BR',
+    en: 'en-US',
+    es: 'es-ES',
+    fr: 'fr-FR',
+    de: 'de-DE',
+  };
+  return tags[code] || 'pt-BR';
+};
+
 export const supportedLanguages = [
   { code: 'pt', name: 'Português' },
   { code: 'en', name: 'English' },

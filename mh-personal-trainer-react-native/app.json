@@ -2,7 +2,7 @@
   "expo": {
     "name": "MH Personal Trainer",
     "slug": "mh-personal-trainer",
-    "version": "8.9.42",
+    "version": "8.9.72",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -20,7 +20,7 @@
       "infoPlist": {
         "NSMotionUsageDescription": "Permita acesso ao sensor de movimento para contar seus passos e corridas no app."
       },
-      "buildNumber": "111"
+      "buildNumber": "142"
     },
     "android": {
       "adaptiveIcon": {
@@ -30,7 +30,7 @@
       "backgroundColor": "#1D2428",
       "package": "com.mycompany.mfitfitnessapp",
       "edgeToEdgeEnabled": true,
-      "versionCode": 111,
+      "versionCode": 142,
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.ACTIVITY_RECOGNITION"
@@ -49,13 +49,6 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Permita localizacao para encontrar alunos proximos em disputas de treino.",
           "locationWhenInUsePermission": "Permita localizacao para ativar ranking por proximidade durante o treino."
-        }
-      ],
-      [
-        "expo-media-library",
-        {
-          "photosPermission": "Permita acesso as fotos para salvar os cards de divulgacao.",
-          "savePhotosPermission": "Permita salvar os cards de divulgacao na galeria."
         }
       ],
       "expo-video",

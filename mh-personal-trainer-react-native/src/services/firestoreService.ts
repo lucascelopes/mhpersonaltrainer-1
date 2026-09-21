@@ -13,6 +13,7 @@ import {
   where, 
   orderBy, 
   limit,
+  setDoc,
   updateDoc,
   serverTimestamp,
   DocumentReference
@@ -344,6 +345,50 @@ async function getCodigoPersonal(uid: string): Promise<string | null> {
     return userCode;
   } catch (error) {
     console.error('Error fetching codigo personal:', error);
+    return null;
+  }
+}
+
+async function ensurePersonalCode(uid: string): Promise<string | null> {
+  try {
+    const existingCode = await getCodigoPersonal(uid);
+    const { numeric, string } = normalizePersonalCode(existingCode);
+    if ((numeric !== null && numeric > 0) || (string && string !== '0')) {
+      return string || String(numeric);
+    }
+
+    const db = getFirebaseDb();
+    const usersRef = collection(db, 'users');
+    let generatedCode = 0;
+
+    for (let attempt = 0; attempt < 10; attempt += 1) {
+      const candidate = Math.floor(1000 + Math.random() * 9000);
+      const exists = await getDocs(
+        query(usersRef, where('codigoPersonal', '==', candidate), limit(1))
+      );
+      if (exists.empty) {
+        generatedCode = candidate;
+        break;
+      }
+    }
+
+    if (!generatedCode) {
+      generatedCode = Math.floor(1000 + Math.random() * 9000);
+    }
+
+    await setDoc(
+      doc(db, 'users', uid),
+      {
+        professorAccount: true,
+        codigoPersonal: generatedCode,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
+
+    return String(generatedCode);
+  } catch (error) {
+    console.error('Error ensuring codigo personal:', error);
     return null;
   }
 }
@@ -1049,6 +1094,7 @@ export const firestoreService = {
   getDashboardStatsForAluno,
   getDashboardStatsForPersonal,
   getCodigoPersonal,
+  ensurePersonalCode,
   getPersonalStudentCapacityByCode,
   updateLastActiveTime,
   updateStudentStatus,

@@ -31,6 +31,46 @@ const mapNotification = (id: string, data: any): NotificationItem => ({
   loginMeta: data.loginMeta,
 });
 
+const isSeenNotification = (data: any) =>
+  Boolean(
+    data?.seen ||
+      data?.visto ||
+      data?.read ||
+      data?.lida ||
+      data?.visualizada ||
+      data?.seenAt ||
+      data?.viewedAt
+  );
+
+const matchesWorkoutNotification = (data: any, workoutId: string) => {
+  const target = String(workoutId);
+  const ids = [
+    data?.workoutId,
+    data?.treinoId,
+    data?.treino?.id,
+    data?.workout?.id,
+    data?.assignment?.workoutId,
+  ];
+  return ids.some((value) => value !== undefined && value !== null && String(value) === target);
+};
+
+const fetchNotificationDocsForUser = async (userId: string) => {
+  const ref = collection(db, 'notificacao');
+  const [userSnapshot, allSnapshot] = await Promise.all([
+    getDocs(query(ref, where('para', '==', userId))),
+    getDocs(query(ref, where('paraTodos', '==', true))),
+  ]);
+
+  const merged = new Map<string, { id: string; data: any }>();
+  userSnapshot.forEach((docItem) => merged.set(docItem.id, { id: docItem.id, data: docItem.data() }));
+  allSnapshot.forEach((docItem) => {
+    if (!merged.has(docItem.id)) {
+      merged.set(docItem.id, { id: docItem.id, data: docItem.data() });
+    }
+  });
+  return Array.from(merged.values());
+};
+
 const formatSecurityDate = (value: Date) =>
   new Intl.DateTimeFormat('pt-BR', {
     dateStyle: 'short',
@@ -151,12 +191,14 @@ export async function createNotification(
 ): Promise<QueryResult<NotificationItem>> {
   try {
     const ref = collection(db, 'notificacao');
+    const workoutId = (payload as any).treinoId || (payload as any).workoutId;
     const docRef = await addDoc(ref, {
       titulo: payload.titulo,
       descricao: payload.descricao,
       tipo: payload.tipo || 'Sistema',
       para: payload.para || null,
       paraTodos: payload.paraTodos || false,
+      ...(workoutId ? { treinoId: workoutId, workoutId, treino: { id: workoutId } } : {}),
       data: Timestamp.now(),
     });
     return {
@@ -169,6 +211,111 @@ export async function createNotification(
     };
   } catch (error: any) {
     return { data: null, error: error.message };
+  }
+}
+
+export async function countPendingNotificationsForUser(
+  userId: string
+): Promise<QueryResult<number>> {
+  try {
+    if (!userId) return { data: 0, error: null };
+    const items = await fetchNotificationDocsForUser(userId);
+    const total = items.filter((item) => !isSeenNotification(item.data)).length;
+    return { data: total, error: null };
+  } catch (error: any) {
+    return { data: 0, error: error?.message || 'Erro ao contar notificacoes' };
+  }
+}
+
+export async function markWorkoutNotificationsAsSeen(
+  userId: string,
+  workoutId: string
+): Promise<void> {
+  if (!userId || !workoutId) return;
+  try {
+    const items = await fetchNotificationDocsForUser(userId);
+    const updates = items
+      .filter((item) => matchesWorkoutNotification(item.data, workoutId))
+      .map((item) =>
+        updateDoc(doc(db, 'notificacao', item.id), {
+          seen: true,
+          visto: true,
+          seenAt: Timestamp.now(),
+          updatedAt: Timestamp.now(),
+        })
+      );
+    await Promise.all(updates);
+  } catch (error) {
+    console.warn('Error marking workout notifications as seen:', error);
+  }
+}
+
+export async function syncWorkoutNotificationStatus(payload: {
+  userId: string;
+  workoutId: string;
+  sessionStatus?: string;
+}): Promise<void> {
+  if (!payload.userId || !payload.workoutId) return;
+  try {
+    const items = await fetchNotificationDocsForUser(payload.userId);
+    const completed = payload.sessionStatus === 'completed';
+    const updates = items
+      .filter((item) => matchesWorkoutNotification(item.data, payload.workoutId))
+      .map((item) =>
+        updateDoc(doc(db, 'notificacao', item.id), {
+          workoutStatus: payload.sessionStatus || null,
+          ...(completed ? { seen: true, visto: true, seenAt: Timestamp.now() } : {}),
+          updatedAt: Timestamp.now(),
+        })
+      );
+    await Promise.all(updates);
+  } catch (error) {
+    console.warn('Error syncing workout notification status:', error);
+  }
+}
+
+export async function sendWorkoutAssignmentNotification(payload: {
+  studentId: string;
+  workoutId: string;
+  workoutName?: string;
+  personalName?: string;
+  isUpdate?: boolean;
+}): Promise<QueryResult<NotificationItem>> {
+  try {
+    const title = payload.isUpdate ? 'Treino atualizado' : 'Novo treino';
+    const workoutName = payload.workoutName?.trim() || 'Treino';
+    const personalName = payload.personalName?.trim();
+    const description = personalName
+      ? `${personalName} ${payload.isUpdate ? 'atualizou' : 'enviou'} ${workoutName}.`
+      : `${payload.isUpdate ? 'Atualizacao de' : 'Novo'} treino: ${workoutName}.`;
+
+    const result = await createNotification({
+      titulo: title,
+      descricao: description,
+      tipo: 'Treino',
+      para: payload.studentId,
+      paraTodos: false,
+      treinoId: payload.workoutId,
+    } as Omit<NotificationItem, 'id' | 'data'>);
+
+    if (!result.error) {
+      try {
+        await sendPushNotificationToUser(payload.studentId, {
+          title,
+          body: description,
+          data: {
+            type: 'workout_assignment',
+            workoutId: payload.workoutId,
+          },
+        });
+      } catch (pushError) {
+        console.warn('Error sending workout push notification:', pushError);
+      }
+    }
+
+    return result;
+  } catch (error: any) {
+    return { data: null, error: error?.message || 'Erro ao enviar notificacao de treino' };
   }
 }
 
