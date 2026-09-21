@@ -504,7 +504,7 @@ async function listenToAlunosDoPersonal(
   let needsReload = false;
 
   const handleError = (error: unknown) => {
-    console.error('Erro ao escutar alunos:', error);
+    console.warn('Aviso ao escutar alunos:', error);
     onError?.(error);
   };
 
@@ -538,25 +538,51 @@ async function listenToAlunosDoPersonal(
   const usersRef = collection(db, 'users');
 
   codeVariants.forEach((value) => {
-    const q = query(usersRef, where('codigoPersonal', '==', value), limit(50));
-    unsubscribers.push(
-      onSnapshot(q, triggerReload, handleError)
-    );
+    try {
+      const q = query(usersRef, where('codigoPersonal', '==', value), limit(50));
+      unsubscribers.push(
+        onSnapshot(q, triggerReload, (err) => {
+          console.warn('Aviso: listener de alunos por código:', err);
+        })
+      );
+    } catch (e) {
+      console.warn('Falha ao registrar listener por código:', e);
+    }
   });
 
-  unsubscribers.push(
-    onSnapshot(doc(db, 'users', uid), triggerReload, handleError)
-  );
-  unsubscribers.push(
-    onSnapshot(collection(db, 'users', uid, 'personalAccount'), triggerReload, handleError)
-  );
-  unsubscribers.push(
-    onSnapshot(
-      query(collection(db, 'professorAccount'), where('uid', '==', uid), limit(1)),
-      triggerReload,
-      handleError
-    )
-  );
+  try {
+    unsubscribers.push(
+      onSnapshot(doc(db, 'users', uid), triggerReload, (err) => {
+        console.warn('Aviso: listener de doc user:', err);
+      })
+    );
+  } catch (e) {
+    console.warn('Falha ao registrar listener do user:', e);
+  }
+
+  try {
+    unsubscribers.push(
+      onSnapshot(collection(db, 'users', uid, 'personalAccount'), triggerReload, (err) => {
+        console.warn('Aviso: listener de personalAccount:', err);
+      })
+    );
+  } catch (e) {
+    console.warn('Falha ao registrar listener personalAccount:', e);
+  }
+
+  try {
+    unsubscribers.push(
+      onSnapshot(
+        query(collection(db, 'professorAccount'), where('uid', '==', uid), limit(1)),
+        triggerReload,
+        (err) => {
+          console.warn('Aviso: listener de professorAccount:', err);
+        }
+      )
+    );
+  } catch (e) {
+    console.warn('Falha ao registrar listener professorAccount:', e);
+  }
 
   return () => {
     unsubscribers.forEach((unsubscribe) => unsubscribe());

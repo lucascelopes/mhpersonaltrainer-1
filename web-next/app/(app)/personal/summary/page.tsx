@@ -129,7 +129,9 @@ export default function PersonalSummaryPage() {
       breadcrumbs={[{ label: 'Painel', href: '/app' }]}
     >
       <section className="personal-summary-page">
-        {dashboard.error ? <p className="personal-summary-alert">{dashboard.error}</p> : null}
+        {dashboard.error && !dashboard.hasLoadedOnce ? (
+          <p className="personal-summary-alert">{dashboard.error}</p>
+        ) : null}
 
         <div className="personal-summary-hero card">
           <div>

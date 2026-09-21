@@ -117,15 +117,15 @@ export function useDashboardData(): DashboardData {
           async (items) => {
             if (!active) return;
             realtimeRef.current = true;
+            setError('');
             setAlunos(items);
             const personalStats = await firestoreService.getDashboardStatsForPersonal(user.uid, items);
             if (!active) return;
             setStats(personalStats);
           },
-          () => {
-            if (active) {
-              setError('Erro ao atualizar alunos em tempo real.');
-            }
+          (err) => {
+            console.warn('Aviso na atualização em tempo real de alunos:', err);
+            // Não poluir o painel com tarja vermelha se já temos dados na tela
           }
         );
         if (!active) {
@@ -134,9 +134,7 @@ export function useDashboardData(): DashboardData {
         }
         unsubscribe = stop;
       } catch (err) {
-        if (active) {
-          setError('Erro ao iniciar atualizacao em tempo real.');
-        }
+        console.warn('Aviso ao iniciar sincronização em tempo real:', err);
       }
     };
 

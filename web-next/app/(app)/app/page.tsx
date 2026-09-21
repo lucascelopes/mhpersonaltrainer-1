@@ -537,7 +537,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {dashboard.error && (
+        {dashboard.error && !dashboard.hasLoadedOnce && (
           <div className="personal-banner">
             <p>{dashboard.error}</p>
           </div>
@@ -964,7 +964,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {dashboard.error && (
+        {dashboard.error && !dashboard.hasLoadedOnce && (
           <div className="student-banner">
             <p>{dashboard.error}</p>
           </div>

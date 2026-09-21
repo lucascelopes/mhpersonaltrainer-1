@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "dev:clean": "npm run clean:next && next dev",
+    "dev": "node ./scripts/dev.js",
+    "dev:clean": "npm run clean:next && node ./scripts/dev.js",
     "build": "next build",
     "build:hosting": "powershell -Command \"$env:HOSTING_BUILD='1'; node ./node_modules/next/dist/bin/next build\"",
     "build:tauri": "powershell -Command \"$env:TAURI_BUILD='1'; node ./node_modules/next/dist/bin/next build\"",
