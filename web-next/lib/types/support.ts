@@ -7,5 +7,6 @@ export interface SupportTicket {
   data?: Date;
   userId?: string;
   resposta?: string;
+  status?: string;
   fotos?: string[];
 }

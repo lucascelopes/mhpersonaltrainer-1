@@ -16,6 +16,7 @@ const mapTicket = (id: string, data: any): SupportTicket => ({
   data: data.d?.toDate ? data.d.toDate() : data.d ? new Date(data.d) : undefined,
   userId: data.user?.id,
   resposta: data.resposta,
+  status: data.status,
   fotos: data.fotos || [],
 });
 

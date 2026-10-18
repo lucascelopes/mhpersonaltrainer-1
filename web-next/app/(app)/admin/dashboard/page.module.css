@@ -1,0 +1,9 @@
+.overview { min-width: 0; display: grid; gap: 18px; }
+.toolbar { display: flex; justify-content: flex-end; }
+.toolbar button { min-height: 48px; }
+.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 16px; }
+.card { min-width: 0; display: grid; gap: 12px; padding: 24px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface-strong); color: var(--text-primary); }
+.card h2 { font-size: 1rem; font-weight: 600; overflow-wrap: anywhere; }
+.card strong { font-size: clamp(2rem, 5vw, 3rem); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.error { color: #a42c28; background: #fff1ef; border: 1px solid #e5aaa5; border-radius: 12px; padding: 16px; overflow-wrap: anywhere; }
+:global(:root[data-theme='dark']) .error { color: #ffc6bf; background: #421e24; border-color: #955561; }

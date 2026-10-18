@@ -22,6 +22,7 @@ import { fetchAllSupportTickets } from '@/lib/services/support';
 import type { PaymentRecord } from '@/lib/types/finance';
 import type { SupportTicket } from '@/lib/types/support';
 import styles from './page.module.css';
+import { normalizeSupportPriority, resolveSupportStatus } from '@/lib/supportTicketState';
 
 type EntryCounts = {
   total: number | null;
@@ -58,7 +59,10 @@ const getPaymentDate = (payment: PaymentRecord) => {
 
 export default function AcademyPortalPage() {
   const { role } = useAuth();
-  const { overview, loading, error } = useAdminDashboardData(true);
+  const { overview, loading, error, refresh } = useAdminDashboardData(true);
+  const [attempt, setAttempt] = useState(0);
+  const [supportError, setSupportError] = useState('');
+  const [personalsError, setPersonalsError] = useState('');
   const [personals, setPersonals] = useState<PersonalProfile[]>([]);
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>([]);
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
@@ -80,43 +84,54 @@ export default function AcademyPortalPage() {
     if (role !== 'admin') return;
     let active = true;
     setLoadingPersonals(true);
+    setPersonals([]);
+    setPersonalsError('');
     firestoreService
-      .fetchPersonals(8)
+      .fetchPersonals(8, { throwOnError: true })
       .then((data) => {
         if (!active) return;
         setPersonals(data);
       })
+      .catch(() => { if (active) setPersonalsError('Não foi possível carregar os personais.'); })
       .finally(() => {
         if (active) setLoadingPersonals(false);
       });
     return () => {
       active = false;
     };
-  }, [role]);
+  }, [role, attempt]);
 
   useEffect(() => {
     if (role !== 'admin') return;
     let active = true;
     setLoadingSupport(true);
+    setSupportTickets([]);
+    setSupportError('');
     fetchAllSupportTickets()
       .then((result) => {
         if (!active) return;
+        if (result.error) {
+          setSupportError('Não foi possível carregar os chamados.');
+          return;
+        }
         if (result.data) {
           setSupportTickets(result.data);
         }
       })
+      .catch(() => { if (active) setSupportError('Não foi possível carregar os chamados.'); })
       .finally(() => {
         if (active) setLoadingSupport(false);
       });
     return () => {
       active = false;
     };
-  }, [role]);
+  }, [role, attempt]);
 
   useEffect(() => {
     if (role !== 'admin') return;
     let active = true;
     setLoadingPayments(true);
+    setPayments([]);
     setFinanceError('');
     const loadPayments = async () => {
       try {
@@ -138,12 +153,13 @@ export default function AcademyPortalPage() {
     return () => {
       active = false;
     };
-  }, [role]);
+  }, [role, attempt]);
 
   useEffect(() => {
     if (role !== 'admin') return;
     let active = true;
     setLoadingEntries(true);
+    setEntries({ total: null, personals: null, alunos: null, academias: null, admins: null });
     setEntriesError('');
     const loadEntries = async () => {
       try {
@@ -195,11 +211,14 @@ export default function AcademyPortalPage() {
     return () => {
       active = false;
     };
-  }, [role]);
+  }, [role, attempt]);
 
-  const totalUsers = overview?.totalUsers ?? 0;
-  const totalPersonals = overview?.totalPersonals ?? 0;
-  const totalAlunos = overview?.totalAlunos ?? 0;
+  const totalUsers = error || !overview ? '—' : overview.totalUsers;
+  const totalPersonals = error || !overview ? '—' : overview.totalPersonals;
+  const totalAlunos = error || !overview ? '—' : overview.totalAlunos;
+  const financeValue = (value: number) => loadingPayments ? '...' : financeError ? '—' : formatCurrency(value);
+  const supportValue = (value: number) => loadingSupport ? '...' : supportError ? '—' : value;
+  const retry = () => { setAttempt((value) => value + 1); void refresh(); };
 
   const recentAlunos = useMemo(
     () => (overview?.recentUsers || []).filter((user) => user.role === 'aluno').slice(0, 6),
@@ -225,8 +244,9 @@ export default function AcademyPortalPage() {
 
   const supportSummary = useMemo(() => {
     const total = supportTickets.length;
-    const abertas = supportTickets.filter((ticket) => !ticket.resposta).length;
-    const alta = supportTickets.filter((ticket) => ticket.priority === 'Alta').length;
+    const abertas = supportTickets.filter((ticket) => resolveSupportStatus(ticket) === 'aberto').length;
+    const alta = supportTickets.filter((ticket) => resolveSupportStatus(ticket) !== 'resolvido' &&
+      ['alta', 'critica'].includes(normalizeSupportPriority(ticket.priority))).length;
     const recente = supportTickets.slice(0, 5);
     return { total, abertas, alta, recente };
   }, [supportTickets]);
@@ -241,9 +261,15 @@ export default function AcademyPortalPage() {
       ]}
     >
       <AdminGate>
+        <div className={styles.refreshRow}>
+          <button type="button" className="button secondary" onClick={retry}
+            disabled={loading || loadingPayments || loadingEntries || loadingSupport || loadingPersonals}>
+            Atualizar dados
+          </button>
+        </div>
         {error && (
           <div className="card" style={{ marginBottom: 24 }}>
-            <p style={{ color: '#c0392b' }}>{error}</p>
+            <p className={styles.error} role="alert">Não foi possível carregar o resumo de usuários.</p>
           </div>
         )}
 
@@ -259,7 +285,7 @@ export default function AcademyPortalPage() {
                 <Link className="button" href="/admin/users">
                   Gerenciar usuários
                 </Link>
-                <Link className="button secondary" href="/support/ticket">
+                <Link className="button secondary" href="/admin/support">
                   Central de suporte
                 </Link>
               </div>
@@ -283,17 +309,17 @@ export default function AcademyPortalPage() {
           <section className="academy-kpi-grid">
             <div className="academy-kpi-card">
               <span>Recebido (amostra)</span>
-              <strong>{formatCurrency(paymentSummary.totalPaid)}</strong>
+              <strong>{financeValue(paymentSummary.totalPaid)}</strong>
               <small>{loadingPayments ? 'Carregando pagamentos...' : 'Últimos 200 pagamentos'}</small>
             </div>
             <div className="academy-kpi-card">
               <span>Pendente (amostra)</span>
-              <strong>{formatCurrency(paymentSummary.totalPending)}</strong>
+              <strong>{financeValue(paymentSummary.totalPending)}</strong>
               <small>Valores aguardando confirmação</small>
             </div>
             <div className="academy-kpi-card">
               <span>Ticket médio</span>
-              <strong>{formatCurrency(paymentSummary.ticketMedio)}</strong>
+              <strong>{financeValue(paymentSummary.ticketMedio)}</strong>
               <small>Baseado nos pagamentos pagos</small>
             </div>
             <div className="academy-kpi-card">
@@ -314,19 +340,19 @@ export default function AcademyPortalPage() {
                   Ver financeiro
                 </Link>
               </div>
-              {financeError && <p className="academy-error">{financeError}</p>}
+              {financeError && <p className={styles.error} role="alert">Não foi possível carregar os pagamentos.</p>}
               <div className="academy-finance-grid">
                 <div>
                   <span>Recebido</span>
-                  <strong>{formatCurrency(paymentSummary.totalPaid)}</strong>
+                  <strong>{financeValue(paymentSummary.totalPaid)}</strong>
                 </div>
                 <div>
                   <span>Pendente</span>
-                  <strong>{formatCurrency(paymentSummary.totalPending)}</strong>
+                  <strong>{financeValue(paymentSummary.totalPending)}</strong>
                 </div>
                 <div>
                   <span>Pagamentos na base</span>
-                  <strong>{payments.length}</strong>
+                  <strong>{loadingPayments ? '...' : financeError ? '—' : payments.length}</strong>
                 </div>
               </div>
               <div className="academy-list">
@@ -349,7 +375,7 @@ export default function AcademyPortalPage() {
                   ))
                 ) : (
                   <p className="subtle">
-                    {loadingPayments ? 'Carregando pagamentos...' : 'Nenhum pagamento encontrado.'}
+                    {loadingPayments ? 'Carregando pagamentos...' : financeError ? 'Pagamentos indisponíveis.' : 'Nenhum pagamento encontrado.'}
                   </p>
                 )}
               </div>
@@ -365,7 +391,7 @@ export default function AcademyPortalPage() {
                   Ver usuários
                 </Link>
               </div>
-              {entriesError && <p className="academy-error">{entriesError}</p>}
+              {entriesError && <p className={styles.error} role="alert">Não foi possível carregar os cadastros do mês.</p>}
               <div className="academy-entry-grid">
                 <div>
                   <span>Alunos</span>
@@ -403,7 +429,7 @@ export default function AcademyPortalPage() {
                     </div>
                   ))
                 ) : (
-                  <p className="subtle">{loading ? 'Carregando...' : 'Nenhum cadastro recente.'}</p>
+                  <p className="subtle">{loading ? 'Carregando...' : error ? 'Cadastros indisponíveis.' : 'Nenhum cadastro recente.'}</p>
                 )}
               </div>
             </div>
@@ -420,6 +446,7 @@ export default function AcademyPortalPage() {
                   Ver todos
                 </Link>
               </div>
+              {personalsError && <p className={styles.error} role="alert">{personalsError}</p>}
               <div className="academy-list">
                 {personals.length ? (
                   personals.map((personal) => (
@@ -438,7 +465,7 @@ export default function AcademyPortalPage() {
                   ))
                 ) : (
                   <p className="subtle">
-                    {loadingPersonals ? 'Carregando personais...' : 'Nenhum personal encontrado.'}
+                    {loadingPersonals ? 'Carregando personais...' : personalsError ? 'Personais indisponíveis.' : 'Nenhum personal encontrado.'}
                   </p>
                 )}
               </div>
@@ -469,7 +496,7 @@ export default function AcademyPortalPage() {
                     </div>
                   ))
                 ) : (
-                  <p className="subtle">{loading ? 'Carregando...' : 'Nenhum aluno recente.'}</p>
+                  <p className="subtle">{loading ? 'Carregando...' : error ? 'Alunos indisponíveis.' : 'Nenhum aluno recente.'}</p>
                 )}
               </div>
             </div>
@@ -482,22 +509,23 @@ export default function AcademyPortalPage() {
                   <h3>Suporte e qualidade</h3>
                   <p className="subtle">Tickets e prioridades.</p>
                 </div>
-                <Link href="/support/ticket" className="personal-link">
-                  Abrir suporte
+                <Link href="/admin/support" className="personal-link">
+                  Ver chamados
                 </Link>
               </div>
+              {supportError && <p className={styles.error} role="alert">{supportError}</p>}
               <div className="academy-support-grid">
                 <div>
                   <span>Tickets</span>
-                  <strong>{supportSummary.total}</strong>
+                  <strong>{supportValue(supportSummary.total)}</strong>
                 </div>
                 <div>
                   <span>Em aberto</span>
-                  <strong>{supportSummary.abertas}</strong>
+                  <strong>{supportValue(supportSummary.abertas)}</strong>
                 </div>
                 <div>
                   <span>Alta prioridade</span>
-                  <strong>{supportSummary.alta}</strong>
+                  <strong>{supportValue(supportSummary.alta)}</strong>
                 </div>
               </div>
               <div className="academy-list">
@@ -516,7 +544,7 @@ export default function AcademyPortalPage() {
                   ))
                 ) : (
                   <p className="subtle">
-                    {loadingSupport ? 'Carregando tickets...' : 'Nenhum ticket recente.'}
+                    {loadingSupport ? 'Carregando tickets...' : supportError ? 'Chamados indisponíveis.' : 'Nenhum ticket recente.'}
                   </p>
                 )}
               </div>
@@ -542,7 +570,7 @@ export default function AcademyPortalPage() {
                   <strong>Treinos da base</strong>
                   <span>Biblioteca e padrões de treino.</span>
                 </Link>
-                <Link href="/support/ticket" className="academy-action-card">
+                <Link href="/admin/support" className="academy-action-card">
                   <strong>Central de suporte</strong>
                   <span>Atendimento rápido e tickets.</span>
                 </Link>

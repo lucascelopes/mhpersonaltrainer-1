@@ -880,7 +880,7 @@ async function getPersonalStudentCapacityByCode(
   }
 }
 
-async function fetchPersonals(limitCount = 50): Promise<PersonalProfile[]> {
+async function fetchPersonals(limitCount = 50, options?: { throwOnError?: boolean }): Promise<PersonalProfile[]> {
   try {
     const db = getFirebaseDb();
     const usersRef = collection(db, 'users');
@@ -918,6 +918,7 @@ async function fetchPersonals(limitCount = 50): Promise<PersonalProfile[]> {
     return Array.from(merged.values());
   } catch (error) {
     console.error('Error fetching personals:', error);
+    if (options?.throwOnError) throw error;
     return [];
   }
 }

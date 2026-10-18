@@ -3,36 +3,38 @@
 import PageShell from '@/components/PageShell';
 import AdminGate from '@/components/AdminGate';
 import { useAdminDashboardData } from '@/lib/hooks/useAdminDashboardData';
+import styles from './page.module.css';
 
 export default function AdminDashboardPage() {
-  const { overview, error } = useAdminDashboardData(true);
+  const { overview, loading, error, refresh } = useAdminDashboardData(true);
+  const metrics = [
+    ['Usuários', overview?.totalUsers],
+    ['Personais', overview?.totalPersonals],
+    ['Academias', overview?.totalAcademies],
+    ['Administradores', overview?.totalAdmins],
+    ['Alunos', overview?.totalAlunos],
+  ] as const;
 
   return (
-    <PageShell
-      title="Admin dashboard"
-      description="Visao geral de usuarios, alunos e receitas."
-      breadcrumbs={[{ label: 'Admin', href: '/admin' }]}
-    >
+    <PageShell title="Visão geral do Admin" description="Cadastros por perfil no MH Personal."
+      breadcrumbs={[{ label: 'Admin', href: '/admin' }]}>
       <AdminGate>
-        {error && <p style={{ color: '#c0392b' }}>{error}</p>}
-        <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
-          <div className="card">
-            <h3>Usuarios</h3>
-            <p className="subtle" style={{ marginTop: 8 }}>{overview?.totalUsers ?? 0}</p>
+        <section className={styles.overview} aria-label="Resumo de cadastros" aria-busy={loading}>
+          <div className={styles.toolbar}>
+            <button type="button" className="button secondary" onClick={() => void refresh()} disabled={loading}>
+              {loading ? 'Atualizando...' : 'Atualizar dados'}
+            </button>
           </div>
-          <div className="card">
-            <h3>Personals</h3>
-            <p className="subtle" style={{ marginTop: 8 }}>{overview?.totalPersonals ?? 0}</p>
+          {error && <p className={styles.error} role="alert">Não foi possível carregar os cadastros. Tente atualizar os dados.</p>}
+          <div className={styles.metrics}>
+            {metrics.map(([label, value]) => (
+              <div className={styles.card} key={label}>
+                <h2>{label}</h2>
+                <strong>{loading ? '...' : error || value === undefined ? '—' : value}</strong>
+              </div>
+            ))}
           </div>
-          <div className="card">
-            <h3>Admins</h3>
-            <p className="subtle" style={{ marginTop: 8 }}>{overview?.totalAdmins ?? 0}</p>
-          </div>
-          <div className="card">
-            <h3>Alunos</h3>
-            <p className="subtle" style={{ marginTop: 8 }}>{overview?.totalAlunos ?? 0}</p>
-          </div>
-        </div>
+        </section>
       </AdminGate>
     </PageShell>
   );

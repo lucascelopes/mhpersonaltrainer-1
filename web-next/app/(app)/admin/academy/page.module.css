@@ -2,6 +2,37 @@
   min-width: 0;
 }
 
+.refreshRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.refreshRow button {
+  min-height: 48px;
+}
+
+.portal :global(.academy-section-header .personal-link) {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+}
+
+.error {
+  color: #a42c28;
+  padding: 12px;
+  border: 1px solid #e5aaa5;
+  background: #fff1ef;
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+}
+
+:global(:root[data-theme='dark']) .error {
+  color: #ffc6bf;
+  background: #421e24;
+  border-color: #955561;
+}
+
 :global(:root[data-theme='dark']) .portal :global(.academy-hero-metrics) {
   background: var(--surface-soft);
   border-color: var(--border);
@@ -27,9 +58,4 @@
     min-height: 48px;
   }
 
-  .portal :global(.academy-section-header .personal-link) {
-    display: inline-flex;
-    min-height: 48px;
-    align-items: center;
-  }
 }
