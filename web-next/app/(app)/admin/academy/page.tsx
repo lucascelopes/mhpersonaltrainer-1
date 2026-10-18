@@ -27,7 +27,11 @@ type EntryCounts = {
   total: number | null;
   personals: number | null;
   alunos: number | null;
+  academias: number | null;
+  admins: number | null;
 };
+
+const isEnabledFlag = (value: unknown) => value === true || value === 'true' || value === 1;
 
 const mapPayment = (id: string, data: any): PaymentRecord => ({
   id,
@@ -63,6 +67,8 @@ export default function AcademyPortalPage() {
     total: null,
     personals: null,
     alunos: null,
+    academias: null,
+    admins: null,
   });
   const [entriesError, setEntriesError] = useState('');
   const [loadingEntries, setLoadingEntries] = useState(false);
@@ -145,30 +151,42 @@ export default function AcademyPortalPage() {
         const usersRef = collection(db, 'users');
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        const snapshot = await getDocs(query(usersRef, where('created_time', '>=', startOfMonth)));
+        const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        const snapshot = await getDocs(query(
+          usersRef,
+          where('created_time', '>=', startOfMonth),
+          where('created_time', '<', startOfNextMonth)
+        ));
         if (!active) return;
         let total = 0;
         let personalsCount = 0;
         let adminsCount = 0;
+        let academiasCount = 0;
+        let alunosCount = 0;
         snapshot.forEach((docItem) => {
           const data = docItem.data();
           total += 1;
-          if (data.admin) {
+          if (isEnabledFlag(data.admin)) {
             adminsCount += 1;
-          } else if (data.professorAccount) {
+          } else if (isEnabledFlag(data.academyAccount)) {
+            academiasCount += 1;
+          } else if (isEnabledFlag(data.professorAccount)) {
             personalsCount += 1;
+          } else {
+            alunosCount += 1;
           }
         });
-        const alunosCount = Math.max(0, total - personalsCount - adminsCount);
         setEntries({
           total,
           personals: personalsCount,
           alunos: alunosCount,
+          academias: academiasCount,
+          admins: adminsCount,
         });
       } catch (err: any) {
         if (!active) return;
-        setEntriesError(err.message || 'Erro ao carregar entradas.');
-        setEntries({ total: null, personals: null, alunos: null });
+        setEntriesError(err.message || 'Erro ao carregar cadastros.');
+        setEntries({ total: null, personals: null, alunos: null, academias: null, admins: null });
       } finally {
         if (active) setLoadingEntries(false);
       }
@@ -235,7 +253,7 @@ export default function AcademyPortalPage() {
               <p className="academy-eyebrow">Operação central</p>
               <h2>Controle total da academia</h2>
               <p className="subtle">
-                Acompanhe entradas de alunos e personais, valores recebidos e suporte em um único painel.
+                Acompanhe cadastros de alunos e personais, valores recebidos e suporte em um único painel.
               </p>
               <div className="academy-hero-actions">
                 <Link className="button" href="/admin/users">
@@ -248,11 +266,11 @@ export default function AcademyPortalPage() {
             </div>
             <div className="academy-hero-metrics">
               <div>
-                <span>Alunos ativos</span>
+                <span>Alunos cadastrados</span>
                 <strong>{loading ? '...' : totalAlunos}</strong>
               </div>
               <div>
-                <span>Personais ativos</span>
+                <span>Personais cadastrados</span>
                 <strong>{loading ? '...' : totalPersonals}</strong>
               </div>
               <div>
@@ -279,7 +297,7 @@ export default function AcademyPortalPage() {
               <small>Baseado nos pagamentos pagos</small>
             </div>
             <div className="academy-kpi-card">
-              <span>Entradas do mês</span>
+              <span>Cadastros do mês</span>
               <strong>{loadingEntries ? '...' : entries.total ?? '--'}</strong>
               <small>Cadastros desde o início do mês</small>
             </div>
@@ -340,7 +358,7 @@ export default function AcademyPortalPage() {
             <div className="card academy-section">
               <div className="academy-section-header">
                 <div>
-                  <h3>Entradas do mês</h3>
+                  <h3>Cadastros do mês</h3>
                   <p className="subtle">Novos cadastros por perfil.</p>
                 </div>
                 <Link href="/admin/users" className="personal-link">
@@ -356,6 +374,14 @@ export default function AcademyPortalPage() {
                 <div>
                   <span>Personais</span>
                   <strong>{loadingEntries ? '...' : entries.personals ?? '--'}</strong>
+                </div>
+                <div>
+                  <span>Academias</span>
+                  <strong>{loadingEntries ? '...' : entries.academias ?? '--'}</strong>
+                </div>
+                <div>
+                  <span>Admins</span>
+                  <strong>{loadingEntries ? '...' : entries.admins ?? '--'}</strong>
                 </div>
                 <div>
                   <span>Total</span>
@@ -531,11 +557,11 @@ export default function AcademyPortalPage() {
                   <strong>{loading ? '...' : totalAlunos}</strong>
                 </div>
                 <div>
-                  <span>Entradas de personais</span>
+                  <span>Novos personais no mês</span>
                   <strong>{loadingEntries ? '...' : entries.personals ?? '--'}</strong>
                 </div>
                 <div>
-                  <span>Entradas de alunos</span>
+                  <span>Novos alunos no mês</span>
                   <strong>{loadingEntries ? '...' : entries.alunos ?? '--'}</strong>
                 </div>
               </div>
