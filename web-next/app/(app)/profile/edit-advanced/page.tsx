@@ -35,8 +35,11 @@ export default function ProfileEditAdvancedPage() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!userId) return;
-    const codigoNumero = codigoPersonal ? Number(codigoPersonal) : null;
-    if (canLinkPersonal && codigoPersonal && (codigoNumero === null || Number.isNaN(codigoNumero) || codigoNumero <= 0)) {
+    const codigoTexto = codigoPersonal.trim();
+    const codigoNumero = codigoTexto ? Number(codigoTexto) : null;
+    const codigoValido =
+      /^\d+$/.test(codigoTexto) && codigoNumero !== null && Number.isSafeInteger(codigoNumero) && codigoNumero > 0;
+    if (canLinkPersonal && codigoTexto && !codigoValido) {
       setError('Informe um código do personal válido.');
       setMessage('');
       return;
