@@ -1,0 +1,19 @@
+.squad :global(.academy-squad-details > div) {
+  display: grid;
+  gap: 4px;
+}
+
+@media (max-width: 640px) {
+  .squad :global(.academy-squad-card-actions) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .squad :global(.academy-squad-card-actions .button) {
+    width: 100%;
+    min-height: 48px;
+    flex: none;
+    justify-content: center;
+  }
+}

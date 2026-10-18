@@ -5,6 +5,7 @@ import PageShell from '@/components/PageShell';
 import AcademyGate from '@/components/AcademyGate';
 import { formatDate } from '@/lib/firestoreHooks';
 import { useAcademyData } from '@/lib/hooks/useAcademyData';
+import styles from './page.module.css';
 
 export default function AcademyPersonalsPage() {
   const { personals, students, summary, academyCode, loadingAcademy, academyError } = useAcademyData();
@@ -38,7 +39,7 @@ export default function AcademyPersonalsPage() {
           </div>
         )}
 
-        <div className="academy-squad">
+        <div className={`academy-squad ${styles.squad}`}>
           <section className="academy-squad-hero">
             <div className="academy-squad-hero-main">
               <p className="academy-squad-kicker">Equipe da academia</p>
