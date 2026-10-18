@@ -1,0 +1,112 @@
+.layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  min-width: 0;
+}
+
+.card {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.card h2,
+.preferenceDescription {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.card h2 {
+  font-size: 1.1rem;
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  color: var(--text-primary);
+  font-size: 0.94rem;
+  font-weight: 600;
+}
+
+.control {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-strong);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.control:focus-visible {
+  outline: 3px solid rgba(29, 111, 191, 0.3);
+  outline-offset: 2px;
+  border-color: rgba(29, 111, 191, 0.76);
+}
+
+.submit {
+  min-height: 48px;
+  justify-self: start;
+}
+
+.success,
+.error {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.success {
+  color: #16713c;
+}
+
+.error {
+  color: #b42318;
+}
+
+.preferenceLinks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.preferenceLinks a {
+  min-height: 48px;
+  justify-content: center;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .submit,
+  .preferenceLinks a {
+    width: 100%;
+  }
+
+  .submit {
+    justify-self: stretch;
+  }
+
+  .preferenceLinks {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

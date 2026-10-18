@@ -1,15 +1,20 @@
 'use client';
 
 import { useEffect, useState, type FormEvent } from 'react';
+import Link from 'next/link';
 import PageShell from '@/components/PageShell';
 import { useDocumentData, useUserScope } from '@/lib/firestoreHooks';
 import { firestoreService } from '@/lib/services/firestoreService';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
+import { useAuth } from '@/lib/auth';
+import styles from './page.module.css';
 
 export default function ProfileEditAdvancedPage() {
+  const { role } = useAuth();
   const { userId } = useUserScope();
   const { data } = useDocumentData<any>(['users', userId]);
+  const canLinkPersonal = role === 'aluno';
 
   const [codigoPersonal, setCodigoPersonal] = useState('');
   const [cidade, setCidade] = useState('');
@@ -30,10 +35,9 @@ export default function ProfileEditAdvancedPage() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!userId) return;
-    const isPersonalAccount = data?.professorAccount === true || data?.professorAccount === 'true';
     const codigoNumero = codigoPersonal ? Number(codigoPersonal) : null;
-    if (codigoPersonal && (codigoNumero === null || Number.isNaN(codigoNumero) || codigoNumero <= 0)) {
-      setError('Informe um codigo do personal valido.');
+    if (canLinkPersonal && codigoPersonal && (codigoNumero === null || Number.isNaN(codigoNumero) || codigoNumero <= 0)) {
+      setError('Informe um código do personal válido.');
       setMessage('');
       return;
     }
@@ -47,15 +51,15 @@ export default function ProfileEditAdvancedPage() {
         objetivoNoApp: objetivo,
       };
 
-      if (!isPersonalAccount && codigoNumero) {
+      if (canLinkPersonal && codigoNumero) {
         const capacity = await firestoreService.getPersonalStudentCapacityByCode(codigoNumero, {
           excludeUserId: userId,
         });
         if (!capacity.allowed) {
           setError(
             capacity.reason === 'personal_not_found'
-              ? 'Codigo do personal nao encontrado.'
-              : 'Esse personal ja atingiu o limite de 4 alunos no plano gratuito. Peca para ele assinar o Premium para liberar alunos ilimitados.'
+              ? 'Código do personal não encontrado.'
+              : 'Esse personal já atingiu o limite de 4 alunos no plano gratuito. Peça para ele assinar o Premium para liberar alunos ilimitados.'
           );
           return;
         }
@@ -63,13 +67,16 @@ export default function ProfileEditAdvancedPage() {
         if (capacity.personalName) {
           updates.nameDoSeuPersonal = capacity.personalName;
         }
-      } else if (!isPersonalAccount) {
+      } else if (canLinkPersonal) {
         updates.codigoPersonal = codigoNumero;
         updates.nameDoSeuPersonal = '';
       }
 
       await updateDoc(doc(db, 'users', userId), updates);
-      setMessage('Dados atualizados.');
+      setMessage('Dados atualizados com sucesso.');
+    } catch (saveError) {
+      console.error('Erro ao salvar perfil avançado:', saveError);
+      setError('Não foi possível salvar agora. Tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -77,67 +84,74 @@ export default function ProfileEditAdvancedPage() {
 
   return (
     <PageShell
-      title="Editar perfil avancado"
-      description="Dados extras, preferencias e codigo do personal."
+      title="Editar perfil avançado"
+      description={canLinkPersonal ? 'Dados extras, preferências e código do personal.' : 'Dados extras e preferências.'}
       breadcrumbs={[{ label: 'Perfil', href: '/profile' }]}
     >
-      <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
-        <div className="card">
-          <h3>Informacoes extras</h3>
-          <form style={{ marginTop: 12, display: 'grid', gap: 10 }} onSubmit={handleSubmit}>
-            <label>
-              Codigo do personal
+      <div className={styles.layout}>
+        <section className={`card ${styles.card}`}>
+          <h2>Informações extras</h2>
+          <form className={styles.form} onSubmit={handleSubmit}>
+            {canLinkPersonal && (
+              <label className={styles.field}>
+                <span>Código do personal</span>
+                <input
+                  className={styles.control}
+                  type="text"
+                  inputMode="numeric"
+                  value={codigoPersonal}
+                  onChange={(event) => setCodigoPersonal(event.target.value)}
+                  placeholder="12345"
+                />
+              </label>
+            )}
+            <label className={styles.field}>
+              <span>Cidade</span>
               <input
-                type="text"
-                value={codigoPersonal}
-                onChange={(event) => setCodigoPersonal(event.target.value)}
-                placeholder="12345"
-                style={{ marginTop: 6, width: '100%', padding: 10, borderRadius: 10, border: '1px solid var(--border)' }}
-              />
-            </label>
-            <label>
-              Cidade
-              <input
+                className={styles.control}
                 type="text"
                 value={cidade}
                 onChange={(event) => setCidade(event.target.value)}
-                placeholder="Sao Paulo"
-                style={{ marginTop: 6, width: '100%', padding: 10, borderRadius: 10, border: '1px solid var(--border)' }}
+                placeholder="São Paulo"
               />
             </label>
-            <label>
-              Estado
+            <label className={styles.field}>
+              <span>Estado</span>
               <input
+                className={styles.control}
                 type="text"
                 value={estado}
                 onChange={(event) => setEstado(event.target.value)}
                 placeholder="SP"
-                style={{ marginTop: 6, width: '100%', padding: 10, borderRadius: 10, border: '1px solid var(--border)' }}
               />
             </label>
-            <label>
-              Objetivo no app
+            <label className={styles.field}>
+              <span>Objetivo no app</span>
               <input
+                className={styles.control}
                 type="text"
                 value={objetivo}
                 onChange={(event) => setObjetivo(event.target.value)}
                 placeholder="Emagrecimento, hipertrofia..."
-                style={{ marginTop: 6, width: '100%', padding: 10, borderRadius: 10, border: '1px solid var(--border)' }}
               />
             </label>
-            {message && <p style={{ color: '#1b7f3b' }}>{message}</p>}
-            {error && <p style={{ color: '#c0392b' }}>{error}</p>}
-            <button className="button" type="submit" disabled={loading}>
+            {message && <p className={styles.success} role="status">{message}</p>}
+            {error && <p className={styles.error} role="alert">{error}</p>}
+            <button className={`button ${styles.submit}`} type="submit" disabled={loading || !role}>
               {loading ? 'Salvando...' : 'Salvar'}
             </button>
           </form>
-        </div>
-        <div className="card">
-          <h3>Preferencias</h3>
-          <p className="subtle" style={{ marginTop: 8 }}>
-            Ajuste seu idioma e estilo de notificacao.
+        </section>
+        <section className={`card ${styles.card}`}>
+          <h2>Preferências</h2>
+          <p className={`subtle ${styles.preferenceDescription}`}>
+            Ajuste seu idioma e estilo de notificação.
           </p>
-        </div>
+          <nav className={styles.preferenceLinks} aria-label="Configurações de preferência">
+            <Link className="button secondary" href="/profile/language">Idioma</Link>
+            <Link className="button secondary" href="/profile/notifications">Notificações</Link>
+          </nav>
+        </section>
       </div>
     </PageShell>
   );
