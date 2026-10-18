@@ -7,7 +7,7 @@ export default function ProfileEditPage() {
   return (
     <PageShell
       title="Editar perfil"
-      description="Atualize informacoes pessoais da sua conta."
+      description="Atualize as informações pessoais da sua conta."
       breadcrumbs={[{ label: 'Perfil', href: '/profile' }]}
     >
       <ProfileInfoEditor />

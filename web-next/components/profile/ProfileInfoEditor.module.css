@@ -111,3 +111,38 @@
   display: flex;
   justify-content: flex-start;
 }
+
+.actions button {
+  min-height: 48px;
+}
+
+@media (max-width: 640px) {
+  .field input,
+  .field textarea {
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  .tabs {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tabButton,
+  .actions button {
+    width: 100%;
+  }
+
+  .tabButton {
+    min-height: 48px;
+    font-size: 16px;
+  }
+}
+
+.tabButton:focus-visible,
+.field input:focus-visible,
+.field textarea:focus-visible,
+.actions button:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.55);
+  outline-offset: 2px;
+}

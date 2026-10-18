@@ -91,7 +91,7 @@ export default function ProfileInfoEditor({
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!userId) {
-      setError('Usuario nao identificado.');
+      setError('Usuário não identificado.');
       return;
     }
     setLoading(true);
@@ -117,10 +117,10 @@ export default function ProfileInfoEditor({
     }
     try {
       await updateDoc(doc(db, 'users', userId), payload);
-      setMessage('Informacoes atualizadas com sucesso.');
+      setMessage('Informações atualizadas com sucesso.');
     } catch (saveError) {
       console.error('Erro ao salvar perfil:', saveError);
-      setError('Nao foi possivel salvar agora. Tente novamente.');
+      setError('Não foi possível salvar agora. Tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -132,16 +132,18 @@ export default function ProfileInfoEditor({
   return (
     <div className={variant === 'card' ? `card ${styles.editor}` : styles.editor}>
       {includeProfessionalFields && (
-        <div className={styles.tabs}>
+        <div className={styles.tabs} role="group" aria-label="Seção de edição do perfil">
           <button
             type="button"
+            aria-pressed={activeTab === 'personal'}
             className={`${styles.tabButton} ${activeTab === 'personal' ? styles.tabButtonActive : ''}`}
             onClick={() => setActiveTab('personal')}
           >
-            Informacoes pessoais
+            Informações pessoais
           </button>
           <button
             type="button"
+            aria-pressed={activeTab === 'professional'}
             className={`${styles.tabButton} ${activeTab === 'professional' ? styles.tabButtonActive : ''}`}
             onClick={() => setActiveTab('professional')}
           >
@@ -153,7 +155,7 @@ export default function ProfileInfoEditor({
       <form className={styles.form} onSubmit={handleSubmit}>
         {showPersonalTab && (
           <section className={styles.section}>
-            <h3>Informacoes do usuario</h3>
+            <h3>Informações do usuário</h3>
             <div className={styles.fieldGrid}>
               <label className={styles.field}>
                 <span>Nome completo</span>
@@ -162,12 +164,15 @@ export default function ProfileInfoEditor({
                   value={form.displayName}
                   onChange={setField('displayName')}
                   placeholder="Seu nome"
+                  autoComplete="name"
                 />
               </label>
               <label className={styles.field}>
                 <span>Telefone</span>
                 <input
-                  type="text"
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
                   value={form.phone}
                   onChange={setField('phone')}
                   placeholder="(11) 99999-9999"
@@ -175,11 +180,23 @@ export default function ProfileInfoEditor({
               </label>
               <label className={styles.field}>
                 <span>Cidade</span>
-                <input type="text" value={form.cidade} onChange={setField('cidade')} placeholder="Sao Paulo" />
+                <input
+                  type="text"
+                  autoComplete="address-level2"
+                  value={form.cidade}
+                  onChange={setField('cidade')}
+                  placeholder="São Paulo"
+                />
               </label>
               <label className={styles.field}>
                 <span>Estado</span>
-                <input type="text" value={form.estado} onChange={setField('estado')} placeholder="SP" />
+                <input
+                  type="text"
+                  autoComplete="address-level1"
+                  value={form.estado}
+                  onChange={setField('estado')}
+                  placeholder="SP"
+                />
               </label>
             </div>
             <label className={styles.field}>
@@ -188,7 +205,7 @@ export default function ProfileInfoEditor({
                 rows={4}
                 value={form.bio}
                 onChange={setField('bio')}
-                placeholder="Conte um pouco sobre voce"
+                placeholder="Conte um pouco sobre você"
               />
             </label>
           </section>
@@ -238,11 +255,11 @@ export default function ProfileInfoEditor({
           </section>
         )}
 
-        {message ? <p className={styles.success}>{message}</p> : null}
-        {error ? <p className={styles.error}>{error}</p> : null}
+        {message ? <p className={styles.success} role="status">{message}</p> : null}
+        {error ? <p className={styles.error} role="alert">{error}</p> : null}
         <div className={styles.actions}>
           <button className="button" type="submit" disabled={loading}>
-            {loading ? 'Salvando...' : 'Salvar alteracoes'}
+            {loading ? 'Salvando…' : 'Salvar alterações'}
           </button>
         </div>
       </form>

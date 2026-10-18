@@ -108,6 +108,7 @@ export default function RootLayout({
     <html
       lang="pt-br"
       className={`${manrope.variable} ${spaceGrotesk.variable} ${sora.variable} ${oswald.variable} ${merriweather.variable}`}
+      suppressHydrationWarning
     >
       <body>
         <Script id="theme-init" strategy="beforeInteractive">
