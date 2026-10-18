@@ -1,0 +1,21 @@
+.portal {
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .portal :global(.academy-hero-actions) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .portal :global(.academy-hero-actions .button) {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .portal :global(.academy-section-header .personal-link) {
+    display: inline-flex;
+    min-height: 48px;
+    align-items: center;
+  }
+}

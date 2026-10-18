@@ -21,6 +21,7 @@ import { formatCurrency } from '@/lib/services/payments';
 import { fetchAllSupportTickets } from '@/lib/services/support';
 import type { PaymentRecord } from '@/lib/types/finance';
 import type { SupportTicket } from '@/lib/types/support';
+import styles from './page.module.css';
 
 type EntryCounts = {
   total: number | null;
@@ -32,7 +33,7 @@ const mapPayment = (id: string, data: any): PaymentRecord => ({
   id,
   valorDaCombranca: data.valorDaCombranca ?? 0,
   todoDiaDoMes: data.todoDiaDoMes,
-  descricao: data.descricao || 'Cobranca',
+  descricao: data.descricao || 'Cobrança',
   pago: data.Pago ?? data.pago ?? false,
   repetirPMes: data.repetirPMes,
   diaDoPagamento: data.diaDoPagamento ?? data.todoDiaDoMes,
@@ -215,10 +216,10 @@ export default function AcademyPortalPage() {
   return (
     <PageShell
       title="Portal da academia"
-      description="Gestao completa de alunos, personais, financeiro e suporte."
+      description="Gestão completa de alunos, personais, financeiro e suporte."
       actions={[
-        { label: 'Usuarios', href: '/admin/users' },
-        { label: 'Notificacoes', href: '/notifications/admin' },
+        { label: 'Usuários', href: '/admin/users' },
+        { label: 'Notificações', href: '/notifications/admin' },
       ]}
     >
       <AdminGate>
@@ -228,17 +229,17 @@ export default function AcademyPortalPage() {
           </div>
         )}
 
-        <div className="academy-panel">
+        <div className={`academy-panel ${styles.portal}`}>
           <section className="academy-hero-card">
             <div className="academy-hero-content">
-              <p className="academy-eyebrow">Operacao central</p>
+              <p className="academy-eyebrow">Operação central</p>
               <h2>Controle total da academia</h2>
               <p className="subtle">
-                Acompanhe entradas de alunos e personais, valores recebidos e suporte em um unico painel.
+                Acompanhe entradas de alunos e personais, valores recebidos e suporte em um único painel.
               </p>
               <div className="academy-hero-actions">
                 <Link className="button" href="/admin/users">
-                  Gerenciar usuarios
+                  Gerenciar usuários
                 </Link>
                 <Link className="button secondary" href="/support/ticket">
                   Central de suporte
@@ -255,7 +256,7 @@ export default function AcademyPortalPage() {
                 <strong>{loading ? '...' : totalPersonals}</strong>
               </div>
               <div>
-                <span>Usuarios totais</span>
+                <span>Usuários totais</span>
                 <strong>{loading ? '...' : totalUsers}</strong>
               </div>
             </div>
@@ -265,22 +266,22 @@ export default function AcademyPortalPage() {
             <div className="academy-kpi-card">
               <span>Recebido (amostra)</span>
               <strong>{formatCurrency(paymentSummary.totalPaid)}</strong>
-              <small>{loadingPayments ? 'Carregando pagamentos...' : 'Ultimos 200 pagamentos'}</small>
+              <small>{loadingPayments ? 'Carregando pagamentos...' : 'Últimos 200 pagamentos'}</small>
             </div>
             <div className="academy-kpi-card">
               <span>Pendente (amostra)</span>
               <strong>{formatCurrency(paymentSummary.totalPending)}</strong>
-              <small>Valores aguardando confirmacao</small>
+              <small>Valores aguardando confirmação</small>
             </div>
             <div className="academy-kpi-card">
-              <span>Ticket medio</span>
+              <span>Ticket médio</span>
               <strong>{formatCurrency(paymentSummary.ticketMedio)}</strong>
               <small>Baseado nos pagamentos pagos</small>
             </div>
             <div className="academy-kpi-card">
-              <span>Entradas do mes</span>
+              <span>Entradas do mês</span>
               <strong>{loadingEntries ? '...' : entries.total ?? '--'}</strong>
-              <small>Cadastros desde o inicio do mes</small>
+              <small>Cadastros desde o início do mês</small>
             </div>
           </section>
 
@@ -289,7 +290,7 @@ export default function AcademyPortalPage() {
               <div className="academy-section-header">
                 <div>
                   <h3>Fluxo financeiro</h3>
-                  <p className="subtle">Entradas e cobrancas recentes.</p>
+                  <p className="subtle">Entradas e cobranças recentes.</p>
                 </div>
                 <Link href="/financeiro" className="personal-link">
                   Ver financeiro
@@ -315,9 +316,9 @@ export default function AcademyPortalPage() {
                   paymentSummary.recentPayments.map((payment) => (
                     <div key={payment.id} className="academy-list-item">
                       <div>
-                        <strong>{payment.descricao || 'Cobranca'}</strong>
+                        <strong>{payment.descricao || 'Cobrança'}</strong>
                         <span>
-                          {getPaymentDate(payment) ? formatDate(getPaymentDate(payment)) : 'Data nao informada'}
+                          {getPaymentDate(payment) ? formatDate(getPaymentDate(payment)) : 'Data não informada'}
                         </span>
                       </div>
                       <div className="academy-list-meta">
@@ -339,11 +340,11 @@ export default function AcademyPortalPage() {
             <div className="card academy-section">
               <div className="academy-section-header">
                 <div>
-                  <h3>Entradas do mes</h3>
+                  <h3>Entradas do mês</h3>
                   <p className="subtle">Novos cadastros por perfil.</p>
                 </div>
                 <Link href="/admin/users" className="personal-link">
-                  Ver usuarios
+                  Ver usuários
                 </Link>
               </div>
               {entriesError && <p className="academy-error">{entriesError}</p>}
@@ -367,7 +368,7 @@ export default function AcademyPortalPage() {
                     <div key={user.id} className="academy-list-item">
                       <div>
                         <strong>{user.name}</strong>
-                        <span>{user.email || 'Email nao informado'}</span>
+                        <span>{user.email || 'E-mail não informado'}</span>
                       </div>
                       <div className="academy-list-meta">
                         <span className="academy-pill">{user.role}</span>
@@ -400,12 +401,12 @@ export default function AcademyPortalPage() {
                       <div>
                         <strong>{personal.displayName}</strong>
                         <span>
-                          {personal.cidade ? `${personal.cidade}${personal.estado ? ` / ${personal.estado}` : ''}` : 'Cidade nao informada'}
+                          {personal.cidade ? `${personal.cidade}${personal.estado ? ` / ${personal.estado}` : ''}` : 'Cidade não informada'}
                         </span>
                       </div>
                       <div className="academy-list-meta">
-                        <span className="academy-pill">Codigo {personal.codigoPersonal ?? '--'}</span>
-                        <strong>{personal.servicos?.length || 0} servicos</strong>
+                        <span className="academy-pill">Código {personal.codigoPersonal ?? '--'}</span>
+                        <strong>{personal.servicos?.length || 0} serviços</strong>
                       </div>
                     </div>
                   ))
@@ -421,7 +422,7 @@ export default function AcademyPortalPage() {
               <div className="academy-section-header">
                 <div>
                   <h3>Alunos recentes</h3>
-                  <p className="subtle">Ultimos alunos cadastrados.</p>
+                  <p className="subtle">Últimos alunos cadastrados.</p>
                 </div>
                 <Link href="/admin/users" className="personal-link">
                   Ver alunos
@@ -433,7 +434,7 @@ export default function AcademyPortalPage() {
                     <div key={aluno.id} className="academy-list-item">
                       <div>
                         <strong>{aluno.name}</strong>
-                        <span>{aluno.email || 'Email nao informado'}</span>
+                        <span>{aluno.email || 'E-mail não informado'}</span>
                       </div>
                       <div className="academy-list-meta">
                         <span className="academy-pill">Aluno</span>
@@ -498,26 +499,26 @@ export default function AcademyPortalPage() {
             <div className="card academy-section">
               <div className="academy-section-header">
                 <div>
-                  <h3>Acoes da academia</h3>
-                  <p className="subtle">Atalhos de operacao diaria.</p>
+                  <h3>Ações da academia</h3>
+                  <p className="subtle">Atalhos de operação diária.</p>
                 </div>
               </div>
               <div className="academy-actions-grid">
                 <Link href="/admin/users" className="academy-action-card">
-                  <strong>Gerenciar usuarios</strong>
-                  <span>Permissoes, bloqueios e acesso.</span>
+                  <strong>Gerenciar usuários</strong>
+                  <span>Permissões, bloqueios e acesso.</span>
                 </Link>
                 <Link href="/financeiro" className="academy-action-card">
                   <strong>Fluxo financeiro</strong>
-                  <span>Pagamentos, repasses e cobrancas.</span>
+                  <span>Pagamentos, repasses e cobranças.</span>
                 </Link>
                 <Link href="/workouts" className="academy-action-card">
                   <strong>Treinos da base</strong>
-                  <span>Biblioteca e padroes de treino.</span>
+                  <span>Biblioteca e padrões de treino.</span>
                 </Link>
                 <Link href="/support/ticket" className="academy-action-card">
                   <strong>Central de suporte</strong>
-                  <span>Atendimento rapido e tickets.</span>
+                  <span>Atendimento rápido e tickets.</span>
                 </Link>
               </div>
               <div className="academy-split-list">
