@@ -1,3 +1,19 @@
+:root[data-theme='dark'] .academy-agenda-page .academy-agenda-hero {
+  background: var(--surface-strong);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+:root[data-theme='dark'] .academy-agenda-page .academy-agenda-day:not(.is-selected) {
+  background: var(--surface-soft);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+:root[data-theme='dark'] .academy-agenda-page .academy-agenda-day.is-outside {
+  opacity: 0.68;
+}
+
 @media (max-width: 720px) {
   .academy-agenda-page .academy-agenda-calendar-head {
     display: grid;
