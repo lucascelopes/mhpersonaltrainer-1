@@ -1,0 +1,20 @@
+.app-content .grid > .card > a[target='_blank'] {
+  width: 100%;
+  min-width: 0;
+  justify-content: center;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #0b6bd8;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+}
+
+.app-content .grid > .card > a[target='_blank']:hover {
+  background: #0957b1;
+}
+
+.app-content .grid > .card > a[target='_blank']:focus-visible {
+  outline: 3px solid #f59e0b;
+  outline-offset: 3px;
+}

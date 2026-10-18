@@ -1,4 +1,5 @@
 import ExerciseDetailPage from './ClientPage';
+import './exercise-detail.css';
 
 export const dynamicParams = process.env.NODE_ENV !== 'production';
 
