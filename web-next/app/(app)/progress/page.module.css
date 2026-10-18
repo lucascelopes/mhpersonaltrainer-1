@@ -2,6 +2,12 @@
   min-width: 0;
 }
 
+.progress :global(.student-list-item > div:first-child) {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
 @media (max-width: 720px) {
   .progress :global(.student-workout-detail-header) {
     grid-template-columns: 48px minmax(0, 1fr) 48px;

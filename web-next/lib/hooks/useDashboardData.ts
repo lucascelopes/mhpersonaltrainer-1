@@ -38,12 +38,11 @@ export function useDashboardData(): DashboardData {
   const isAcademy = role === 'academy';
 
   const mapUserWorkoutToTreino = (workout: UserWorkout): Treino => {
-    const intervalos = workout.intervalo || [];
     return {
       id: workout.id,
       nome: workout.nomeDoTreino || 'Treino',
-      tipo: 'Musculacao',
-      duracao: intervalos.length ? `${intervalos.length * 2} min` : undefined,
+      tipo: 'Treino',
+      duracao: workout.duracao?.trim() || undefined,
       exercicios: Array.isArray(workout.treino) ? workout.treino.length : 0,
       concluido: Boolean(workout.lastCompletedAt),
       dataCriacao: workout.createdAt,

@@ -50,6 +50,7 @@ function StudentProgress() {
   const recentEvaluations = useMemo(() => evaluationsSorted.slice(0, 5), [evaluationsSorted]);
 
   const completionRate = Number.isFinite(stats.taxaConclusao) ? Math.round(stats.taxaConclusao) : 0;
+  const pendingWorkouts = Math.max(0, stats.totalTreinos - stats.treinosConcluidos);
 
   const getEvaluationLabel = (type?: string) => {
     if (!type) return 'Avaliação';
@@ -102,12 +103,12 @@ function StudentProgress() {
         </div>
         <div className="student-progress-row">
           <div className="student-progress-metric">
-            <strong>{stats.sequenciaAtual}</strong>
-            <span>Sequência</span>
+            <strong>{pendingWorkouts}</strong>
+            <span>Não concluídos</span>
           </div>
           <div className="student-progress-metric">
             <strong>{completionRate}%</strong>
-            <span>Taxa</span>
+            <span>Conclusão</span>
           </div>
         </div>
       </div>
@@ -123,12 +124,17 @@ function StudentProgress() {
           <div className="student-list">
             {recentWorkouts.map((treino) => {
               const workoutDate = treino.lastCompletedAt || treino.dataCriacao;
-              const statusLabel = treino.concluido ? 'Concluído' : 'Em andamento';
+              const statusLabel = treino.concluido ? 'Concluído' : 'Não concluído';
+              const exerciseLabel = typeof treino.exercicios === 'number'
+                ? treino.exercicios === 0
+                  ? 'Sem exercícios cadastrados'
+                  : `${treino.exercicios} ${treino.exercicios === 1 ? 'exercício' : 'exercícios'}`
+                : treino.tipo || 'Treino';
               return (
                 <Link key={treino.id} href={`/workout/${treino.id}`} className="student-list-item">
                   <div>
                     <strong>{treino.nome || 'Treino'}</strong>
-                    <span>{treino.tipo || 'Treino'}</span>
+                    <span>{exerciseLabel}</span>
                   </div>
                   <div className="student-list-meta">
                     <span>{statusLabel}</span>
