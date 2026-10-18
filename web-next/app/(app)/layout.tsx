@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import AuthGate from '@/components/AuthGate';
 import AppShell from '@/components/AppShell';
+import './student-dark-surfaces.css';
 
 export const metadata: Metadata = {
   robots: {

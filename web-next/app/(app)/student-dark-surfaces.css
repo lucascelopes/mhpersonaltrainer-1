@@ -1,0 +1,24 @@
+:root[data-theme='dark'] .student-progress-card,
+:root[data-theme='dark'] .student-list-item,
+:root[data-theme='dark'] .student-empty-state,
+:root[data-theme='dark'] .student-empty {
+  background: var(--surface-strong);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+:root[data-theme='dark'] .student-progress-metric {
+  background: var(--surface-soft);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+:root[data-theme='dark'] .student-progress .student-list-meta {
+  border-color: var(--border);
+}
+
+:root[data-theme='dark'] .student-workout-back {
+  background: var(--surface-strong);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
