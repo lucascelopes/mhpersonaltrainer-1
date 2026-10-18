@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import PageShell from '@/components/PageShell';
+import styles from './page.module.css';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/lib/firebaseClient';
 import { useAuth } from '@/lib/auth';
@@ -34,7 +35,7 @@ export default function AiImageAnalysisPage() {
     position: PhotoPosition;
   } | null>(null);
   const previewUrl = useMemo(() => (file ? URL.createObjectURL(file) : ''), [file]);
-  const statusLabel = loading ? 'Analisando' : result ? 'Analise pronta' : 'Aguardando';
+  const statusLabel = loading ? 'Analisando' : result ? 'Análise pronta' : 'Aguardando';
   const statusHint = result
     ? 'Confira os detalhes antes de salvar.'
     : 'Envie a imagem para iniciar a leitura.';
@@ -81,7 +82,7 @@ export default function AiImageAnalysisPage() {
           item.obsFotoFrontal ||
           item.obsFotoLateral ||
           item.obsFotoPosterior ||
-          'Sem observacoes.';
+          'Sem observações.';
         const createdAt = item.dateForAvaliacaoPostural || item.createdAt || item.data;
         return {
           id: item.id,
@@ -190,11 +191,11 @@ export default function AiImageAnalysisPage() {
       const lines = [
         positionLabel ? `Foto: ${positionLabel}` : null,
         result.postura ? `Postura: ${result.postura}` : null,
-        result.descricaoPostura ? `Descricao: ${result.descricaoPostura}` : null,
-        result.metricas ? `Metricas: ${result.metricas}` : null,
+        result.descricaoPostura ? `Descrição: ${result.descricaoPostura}` : null,
+        result.metricas ? `Métricas: ${result.metricas}` : null,
         result.textoDetalhado ? `Detalhes: ${result.textoDetalhado}` : null,
       ].filter(Boolean) as string[];
-      const observacoes = lines.join('\n') || 'Analise gerada pela IA.';
+      const observacoes = lines.join('\n') || 'Análise gerada pela IA.';
 
       const fotosPostura = {
         anterior: analysisContext.position === 'frontal' ? uploadedUrl : undefined,
@@ -215,10 +216,10 @@ export default function AiImageAnalysisPage() {
       if (response.error) {
         setSaveError(response.error);
       } else {
-        setSaveMessage(`Analise salva para ${analysisContext.studentLabel || 'aluno'}.`);
+        setSaveMessage(`Análise salva para ${analysisContext.studentLabel || 'aluno'}.`);
       }
     } catch (err: any) {
-      setSaveError(err.message || 'Erro ao salvar analise.');
+      setSaveError(err.message || 'Erro ao salvar análise.');
     } finally {
       setSaving(false);
     }
@@ -227,18 +228,18 @@ export default function AiImageAnalysisPage() {
   if (!aiAccess.loading && !aiAccess.premium) {
     return (
       <PageShell
-        title="Analise de imagem"
-        description="Envie fotos para analise postural com IA."
+        title="Análise de imagem"
+        description="Envie fotos para análise postural com IA."
         breadcrumbs={[{ label: 'IA Hub', href: '/ai' }]}
       >
-        <section className="ai-page">
-          <div className="card">
+        <section className={`ai-page ${styles.imagePage}`}>
+          <div className={`card ${styles.premiumCard}`}>
             <p className="pill">Premium</p>
-            <h3>Analise postural por imagem</h3>
-            <p className="subtle" style={{ marginTop: 8 }}>
-              Este recurso de IA esta disponivel apenas no plano Premium.
+            <h2>Análise postural por imagem</h2>
+            <p className={`subtle ${styles.premiumDescription}`}>
+              Este recurso de IA está disponível apenas no plano Premium.
             </p>
-            <div style={{ marginTop: 12, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <div className={styles.premiumActions}>
               <Link href="/profile/subscription" className="button">
                 Ver assinatura
               </Link>
@@ -254,29 +255,29 @@ export default function AiImageAnalysisPage() {
 
   return (
     <PageShell
-      title="Analise de imagem"
-      description="Envie fotos para analise postural com IA."
+      title="Análise de imagem"
+      description="Envie fotos para análise postural com IA."
       breadcrumbs={[{ label: 'IA Hub', href: '/ai' }]}
     >
-      <section className="ai-page">
+      <section className={`ai-page ${styles.imagePage}`}>
         <div className="ai-image-hero">
           <div className="ai-image-hero-copy">
             <p className="pill">IA postural</p>
-            <h2>Analise postural por imagem</h2>
+            <h2>Análise postural por imagem</h2>
             <p className="subtle">
-              Envie fotos frontais e laterais para gerar um resumo tecnico com
-              observacoes e metricas.
+              Envie fotos frontais e laterais para gerar um resumo técnico com
+              observações e métricas.
             </p>
             <div className="ai-status-row">
               <span className="ai-tag">Beta</span>
-              <span className="ai-tag">Tempo medio: 15s</span>
+              <span className="ai-tag">Etapa: análise da foto</span>
               <span className="ai-tag">Formatos: JPG, PNG</span>
             </div>
           </div>
           <div className="ai-image-hero-cards">
             <div className="ai-card">
-              <span>Status da analise</span>
-              <strong>{statusLabel}</strong>
+              <span>Status da análise</span>
+              <strong role="status">{statusLabel}</strong>
               <small>{statusHint}</small>
             </div>
             <div className="ai-card">
@@ -297,7 +298,7 @@ export default function AiImageAnalysisPage() {
             <div className="ai-card-header">
               <div>
                 <h3>Enviar imagem</h3>
-                <p className="subtle">Carregue a foto do aluno para iniciar a avaliacao.</p>
+                <p className="subtle">Carregue a foto do aluno para iniciar a avaliação.</p>
               </div>
               <span className="ai-tag ai-tag--compact">Beta</span>
             </div>
@@ -326,7 +327,7 @@ export default function AiImageAnalysisPage() {
                   )}
                 </label>
                 <label>
-                  Posicao da foto
+                  Posição da foto
                   <select
                     value={photoPosition}
                     onChange={(event) => setPhotoPosition(event.target.value as PhotoPosition)}
@@ -340,7 +341,7 @@ export default function AiImageAnalysisPage() {
               {isPersonal && !students.length && (
                 <div className="ai-context-hint">
                   <p className="subtle">
-                    Nenhum aluno vinculado ao seu codigo. Convide pelo menu de alunos.
+                    Nenhum aluno vinculado ao seu código. Convide pelo menu de alunos.
                   </p>
                   <Link className="button secondary sm" href="/students">
                     Ver alunos
@@ -364,7 +365,7 @@ export default function AiImageAnalysisPage() {
                 />
                 <div>
                   <strong>{file ? 'Arquivo selecionado' : 'Clique para enviar a imagem'}</strong>
-                  <span>Use fotos com boa iluminacao e fundo neutro.</span>
+                  <span>Use fotos com boa iluminação e fundo neutro.</span>
                 </div>
               </label>
               {fileMeta && <p className="ai-file-meta">{fileMeta}</p>}
@@ -377,7 +378,7 @@ export default function AiImageAnalysisPage() {
                   <span>Preview da imagem aparece aqui.</span>
                 </div>
               )}
-              {error && <p className="ai-alert">{error}</p>}
+              {error && <p className="ai-alert" role="alert">{error}</p>}
               <div className="ai-upload-actions">
                 <button className="button" type="submit" disabled={loading || !file}>
                   {loading ? 'Analisando...' : 'Analisar'}
@@ -396,7 +397,7 @@ export default function AiImageAnalysisPage() {
                   <h3>Resultado</h3>
                   <p className="subtle">Resumo da leitura postural.</p>
                 </div>
-                <span className="ai-tag">{result ? 'Analise pronta' : 'Aguardando'}</span>
+                <span className="ai-tag">{result ? 'Análise pronta' : 'Aguardando'}</span>
               </div>
               {result ? (
                 <>
@@ -406,11 +407,11 @@ export default function AiImageAnalysisPage() {
                       <strong>{result.postura || '-'}</strong>
                     </div>
                     <div className="ai-result-item">
-                      <span>Descricao</span>
+                      <span>Descrição</span>
                       <strong>{result.descricaoPostura || '-'}</strong>
                     </div>
                     <div className="ai-result-item">
-                      <span>Metricas</span>
+                      <span>Métricas</span>
                       <strong>{result.metricas || '-'}</strong>
                     </div>
                     <div className="ai-result-item">
@@ -431,23 +432,23 @@ export default function AiImageAnalysisPage() {
                       onClick={handleSave}
                       disabled={!analysisContext?.studentId || saving}
                     >
-                      {saving ? 'Salvando...' : 'Salvar avaliacao'}
+                      {saving ? 'Salvando...' : 'Salvar avaliação'}
                     </button>
                     {analysisContext?.studentId ? (
                       <span className="subtle">
-                        Sera salvo para {analysisContext.studentLabel || 'o aluno'}.
+                        Será salvo para {analysisContext.studentLabel || 'o aluno'}.
                       </span>
                     ) : (
                       <span className="subtle">Selecione um aluno antes de salvar.</span>
                     )}
                   </div>
-                  {saveError && <p className="ai-alert">{saveError}</p>}
-                  {saveMessage && <p className="ai-success">{saveMessage}</p>}
+                  {saveError && <p className="ai-alert" role="alert">{saveError}</p>}
+                  {saveMessage && <p className="ai-success" role="status">{saveMessage}</p>}
                 </>
               ) : (
                 <div className="ai-result-empty">
                   <h4>Aguardando imagem</h4>
-                  <p className="subtle">Envie uma foto para ver a analise completa.</p>
+                  <p className="subtle">Envie uma foto para ver a análise completa.</p>
                 </div>
               )}
             </div>
@@ -462,7 +463,7 @@ export default function AiImageAnalysisPage() {
             </div>
 
             <div className="card ai-info-card">
-              <h3>Sugestoes de captura</h3>
+              <h3>Sugestões de captura</h3>
               <ul className="ai-checklist">
                 {captureTips.map((item) => (
                   <li key={item}>{item}</li>
@@ -473,12 +474,12 @@ export default function AiImageAnalysisPage() {
             <div className="card ai-info-card ai-analysis-card">
               <div className="ai-card-header">
                 <div>
-                  <h3>Analises salvas</h3>
+                  <h3>Análises salvas</h3>
                   <p className="subtle">
-                    {targetUserId ? `Historico recente de ${targetLabel}.` : 'Selecione um aluno para ver o historico.'}
+                    {targetUserId ? `Histórico recente de ${targetLabel}.` : 'Selecione um aluno para ver o histórico.'}
                   </p>
                 </div>
-                <span className="ai-tag">Historico</span>
+                <span className="ai-tag">Histórico</span>
               </div>
               {!targetUserId ? (
                 <p className="subtle">Defina um aluno para carregar as avaliacoes salvas.</p>
@@ -488,7 +489,7 @@ export default function AiImageAnalysisPage() {
                     <li key={item.id} className="ai-analysis-item">
                       <div className="ai-analysis-preview">
                         {item.photo ? (
-                          <img src={item.photo} alt="Foto da avaliacao" />
+                          <img src={item.photo} alt="Foto da avaliação" />
                         ) : (
                           <span>Sem foto</span>
                         )}
@@ -504,7 +505,7 @@ export default function AiImageAnalysisPage() {
                   ))}
                 </ul>
               ) : (
-                <p className="subtle">Nenhuma analise salva ainda.</p>
+                <p className="subtle">Nenhuma análise salva ainda.</p>
               )}
             </div>
           </div>
