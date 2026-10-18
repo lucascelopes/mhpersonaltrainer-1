@@ -29,7 +29,7 @@ import {
   updateWorkout,
 } from '@/lib/services/workouts';
 import type { Exercise, UserWorkout } from '@/lib/types/workout';
-import { getMHWorkoutPhoto } from '@/lib/workoutPhotos';
+import { getMHWorkoutPhoto, resolveMHWorkoutPhoto } from '@/lib/workoutPhotos';
 import { useSearchParams, usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import {
@@ -1231,10 +1231,11 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
         carga: workout.carga?.[index],
         intervalo: workout.intervalo?.[index],
         videoUrl: workout.videoUrls?.[index],
-        photoUrl: workout.fotoUrls?.[index] || getMHWorkoutPhoto(
+        photoUrl: resolveMHWorkoutPhoto(
           String(name || ''),
           '',
-          workout.exercicios?.[index]?.exerciseId
+          workout.exercicios?.[index]?.exerciseId,
+          workout.fotoUrls?.[index]
         ),
       }))
       .filter((item) => item.name);

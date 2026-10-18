@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import PageShell from '@/components/PageShell';
 import { fetchExerciseById } from '@/lib/services/workouts';
+import { getMHWorkoutPhoto } from '@/lib/workoutPhotos';
 import { usePathname } from 'next/navigation';
 
 export default function ExerciseDetailPage({ params }: { params: { id: string } }) {
@@ -50,13 +51,16 @@ export default function ExerciseDetailPage({ params }: { params: { id: string } 
             <p className="subtle" style={{ marginTop: 8 }}>
               Colecao: {exercise.colecao || 'geral'}
             </p>
-            {exercise.fotoDoTreino && (
-              <img
-                src={exercise.fotoDoTreino}
-                alt={exercise.nomeDoTreino}
-                style={{ marginTop: 16, borderRadius: 12, width: '100%' }}
-              />
-            )}
+            <img
+              src={getMHWorkoutPhoto(exercise.nomeDoTreino, exercise.colecao, exerciseId)}
+              alt={exercise.nomeDoTreino}
+              style={{ marginTop: 16, borderRadius: 12, width: '100%' }}
+              onError={(event) => {
+                if (exercise.fotoDoTreino && event.currentTarget.getAttribute('src') !== exercise.fotoDoTreino) {
+                  event.currentTarget.src = exercise.fotoDoTreino;
+                }
+              }}
+            />
           </div>
           <div className="card">
             <h3>Series e descanso</h3>
