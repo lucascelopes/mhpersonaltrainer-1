@@ -15,6 +15,7 @@ import {
 import { fetchUserWorkouts } from '@/lib/services/workouts';
 import type { Appointment, AppointmentStatus, AppointmentType } from '@/lib/types/scheduling';
 import type { UserWorkout } from '@/lib/types/workout';
+import './academy-agenda-mobile.css';
 
 type AgendaSource = 'appointment' | 'workout';
 
@@ -25,7 +26,7 @@ type AcademyAgendaItem = Appointment & {
 
 const TYPE_LABELS: Record<AppointmentType, string> = {
   treino: 'Treino',
-  avaliacao: 'Avaliacao',
+  avaliacao: 'Avaliação',
   consulta: 'Consulta',
   acompanhamento: 'Acompanhamento',
   online: 'Online',
@@ -36,13 +37,19 @@ const STATUS_LABELS: Record<AppointmentStatus, string> = {
   agendado: 'Agendado',
   confirmado: 'Confirmado',
   em_andamento: 'Em andamento',
-  concluido: 'Concluido',
+  concluido: 'Concluído',
   cancelado: 'Cancelado',
   reagendado: 'Reagendado',
-  nao_compareceu: 'Nao compareceu',
+  nao_compareceu: 'Não compareceu',
 };
 
-const WEEKDAY_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+const WEEKDAY_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+const calendarDayFormatter = new Intl.DateTimeFormat('pt-BR', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
 
 const normalizeWeekday = (value: string) =>
   value
@@ -377,7 +384,7 @@ export default function AcademyAgendaPage() {
                 <div className="academy-signal-card">
                   <span>Agendamentos</span>
                   <strong>{loading ? '...' : totalAppointments}</strong>
-                  <small>Calendario</small>
+                  <small>Calendário</small>
                 </div>
                 <div className="academy-signal-card">
                   <span>Treinos</span>
@@ -385,7 +392,7 @@ export default function AcademyAgendaPage() {
                   <small>Planejados</small>
                 </div>
                 <div className="academy-signal-card">
-                  <span>Proximos</span>
+                  <span>Próximos</span>
                   <strong>{loading ? '...' : upcoming.length}</strong>
                   <small>Em aberto</small>
                 </div>
@@ -397,7 +404,7 @@ export default function AcademyAgendaPage() {
             <aside className="academy-block academy-agenda-calendar">
               <div className="academy-agenda-calendar-head">
                 <div>
-                  <p className="academy-block-kicker">Calendario da agenda</p>
+                  <p className="academy-block-kicker">Calendário da agenda</p>
                   <h3 className="academy-agenda-month">{monthLabel}</h3>
                   <p className="subtle">
                     {selectedDate
@@ -410,7 +417,7 @@ export default function AcademyAgendaPage() {
                     type="button"
                     className="button secondary sm"
                     onClick={() => handleShiftMonth(-1)}
-                    aria-label="Mes anterior"
+                    aria-label="Mês anterior"
                   >
                     {'<'}
                   </button>
@@ -421,7 +428,7 @@ export default function AcademyAgendaPage() {
                     type="button"
                     className="button secondary sm"
                     onClick={() => handleShiftMonth(1)}
-                    aria-label="Proximo mes"
+                    aria-label="Próximo mês"
                   >
                     {'>'}
                   </button>
@@ -442,6 +449,13 @@ export default function AcademyAgendaPage() {
                     className={`academy-agenda-day ${day.inCurrentMonth ? '' : 'is-outside'} ${
                       day.isToday ? 'is-today' : ''
                     } ${selectedDate && sameDay(day.date, selectedDate) ? 'is-selected' : ''}`}
+                    aria-label={`${calendarDayFormatter.format(day.date)}${
+                      day.eventCount > 0
+                        ? `, ${day.eventCount} ${day.eventCount === 1 ? 'item' : 'itens'} na agenda`
+                        : ''
+                    }`}
+                    aria-current={day.isToday ? 'date' : undefined}
+                    aria-pressed={sameDay(day.date, selectedDate ?? undefined)}
                     onClick={() => handleSelectDay(day.date)}
                   >
                     <span>{day.date.getDate()}</span>
@@ -453,8 +467,8 @@ export default function AcademyAgendaPage() {
               <div className="academy-agenda-calendar-foot">
                 <span>
                   {nextEvent
-                    ? `Proximo evento: ${formatDate(nextEvent.data)}${nextEvent.horaInicio ? ` as ${nextEvent.horaInicio}` : ''}.`
-                    : 'Sem proximos eventos na agenda.'}
+                    ? `Próximo evento: ${formatDate(nextEvent.data)}${nextEvent.horaInicio ? ` às ${nextEvent.horaInicio}` : ''}.`
+                    : 'Sem próximos eventos na agenda.'}
                 </span>
                 {selectedDate && (
                   <button
@@ -473,15 +487,17 @@ export default function AcademyAgendaPage() {
                 <div>
                   <p className="academy-block-kicker">Agenda unificada</p>
                   <h3>Compromissos e treinos da base da academia</h3>
-                  <p className="subtle">Busca por aluno, personal e servico.</p>
+                  <p className="subtle">Busca por aluno, personal e serviço.</p>
                 </div>
                 <div className="academy-agenda-filters">
                   <input
+                    aria-label="Buscar compromissos por aluno, personal ou treino"
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
                     placeholder="Buscar aluno, personal ou treino"
                   />
                   <select
+                    aria-label="Filtrar agenda por origem"
                     value={sourceFilter}
                     onChange={(event) => setSourceFilter(event.target.value as AgendaSource | 'all')}
                   >
@@ -490,6 +506,7 @@ export default function AcademyAgendaPage() {
                     <option value="workout">Treino</option>
                   </select>
                   <select
+                    aria-label="Filtrar agenda por tipo"
                     value={typeFilter}
                     onChange={(event) => setTypeFilter(event.target.value as AppointmentType | 'all')}
                   >
@@ -501,6 +518,7 @@ export default function AcademyAgendaPage() {
                     ))}
                   </select>
                   <select
+                    aria-label="Filtrar agenda por status"
                     value={statusFilter}
                     onChange={(event) => setStatusFilter(event.target.value as AppointmentStatus | 'all')}
                   >
@@ -515,8 +533,8 @@ export default function AcademyAgendaPage() {
               </div>
 
               <div className="academy-agenda-focus">
-                <span>{selectedDate ? `Dia selecionado: ${dateLabel}` : 'Visao geral ativa'}</span>
-                <strong>{displayItems.length} resultado(s)</strong>
+                <span>{selectedDate ? `Dia selecionado: ${dateLabel}` : 'Visão geral ativa'}</span>
+                <strong>{displayItems.length} {displayItems.length === 1 ? 'resultado' : 'resultados'}</strong>
               </div>
 
               {loadingAcademy || loading ? (

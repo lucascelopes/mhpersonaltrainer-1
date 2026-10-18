@@ -1,0 +1,84 @@
+@media (max-width: 720px) {
+  .academy-agenda-page .academy-agenda-calendar-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .academy-agenda-page .academy-agenda-calendar-head > div:first-child {
+    min-width: 0;
+  }
+
+  .academy-agenda-page .academy-agenda-calendar-controls {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+    gap: 8px;
+  }
+
+  .academy-agenda-page .academy-agenda-calendar-controls .button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-width: 48px;
+    min-height: 48px;
+    padding-inline: 8px;
+  }
+
+  .academy-agenda-page .academy-agenda-calendar-foot > *,
+  .academy-agenda-page .academy-agenda-card-header > div,
+  .academy-agenda-page .academy-agenda-meta > * {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .academy-agenda-page .academy-agenda-filters input,
+  .academy-agenda-page .academy-agenda-filters select {
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  .academy-agenda-page .academy-agenda-pill {
+    max-width: 100%;
+    line-height: 1.25;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .academy-agenda-page .academy-agenda-calendar-foot .button,
+  .academy-agenda-page .academy-agenda-actions .button {
+    min-height: 48px;
+  }
+}
+
+@media (max-width: 420px) {
+  .academy-agenda-page .academy-signal-card span,
+  .academy-agenda-page .academy-signal-card small {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .academy-agenda-page .academy-agenda-calendar {
+    width: calc(100% + 28px);
+    margin-inline: -14px;
+  }
+
+  .academy-agenda-page .academy-agenda-weekdays,
+  .academy-agenda-page .academy-agenda-days {
+    width: calc(100% + 46px);
+    margin-inline: -23px;
+    column-gap: 0;
+  }
+
+  .academy-agenda-page .academy-agenda-days {
+    row-gap: 4px;
+  }
+
+  .academy-agenda-page .academy-agenda-day {
+    min-width: 0;
+    border-radius: 8px;
+  }
+}
