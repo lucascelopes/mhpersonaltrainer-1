@@ -2,6 +2,23 @@
   min-width: 0;
 }
 
+.resultsCount {
+  margin: 0 0 12px;
+  color: var(--hub-muted);
+  font-size: 0.875rem;
+}
+
+.emptyState {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.emptyState :global(.button) {
+  min-height: 48px;
+}
+
 @media (max-width: 720px) {
   .checkins :global(.academy-checkins-filters) {
     display: grid;

@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { collection, limit, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import PageShell from '@/components/PageShell';
 import AcademyGate from '@/components/AcademyGate';
-import { formatDate } from '@/lib/firestoreHooks';
 import { useAcademyData } from '@/lib/hooks/useAcademyData';
 import { getFirebaseDb } from '@/lib/services/firebase';
 import styles from './page.module.css';
@@ -56,6 +55,12 @@ const formatToken = (value?: string | null) => {
   return `${value.slice(0, 4)}...${value.slice(-4)}`;
 };
 
+const formatEntryDateTime = (value: Date) =>
+  new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(value);
+
+const normalizeSearch = (value: string) =>
+  value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
 export default function AcademyCheckinsPage() {
   const { academyCodeRaw } = useAcademyData();
   const [entries, setEntries] = useState<CheckinEntry[]>([]);
@@ -67,11 +72,15 @@ export default function AcademyCheckinsPage() {
 
   useEffect(() => {
     if (!academyCodeRaw) {
+      setEntries([]);
       setError('Código da academia não encontrado.');
       setLoading(false);
       return;
     }
 
+    setEntries([]);
+    setError('');
+    setLoading(true);
     const db = getFirebaseDb();
     const entriesRef = collection(db, 'academyCheckins');
     const entriesQuery = query(
@@ -104,6 +113,7 @@ export default function AcademyCheckinsPage() {
           } as CheckinEntry;
         });
         setEntries(items);
+        setError('');
         setLoading(false);
       },
       (err) => {
@@ -116,16 +126,23 @@ export default function AcademyCheckinsPage() {
   }, [academyCodeRaw]);
 
   const filteredEntries = useMemo(() => {
-    const term = searchQuery.trim().toLowerCase();
+    const term = normalizeSearch(searchQuery.trim());
     return entries.filter((entry) => {
       if (methodFilter !== 'all' && entry.method !== methodFilter) return false;
       if (validationFilter !== 'all' && entry.validation !== validationFilter) return false;
       if (!term) return true;
-      const name = (entry.studentName || '').toLowerCase();
-      const studentId = (entry.studentId || '').toLowerCase();
+      const name = normalizeSearch(entry.studentName || '');
+      const studentId = normalizeSearch(entry.studentId || '');
       return name.includes(term) || studentId.includes(term);
     });
   }, [entries, methodFilter, searchQuery, validationFilter]);
+
+  const hasFilters = Boolean(searchQuery.trim()) || methodFilter !== 'all' || validationFilter !== 'all';
+  const clearFilters = () => {
+    setSearchQuery('');
+    setMethodFilter('all');
+    setValidationFilter('all');
+  };
 
   const totals = useMemo(() => {
     const counts = { total: entries.length, biometria: 0, foto: 0, nfc: 0 };
@@ -163,7 +180,7 @@ export default function AcademyCheckinsPage() {
             </div>
             <div className="academy-checkins-stats">
               <div>
-                <span>Total</span>
+                <span>Recentes</span>
                 <strong>{totals.total}</strong>
               </div>
               <div>
@@ -185,10 +202,11 @@ export default function AcademyCheckinsPage() {
             <div className="academy-checkins-header">
               <div>
                 <h3>Registros recentes</h3>
-                <p className="subtle">Lista completa de entradas registradas.</p>
+                <p className="subtle">Até 200 entradas mais recentes da academia.</p>
               </div>
               <div className="academy-checkins-filters">
                 <input
+                  aria-label="Buscar por aluno ou UID"
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder="Buscar por aluno ou UID"
@@ -221,7 +239,13 @@ export default function AcademyCheckinsPage() {
               </div>
             </div>
 
-            {loading ? (
+            {!loading && !error && entries.length > 0 ? (
+              <p className={styles.resultsCount} role="status" aria-live="polite">
+                {filteredEntries.length} de {entries.length} {entries.length === 1 ? 'entrada' : 'entradas'}
+              </p>
+            ) : null}
+
+            {error ? null : loading ? (
               <p className="subtle">Carregando entradas...</p>
             ) : filteredEntries.length ? (
               <div className="academy-checkins-grid">
@@ -238,7 +262,7 @@ export default function AcademyCheckinsPage() {
                     </div>
                     <div className="academy-checkins-meta">
                       <span>
-                        Entrada: {entry.createdAt ? formatDate(entry.createdAt) : 'Sem data'}
+                        Entrada: {entry.createdAt ? formatEntryDateTime(entry.createdAt) : 'Sem data e horário'}
                       </span>
                       <span className="academy-checkins-pill">
                         {validationLabels[entry.validation || ''] || 'Manual'}
@@ -263,7 +287,16 @@ export default function AcademyCheckinsPage() {
                 ))}
               </div>
             ) : (
-              <p className="subtle">Nenhuma entrada registrada ainda.</p>
+              <div className={styles.emptyState} role="status">
+                <p className="subtle">
+                  {entries.length ? 'Nenhuma entrada corresponde à busca ou aos filtros.' : 'Nenhuma entrada registrada ainda.'}
+                </p>
+                {hasFilters ? (
+                  <button type="button" className="button secondary" onClick={clearFilters}>
+                    Limpar filtros
+                  </button>
+                ) : null}
+              </div>
             )}
           </section>
         </div>
