@@ -19,6 +19,21 @@
   min-height: 48px;
 }
 
+:global(:root[data-theme='dark']) .checkins :global(.academy-checkins-hero),
+:global(:root[data-theme='dark']) .checkins :global(.academy-checkins-card) {
+  background: var(--surface-strong);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+:global(:root[data-theme='dark']) .checkins :global(.academy-checkins-stats div),
+:global(:root[data-theme='dark']) .checkins :global(.academy-checkins-tag),
+:global(:root[data-theme='dark']) .checkins :global(.academy-checkins-pill) {
+  background: var(--surface-soft);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
 @media (max-width: 720px) {
   .checkins :global(.academy-checkins-filters) {
     display: grid;
