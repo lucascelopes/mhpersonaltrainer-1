@@ -7,6 +7,7 @@ import { useUserScope } from '@/lib/firestoreHooks';
 import { useAuth } from '@/lib/auth';
 import { fetchAvailableExercises, fetchUserWorkoutById, fetchUserWorkouts, updateUserWorkout } from '@/lib/services/workouts';
 import type { UserWorkout } from '@/lib/types/workout';
+import styles from './page.module.css';
 
 const IconClose = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true" className="student-icon">
@@ -74,13 +75,13 @@ const parseMetricValue = (value: number | string | undefined, fallback: number) 
 
 export default function StartWorkoutPage() {
   const { userId } = useUserScope();
-  const { role } = useAuth();
+  const { user, role, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const workoutParam = searchParams.get('workoutId') || searchParams.get('id');
   const studentId = searchParams.get('studentId') || '';
-  const targetUserId = studentId || userId;
   const isStudent = role === 'aluno';
+  const targetUserId = authLoading || !role ? '' : isStudent ? user?.uid || '' : studentId || userId;
 
   const [workout, setWorkout] = useState<UserWorkout | null>(null);
   const [loading, setLoading] = useState(true);
@@ -297,21 +298,39 @@ export default function StartWorkoutPage() {
       .join(' - ');
 
     return (
-      <section className="student-start">
+      <section className={`student-start ${styles.root}`}>
         <header className="student-start-header">
-          <button type="button" className="student-start-action" onClick={() => router.back()}>
+          <button
+            type="button"
+            className="student-start-action"
+            onClick={() => router.back()}
+            aria-label="Sair do treino em andamento"
+          >
             <IconClose />
           </button>
           <div className="student-start-title">
             <strong>{workout?.nomeDoTreino || 'Treino'}</strong>
             <span>{formatDuration(elapsedSeconds)}</span>
           </div>
-          <button type="button" className="student-start-action" onClick={() => setPaused((prev) => !prev)}>
+          <button
+            type="button"
+            className="student-start-action"
+            onClick={() => setPaused((prev) => !prev)}
+            aria-label={paused ? 'Retomar treino' : 'Pausar treino'}
+            aria-pressed={paused}
+          >
             {paused ? <IconPlay /> : <IconPause />}
           </button>
         </header>
 
-        <div className="student-start-progress">
+        <div
+          className="student-start-progress"
+          role="progressbar"
+          aria-label="Progresso do treino"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(progress)}
+        >
           <span style={{ width: `${progress}%` }} />
         </div>
 

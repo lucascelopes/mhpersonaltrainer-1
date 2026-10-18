@@ -1,0 +1,42 @@
+.root {
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .root :global(.student-start-header) {
+    grid-template-columns: 48px minmax(0, 1fr) 48px;
+    gap: 8px;
+  }
+
+  .root :global(.student-start-action) {
+    width: 48px;
+    height: 48px;
+  }
+
+  .root :global(.student-start-title),
+  .root :global(.student-current-info),
+  .root :global(.student-start-upcoming),
+  .root :global(.student-start-card),
+  .root :global(.student-start-info) {
+    min-width: 0;
+  }
+
+  .root :global(.student-start-title strong),
+  .root :global(.student-current-info > *) {
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .root :global(.student-start-info > strong) {
+    overflow-wrap: anywhere;
+  }
+
+  .root :global(.student-start-button),
+  .root :global(.student-start-skip) {
+    min-height: 48px;
+  }
+
+  .root :global(.student-start-footer) {
+    bottom: calc(80px + env(safe-area-inset-bottom));
+  }
+}
