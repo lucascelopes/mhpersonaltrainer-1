@@ -1332,7 +1332,7 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                 <div key={exercise.id} className="student-exercise-card">
                   <img
                     src={exercise.photoUrl}
-                    alt={`MH demonstrando ${exercise.name}`}
+                    alt={`Imagem ilustrativa de ${exercise.name}`}
                     loading="lazy"
                     onError={(event) => {
                       event.currentTarget.onerror = null;

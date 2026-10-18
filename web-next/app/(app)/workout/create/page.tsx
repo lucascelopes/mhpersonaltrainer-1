@@ -73,7 +73,15 @@ export default function WorkoutCreatePage() {
     setObjetivo(template.objetivo);
     setDuracao(template.duracao);
     setDias(template.dias);
-    setSelectedExercises(template.exercises);
+    setSelectedExercises((current) => {
+      const existingNames = new Set(current.map((exercise) =>
+        exercise.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
+      ));
+      const additions = template.exercises.filter((exercise) =>
+        !existingNames.has(exercise.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim())
+      );
+      return [...current, ...additions];
+    });
   };
 
   const handleSubmit = async (event: FormEvent) => {
@@ -160,7 +168,7 @@ export default function WorkoutCreatePage() {
   return (
     <PageShell
       title="Criar treino"
-      description="Monte treinos completos com blocos e exercicios."
+      description="Crie quantos treinos quiser, cada um com os exercícios que precisar."
       breadcrumbs={[{ label: 'Treinos', href: '/workouts' }]}
     >
       <div className="workout-create">

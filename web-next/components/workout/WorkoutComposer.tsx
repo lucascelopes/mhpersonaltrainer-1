@@ -225,41 +225,15 @@ export default function WorkoutComposer({
       <header className={styles.header}>
         <div>
           <h3 id="workout-composer-title">Monte o treino completo</h3>
-          <p>Escolha um modelo ou adicione quantos exercícios quiser.</p>
+          <p>Comece pela biblioteca ou use um modelo como ponto de partida.</p>
         </div>
         <span className={styles.count}>{selectedExercises.length} selecionados</span>
       </header>
 
-      <div className={styles.templateGrid}>
-        {workoutTemplates.map((template) => (
-          <button
-            key={template.title}
-            type="button"
-            className={`${styles.template} ${activeTemplate === template.title ? styles.templateActive : ''}`}
-            onClick={() => applyTemplate(template)}
-            aria-pressed={activeTemplate === template.title}
-          >
-            <img
-              src={template.foto}
-              alt={`MH demonstrando exercício: ${template.title}`}
-              loading="lazy"
-              onError={(event) => { event.currentTarget.hidden = true; }}
-            />
-            <span className={styles.templateContent}>
-              <strong className={styles.templateTitle}>{template.title}</strong>
-              <span className={styles.templateDescription}>{template.description}</span>
-              <span className={styles.templateMeta}>
-                {template.dias.join(' · ')} · {template.exercises.length} exercícios
-              </span>
-            </span>
-          </button>
-        ))}
-      </div>
-
       <div className={styles.libraryHeader}>
         <div>
           <h4>Biblioteca de exercícios</h4>
-          <p>O catálogo inteiro fica disponível — não há limite de itens no treino.</p>
+          <p>Busque e adicione quantos exercícios quiser. Os modelos rápidos abaixo são só exemplos.</p>
         </div>
         <span>{availableExercises.length} no catálogo</span>
       </div>
@@ -315,7 +289,7 @@ export default function WorkoutComposer({
               <article className={styles.exercise} key={exercise.id}>
                 <img
                   src={getMHWorkoutPhoto(name, exercise.colecao || '', exercise.id)}
-                  alt={`MH demonstrando ${name}`}
+                  alt={`Imagem ilustrativa de ${name}`}
                   loading="lazy"
                   onError={(event) => { event.currentTarget.hidden = true; }}
                 />
@@ -337,14 +311,53 @@ export default function WorkoutComposer({
       </div>
 
       {!loading && !loadError && filteredExercises.length > visibleCount && (
-        <button
-          type="button"
-          className={styles.loadMore}
-          onClick={() => setVisibleCount((count) => Math.min(count + 24, filteredExercises.length))}
-        >
-          Carregar mais exercícios ({visibleCount} de {filteredExercises.length})
-        </button>
+        <div className={styles.loadActions}>
+          <button
+            type="button"
+            className={styles.loadMore}
+            onClick={() => setVisibleCount((count) => Math.min(count + 24, filteredExercises.length))}
+          >
+            Carregar mais ({visibleCount} de {filteredExercises.length})
+          </button>
+          <button
+            type="button"
+            className={styles.loadMore}
+            onClick={() => setVisibleCount(filteredExercises.length)}
+          >
+            Mostrar todos
+          </button>
+        </div>
       )}
+
+      <div className={styles.templateHeader}>
+        <h4>Modelos rápidos opcionais</h4>
+        <p>Adicionam uma base ao treino; você pode continuar escolhendo exercícios no catálogo.</p>
+      </div>
+      <div className={styles.templateGrid}>
+        {workoutTemplates.map((template) => (
+          <button
+            key={template.title}
+            type="button"
+            className={`${styles.template} ${activeTemplate === template.title ? styles.templateActive : ''}`}
+            onClick={() => applyTemplate(template)}
+            aria-pressed={activeTemplate === template.title}
+          >
+            <img
+              src={template.foto}
+              alt=""
+              loading="lazy"
+              onError={(event) => { event.currentTarget.hidden = true; }}
+            />
+            <span className={styles.templateContent}>
+              <strong className={styles.templateTitle}>{template.title}</strong>
+              <span className={styles.templateDescription}>{template.description}</span>
+              <span className={styles.templateMeta}>
+                {template.dias.join(' · ')} · {template.exercises.length} exercícios
+              </span>
+            </span>
+          </button>
+        ))}
+      </div>
 
       {selectedExercises.length > 0 && (
         <div className={styles.selectedSection}>
