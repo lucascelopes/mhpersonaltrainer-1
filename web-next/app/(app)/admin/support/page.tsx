@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { doc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import AdminGate from '@/components/AdminGate';
@@ -90,7 +90,7 @@ export default function AdminSupportPage() {
     'all'
   );
   const [selectedId, setSelectedId] = useState('');
-  const [responseText, setResponseText] = useState('');
+  const [responseDrafts, setResponseDrafts] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [actionError, setActionError] = useState('');
@@ -152,20 +152,12 @@ export default function AdminSupportPage() {
   }, [normalized, query, statusFilter, queueFilter]);
 
   const selected = useMemo(() => {
-    const inList = filtered.find((ticket) => ticket.id === selectedId);
-    if (inList) return inList;
-    return normalized.find((ticket) => ticket.id === selectedId) || filtered[0] || null;
-  }, [filtered, normalized, selectedId]);
-
-  useEffect(() => {
-    if (!selected || selectedId) return;
-    setSelectedId(selected.id);
-    setResponseText(selected.resposta || '');
-  }, [selected, selectedId]);
+    return filtered.find((ticket) => ticket.id === selectedId) || filtered[0] || null;
+  }, [filtered, selectedId]);
+  const responseText = selected ? (responseDrafts[selected.id] ?? selected.resposta ?? '') : '';
 
   const selectTicket = (ticket: (typeof normalized)[number]) => {
     setSelectedId(ticket.id);
-    setResponseText(ticket.resposta || '');
     setMessage('');
     setActionError('');
   };
@@ -240,14 +232,14 @@ export default function AdminSupportPage() {
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Buscar por titulo, descricao, categoria ou usuario"
             />
-            <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)}>
+            <select aria-label="Filtrar por status" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)}>
               <option value="all">Todos os status</option>
               <option value="aberto">Abertos</option>
               <option value="em_andamento">Em andamento</option>
               <option value="respondido">Respondidos</option>
               <option value="resolvido">Resolvidos</option>
             </select>
-            <select value={queueFilter} onChange={(event) => setQueueFilter(event.target.value as typeof queueFilter)}>
+            <select aria-label="Filtrar por fila" value={queueFilter} onChange={(event) => setQueueFilter(event.target.value as typeof queueFilter)}>
               <option value="all">Todas as filas</option>
               <option value="administrativo">Administracao</option>
               <option value="financeiro">Financeiro</option>
@@ -344,7 +336,10 @@ export default function AdminSupportPage() {
                     <textarea
                       rows={8}
                       value={responseText}
-                      onChange={(event) => setResponseText(event.target.value)}
+                      onChange={(event) => setResponseDrafts((drafts) => ({
+                        ...drafts,
+                        [selected.id]: event.target.value,
+                      }))}
                       placeholder="Escreva a resposta com passos claros para o usuario."
                     />
                   </label>

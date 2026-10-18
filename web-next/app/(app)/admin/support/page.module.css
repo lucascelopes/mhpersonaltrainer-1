@@ -358,6 +358,13 @@
   color: #9fd0ff;
 }
 
+@media (max-width: 860px) {
+  .itemTop {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) max-content;
+  }
+}
+
 :global(:root[data-theme='dark']) .stats article {
   background: rgba(20, 31, 50, 0.86);
 }
