@@ -8,15 +8,19 @@ import { useAuth } from '@/lib/auth';
 import { useUserScope } from '@/lib/firestoreHooks';
 import { useDashboardData } from '@/lib/hooks/useDashboardData';
 import { createUserWorkout, createWorkout } from '@/lib/services/workouts';
+import WorkoutComposer, {
+  type WorkoutExerciseDraft,
+  type WorkoutTemplate,
+} from '@/components/workout/WorkoutComposer';
 
 const weekOptions = [
-  { id: 'seg', label: 'Seg' },
-  { id: 'ter', label: 'Ter' },
-  { id: 'qua', label: 'Qua' },
-  { id: 'qui', label: 'Qui' },
-  { id: 'sex', label: 'Sex' },
-  { id: 'sab', label: 'Sab' },
-  { id: 'dom', label: 'Dom' },
+  { id: 'seg', label: 'Seg', value: 'Seg' },
+  { id: 'ter', label: 'Ter', value: 'Ter' },
+  { id: 'qua', label: 'Qua', value: 'Qua' },
+  { id: 'qui', label: 'Qui', value: 'Qui' },
+  { id: 'sex', label: 'Sex', value: 'Sex' },
+  { id: 'sab', label: 'Sáb', value: 'Sab' },
+  { id: 'dom', label: 'Dom', value: 'Dom' },
 ];
 
 export default function WorkoutCreatePage() {
@@ -31,6 +35,7 @@ export default function WorkoutCreatePage() {
   const [objetivo, setObjetivo] = useState('');
   const [duracao, setDuracao] = useState('');
   const [dias, setDias] = useState<string[]>([]);
+  const [selectedExercises, setSelectedExercises] = useState<WorkoutExerciseDraft[]>([]);
   const [scope, setScope] = useState<'user' | 'public'>('user');
   const [selectedStudentId, setSelectedStudentId] = useState('');
   const [targetUserId, setTargetUserId] = useState('');
@@ -63,38 +68,12 @@ export default function WorkoutCreatePage() {
     [dashboard.alunos, selectedStudentId]
   );
 
-  const templateOptions = [
-    {
-      title: 'Hipertrofia 4x',
-      description: 'Volume moderado + progressao.',
-      nome: 'Hipertrofia 4x - Base',
-      objetivo: 'Ganho de massa com foco em basicos',
-      duracao: '55 min',
-      dias: ['Seg', 'Ter', 'Qui', 'Sex'],
-    },
-    {
-      title: 'Emagrecimento 3x',
-      description: 'Circuito e cardio curto.',
-      nome: 'Emagrecimento 3x - Circuito',
-      objetivo: 'Queima calorica e resistencia',
-      duracao: '40 min',
-      dias: ['Seg', 'Qua', 'Sex'],
-    },
-    {
-      title: 'Funcional 2x',
-      description: 'Mobilidade e core.',
-      nome: 'Funcional 2x - Mobilidade',
-      objetivo: 'Mobilidade e estabilidade',
-      duracao: '35 min',
-      dias: ['Ter', 'Sab'],
-    },
-  ];
-
-  const applyTemplate = (template: (typeof templateOptions)[number]) => {
+  const applyTemplate = (template: WorkoutTemplate) => {
     setNome(template.nome);
     setObjetivo(template.objetivo);
     setDuracao(template.duracao);
     setDias(template.dias);
+    setSelectedExercises(template.exercises);
   };
 
   const handleSubmit = async (event: FormEvent) => {
@@ -128,6 +107,22 @@ export default function WorkoutCreatePage() {
           objetivo,
           duracao,
           diasDaSemana: dias,
+          treino: selectedExercises.map((exercise) => exercise.name),
+          seriesRep: selectedExercises.map((exercise) => exercise.sets),
+          repeticoes: selectedExercises.map((exercise) => exercise.reps),
+          carga: selectedExercises.map((exercise) => exercise.load),
+          intervalo: selectedExercises.map((exercise) => exercise.interval),
+          videoUrls: selectedExercises.map((exercise) => exercise.videoUrl),
+          fotoUrls: selectedExercises.map((exercise) => exercise.photoUrl),
+          exercicios: selectedExercises.map((exercise) => ({
+            exerciseId: exercise.id,
+            nome: exercise.name,
+            series: exercise.sets,
+            repeticoes: exercise.reps,
+            carga: exercise.load,
+            intervalo: exercise.interval,
+            videoUrl: exercise.videoUrl,
+          })),
         } as any);
         if (result.error || !result.data) {
           throw new Error(result.error || 'Erro ao criar treino.');
@@ -140,10 +135,16 @@ export default function WorkoutCreatePage() {
       const result = await createUserWorkout(targetId, {
         nomeDoTreino: nome,
         obsInstrucao: objetivo,
-        treino: [],
+        treino: selectedExercises.map((exercise) => exercise.name),
+        seriesRep: selectedExercises.map((exercise) => exercise.sets),
+        repeticoes: selectedExercises.map((exercise) => exercise.reps),
+        carga: selectedExercises.map((exercise) => exercise.load),
+        intervalo: selectedExercises.map((exercise) => exercise.interval),
+        videoUrls: selectedExercises.map((exercise) => exercise.videoUrl),
+        fotoUrls: selectedExercises.map((exercise) => exercise.photoUrl),
+        duracao,
         diasDaSemana: dias,
         arquivos: false,
-        intervalo: duracao ? [duracao] : [],
       });
       if (result.error || !result.data) {
         throw new Error(result.error || 'Erro ao criar treino.');
@@ -253,8 +254,9 @@ export default function WorkoutCreatePage() {
                     <button
                       key={day.id}
                       type="button"
-                      className={`workout-create-day ${dias.includes(day.label) ? 'is-active' : ''}`}
-                      onClick={() => toggleDay(day.label)}
+                      className={`workout-create-day ${dias.includes(day.value) ? 'is-active' : ''}`}
+                      onClick={() => toggleDay(day.value)}
+                      aria-pressed={dias.includes(day.value)}
                     >
                       {day.label}
                     </button>
@@ -321,12 +323,16 @@ export default function WorkoutCreatePage() {
                   <span>Duracao</span>
                   <strong>{duracao || 'Tempo livre'}</strong>
                 </div>
+                <div>
+                  <span>Exercícios</span>
+                  <strong>{selectedExercises.length}</strong>
+                </div>
               </div>
               <div className="workout-create-badges">
                 {dias.length ? (
                   dias.map((dia) => (
                     <span key={dia} className="workout-create-badge">
-                      {dia}
+                      {weekOptions.find((option) => option.value === dia)?.label || dia}
                     </span>
                   ))
                 ) : (
@@ -353,29 +359,11 @@ export default function WorkoutCreatePage() {
           </div>
         </div>
 
-        <div className="card workout-create-templates">
-          <div className="workout-create-templates-header">
-            <div>
-              <h3>Modelos rapidos</h3>
-              <p className="subtle">Comece com uma base pronta e ajuste depois.</p>
-            </div>
-            <span className="pill">Sugestoes</span>
-          </div>
-          <div className="workout-create-template-grid">
-            {templateOptions.map((template) => (
-              <button
-                key={template.title}
-                type="button"
-                className="workout-create-template"
-                onClick={() => applyTemplate(template)}
-              >
-                <strong>{template.title}</strong>
-                <span>{template.description}</span>
-                <p>{template.dias.join(', ')}</p>
-              </button>
-            ))}
-          </div>
-        </div>
+        <WorkoutComposer
+          selectedExercises={selectedExercises}
+          onExercisesChange={setSelectedExercises}
+          onApplyTemplate={applyTemplate}
+        />
       </div>
     </PageShell>
   );

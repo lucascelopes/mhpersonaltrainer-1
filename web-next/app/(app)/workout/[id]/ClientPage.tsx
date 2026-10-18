@@ -29,6 +29,7 @@ import {
   updateWorkout,
 } from '@/lib/services/workouts';
 import type { Exercise, UserWorkout } from '@/lib/types/workout';
+import { getMHWorkoutPhoto } from '@/lib/workoutPhotos';
 import { useSearchParams, usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import {
@@ -56,6 +57,8 @@ interface WorkoutDetail {
   carga?: Array<number | string>;
   intervalo?: Array<number | string>;
   videoUrls?: string[];
+  fotoUrls?: string[];
+  exercicios?: Array<{ exerciseId?: string }>;
   obsInstrucao?: string;
   lastCompletedAt?: Date;
   updatedAt?: Date;
@@ -1228,6 +1231,11 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
         carga: workout.carga?.[index],
         intervalo: workout.intervalo?.[index],
         videoUrl: workout.videoUrls?.[index],
+        photoUrl: workout.fotoUrls?.[index] || getMHWorkoutPhoto(
+          String(name || ''),
+          '',
+          workout.exercicios?.[index]?.exerciseId
+        ),
       }))
       .filter((item) => item.name);
   }, [workout]);
@@ -1321,6 +1329,16 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
               const intervaloLabel = formatWorkoutMetric(exercise.intervalo, 's');
               return (
                 <div key={exercise.id} className="student-exercise-card">
+                  <img
+                    src={exercise.photoUrl}
+                    alt={`MH demonstrando ${exercise.name}`}
+                    loading="lazy"
+                    onError={(event) => {
+                      event.currentTarget.onerror = null;
+                      event.currentTarget.src = getMHWorkoutPhoto(exercise.name);
+                    }}
+                    style={{ width: 64, height: 64, borderRadius: 12, objectFit: 'cover', flex: '0 0 64px' }}
+                  />
                   <div className="student-exercise-index">
                     <span>{index + 1}</span>
                   </div>

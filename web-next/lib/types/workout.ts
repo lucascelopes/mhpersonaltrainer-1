@@ -30,12 +30,14 @@ export interface UserWorkout {
   id: string;
   nomeDoTreino: string;
   obsInstrucao?: string;
+  duracao?: string;
   treino: string[];
   seriesRep?: WorkoutMetricValue[];
   repeticoes?: WorkoutMetricValue[];
   carga?: WorkoutMetricValue[];
   intervalo?: WorkoutMetricValue[];
   videoUrls?: string[];
+  fotoUrls?: string[];
   arquivos?: boolean;
   diasDaSemana?: string[];
   data?: Date;
