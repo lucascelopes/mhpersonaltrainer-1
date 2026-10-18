@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useUserScope } from '@/lib/firestoreHooks';
 import { useAuth } from '@/lib/auth';
+import styles from './UserScopePicker.module.css';
 
 export default function UserScopePicker() {
   const { role } = useAuth();
@@ -19,16 +20,16 @@ export default function UserScopePicker() {
 
   return (
     <div className="card" style={{ marginBottom: 20 }}>
-      <p className="pill">Filtro por usuario</p>
+      <p className="pill">Filtro por usuário</p>
       <p className="subtle" style={{ marginTop: 8 }}>
-        Informe o UID do usuario para carregar subcolecoes (avaliacoes, pagamentos, documentos, etc.).
+        Informe o UID do usuário para carregar subcoleções (avaliações, pagamentos, documentos etc.).
       </p>
-      <div style={{ marginTop: 12, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+      <div className={styles.controls}>
         <input
           value={value}
           onChange={(event) => setValue(event.target.value)}
-          placeholder="UID do usuario"
-          style={{ flex: 1, minWidth: 220, padding: 10, borderRadius: 10, border: '1px solid var(--border)' }}
+          placeholder="UID do usuário"
+          aria-label="UID do usuário"
         />
         <button
           className="button"
@@ -50,7 +51,7 @@ export default function UserScopePicker() {
       </div>
       {userId && (
         <p className="subtle" style={{ marginTop: 10 }}>
-          Usuario atual: {userId}
+          Usuário atual: {userId}
         </p>
       )}
     </div>

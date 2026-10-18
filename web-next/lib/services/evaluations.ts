@@ -331,12 +331,17 @@ const mapPhysicalData = (
   base: PhysicalEvaluation,
   data: DocumentData
 ): PhysicalTestEvaluation => {
-  const peso = toNumber(data.peso) || 0;
-  const altura = toNumber(data.estatura) || 0;
-  const imc = peso && altura ? calculateIMC(peso, altura) : 0;
+  const composition = data.composicaoCorporal && typeof data.composicaoCorporal === 'object'
+    ? data.composicaoCorporal
+    : {};
+  const peso = toNumber(data.peso) ?? toNumber(composition.peso) ?? 0;
+  const altura = toNumber(data.estatura) ?? toNumber(data.altura) ?? toNumber(composition.altura) ?? 0;
+  const imc = toNumber(data.imc) ?? toNumber(composition.imc) ?? (peso && altura ? calculateIMC(peso, altura) : 0);
   const percentualGordura =
     toNumber(data.porcentualDeGordura) ??
     toNumber(data.percentualDeGordura) ??
+    toNumber(data.percentualGordura) ??
+    toNumber(composition.percentualGordura) ??
     toNumber(data.percentualGorduraSiri) ??
     toNumber(data.percentualGorduraBrozek);
   const dobrasCutaneas: SkinFolds = {
@@ -353,7 +358,7 @@ const mapPhysicalData = (
     ),
   };
   const hasDobras = Object.values(dobrasCutaneas).some((value) => typeof value === 'number' && value > 0);
-  const circSource = data.circunferencias || {};
+  const circSource = data.circunferencias || composition.circunferencias || {};
   const circunferencias: Circumferences = {
     pescoco: toNumber(circSource.pescoco ?? data.pescoco),
     ombro: toNumber(circSource.ombro ?? data.ombro),
@@ -374,14 +379,14 @@ const mapPhysicalData = (
   const hasCircunferencias = Object.values(circunferencias).some(
     (value) => typeof value === 'number' && value > 0
   );
-  const massaGorda =
-    typeof percentualGordura === 'number' && percentualGordura > 0 && peso > 0
+  const massaGorda = toNumber(data.massaGorda) ?? toNumber(composition.massaGorda) ??
+    (typeof percentualGordura === 'number' && percentualGordura > 0 && peso > 0
       ? Number(((peso * percentualGordura) / 100).toFixed(2))
-      : toNumber(data.massaGorda);
-  const massaMagra =
-    peso > 0 && typeof massaGorda === 'number'
+      : undefined);
+  const massaMagra = toNumber(data.massaMagra) ?? toNumber(composition.massaMagra) ??
+    (peso > 0 && typeof massaGorda === 'number'
       ? Number((peso - massaGorda).toFixed(2))
-      : toNumber(data.massaMagra);
+      : undefined);
   const taxaMetabolicaBasal = toNumber(data.taxaMetabolicaBasal);
   const densidadeCorporal = toNumber(data.densidadeCorporal);
   const percentualGorduraSiri = toNumber(data.percentualGorduraSiri);
@@ -402,12 +407,13 @@ const mapPhysicalData = (
       ? 'masculino'
       : undefined;
 
-  const composicaoCorporal: BodyComposition | undefined = peso || altura || hasDobras
+  const composicaoCorporal: BodyComposition | undefined = peso || altura || hasDobras || hasCircunferencias ||
+    typeof percentualGordura === 'number' || typeof massaMagra === 'number'
     ? {
         peso,
         altura,
         imc,
-        percentualGordura: percentualGordura || undefined,
+        percentualGordura: typeof percentualGordura === 'number' ? percentualGordura : undefined,
         massaMagra: typeof massaMagra === 'number' && massaMagra > 0 ? massaMagra : undefined,
         massaGorda: typeof massaGorda === 'number' && massaGorda > 0 ? massaGorda : undefined,
         taxaMetabolicaBasal: typeof taxaMetabolicaBasal === 'number' && taxaMetabolicaBasal > 0 ? taxaMetabolicaBasal : undefined,
@@ -429,6 +435,10 @@ const mapPhysicalData = (
     composicaoCorporal,
     testes: Array.isArray(data.testes) ? data.testes : [],
     resultados: Array.isArray(data.resultados) ? data.resultados : [],
+    resultado: typeof data.resultado === 'string' ? data.resultado.trim() : undefined,
+    recomendacoes: Array.isArray(data.recomendacoes)
+      ? data.recomendacoes.filter((item: unknown): item is string => typeof item === 'string' && Boolean(item.trim()))
+      : [],
     sexo,
     idade: typeof idade === 'number' && idade > 0 ? idade : undefined,
   };
@@ -684,7 +694,8 @@ export async function fetchEvaluationsForStudents(
 export async function fetchEvaluationById(
   evaluationId: string,
   type: EvaluationType,
-  userId?: string
+  userId?: string,
+  options?: { allowLegacyLookup?: boolean }
 ): Promise<QueryResult<PhysicalEvaluation>> {
   try {
     const collectionName = COLLECTION_MAP[type];
@@ -717,6 +728,10 @@ export async function fetchEvaluationById(
           error: null,
         };
       }
+    }
+
+    if (options?.allowLegacyLookup === false) {
+      return { data: null, error: 'Avaliação não encontrada' };
     }
 
     const legacyName = LEGACY_COLLECTION_MAP[type];
@@ -1454,7 +1469,7 @@ export function getEvaluationTypeLabel(type: EvaluationType): string {
     online: 'Online',
     personalizada: 'Personalizada',
     postural: 'Postural',
-    fisica: 'Fisica',
+    fisica: 'Física',
   };
   return labels[type] || type;
 }
@@ -1463,10 +1478,10 @@ export function getEvaluationStatusLabel(status: EvaluationStatus): string {
   const labels: Record<EvaluationStatus, string> = {
     pendente: 'Pendente',
     agendada: 'Agendada',
-    em_andamento: 'Em Andamento',
-    concluida: 'Concluida',
+    em_andamento: 'Em andamento',
+    concluida: 'Concluída',
     cancelada: 'Cancelada',
-    nao_realizada: 'Nao realizada',
+    nao_realizada: 'Não realizada',
   };
   return labels[status] || status;
 }

@@ -68,6 +68,8 @@ export interface PhysicalTestEvaluation extends PhysicalEvaluation {
   testes: PhysicalTest[];
   resultados?: TestResult[];
   composicaoCorporal?: BodyComposition;
+  resultado?: string;
+  recomendacoes?: string[];
   sexo?: 'masculino' | 'feminino';
   idade?: number;
 }

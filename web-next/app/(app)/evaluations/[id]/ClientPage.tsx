@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import mobileStyles from '../evaluationMobile.module.css';
 import PageShell from '@/components/PageShell';
 import { useAuth } from '@/lib/auth';
 import { formatDate, useUserScope } from '@/lib/firestoreHooks';
@@ -29,7 +30,7 @@ const isEvaluationType = (value: string | null): value is EvaluationType =>
 
 const formatMetric = (value?: number, suffix?: string) =>
   typeof value === 'number' && Number.isFinite(value)
-    ? `${value}${suffix ? ` ${suffix}` : ''}`
+    ? `${new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 }).format(value)}${suffix ? ` ${suffix}` : ''}`
     : '-';
 
 const hasAnswerValue = (value: EvaluationAnswer['resposta']) => {
@@ -41,15 +42,15 @@ const hasAnswerValue = (value: EvaluationAnswer['resposta']) => {
 const mapCircumferenceEntries = (circunferencias?: Circumferences) => {
   if (!circunferencias) return [];
   const labels: Record<string, string> = {
-    pescoco: 'Pescoco',
+    pescoco: 'Pescoço',
     ombro: 'Ombro',
-    torax: 'Torax',
+    torax: 'Tórax',
     cintura: 'Cintura',
     quadril: 'Quadril',
-    bracoDireito: 'Braco direito',
-    bracoEsquerdo: 'Braco esquerdo',
-    antebracoDireito: 'Antebraco direito',
-    antebracoEsquerdo: 'Antebraco esquerdo',
+    bracoDireito: 'Braço direito',
+    bracoEsquerdo: 'Braço esquerdo',
+    antebracoDireito: 'Antebraço direito',
+    antebracoEsquerdo: 'Antebraço esquerdo',
     punhoDireito: 'Punho direito',
     punhoEsquerdo: 'Punho esquerdo',
     coxaDireita: 'Coxa direita',
@@ -75,7 +76,7 @@ export default function EvaluationDetailPage({ params }: { params: { id: string 
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { role } = useAuth();
+  const { role, isLoading: authLoading } = useAuth();
   const { userId } = useUserScope();
   const isStudent = role === 'aluno';
 
@@ -87,7 +88,8 @@ export default function EvaluationDetailPage({ params }: { params: { id: string 
 
   const typeParam = searchParams.get('type');
   const requestedType = isEvaluationType(typeParam) ? typeParam : null;
-  const scopedUserId = searchParams.get('studentId') || searchParams.get('userId') || userId;
+  const requestedUserId = searchParams.get('studentId') || searchParams.get('userId');
+  const scopedUserId = role === 'admin' ? requestedUserId || userId : userId;
 
   const [evaluation, setEvaluation] = useState<PhysicalEvaluation | null>(null);
   const [loading, setLoading] = useState(true);
@@ -96,8 +98,9 @@ export default function EvaluationDetailPage({ params }: { params: { id: string 
   useEffect(() => {
     let active = true;
     const load = async () => {
+      if (authLoading) return;
       if (!scopedUserId || !evaluationId) {
-        setError('Avaliacao nao encontrada.');
+        setError(scopedUserId ? 'Avaliação não encontrada.' : 'Nenhum aluno selecionado.');
         setLoading(false);
         return;
       }
@@ -110,7 +113,9 @@ export default function EvaluationDetailPage({ params }: { params: { id: string 
       let lastError = '';
 
       for (const type of typesToTry) {
-        const result = await fetchEvaluationById(evaluationId, type, scopedUserId);
+        const result = await fetchEvaluationById(evaluationId, type, scopedUserId, {
+          allowLegacyLookup: !isStudent,
+        });
         if (!active) return;
         if (result.data) {
           setEvaluation(result.data);
@@ -122,7 +127,7 @@ export default function EvaluationDetailPage({ params }: { params: { id: string 
         }
       }
 
-      setError(lastError || 'Avaliacao nao encontrada.');
+      setError(lastError || 'Avaliação não encontrada.');
       setLoading(false);
     };
 
@@ -130,7 +135,7 @@ export default function EvaluationDetailPage({ params }: { params: { id: string 
     return () => {
       active = false;
     };
-  }, [evaluationId, requestedType, scopedUserId]);
+  }, [authLoading, evaluationId, isStudent, requestedType, scopedUserId]);
 
   const typeLabel = evaluation ? getEvaluationTypeLabel(evaluation.type) : '';
   const statusLabel = evaluation ? getEvaluationStatusLabel(evaluation.status) : '';
@@ -162,6 +167,14 @@ export default function EvaluationDetailPage({ params }: { params: { id: string 
   const photoCount = posturalData
     ? Object.values(posturalData.fotosPostura || {}).filter(Boolean).length
     : 0;
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      router.back();
+      return;
+    }
+    router.push('/evaluations');
+  };
 
   const body = (
     <div className="student-eval-detail-content">
@@ -215,7 +228,7 @@ export default function EvaluationDetailPage({ params }: { params: { id: string 
             <div className="student-eval-detail-tags">
               {onlineCirc.slice(0, 10).map((item) => (
                 <span key={`online-${item.label}`} className="student-eval-detail-tag">
-                  {item.label}: {item.value}
+                  {item.label}: {formatMetric(item.value)}
                 </span>
               ))}
             </div>
@@ -225,14 +238,14 @@ export default function EvaluationDetailPage({ params }: { params: { id: string 
 
       {posturalData && (
         <section className="student-section-card">
-          <h3>Analise postural</h3>
+          <h3>Análise postural</h3>
           <div className="student-eval-detail-grid">
             <div className="student-eval-detail-metric">
               <span>Fotos enviadas</span>
               <strong>{photoCount}</strong>
             </div>
             <div className="student-eval-detail-metric">
-              <span>Recomendacoes</span>
+              <span>Recomendações</span>
               <strong>{posturalData.recomendacoes?.length || 0}</strong>
             </div>
           </div>
@@ -253,7 +266,7 @@ export default function EvaluationDetailPage({ params }: { params: { id: string 
 
       {personalizedData && (
         <section className="student-section-card">
-          <h3>Avaliacao personalizada</h3>
+          <h3>Avaliação personalizada</h3>
           <div className="student-eval-detail-grid">
             <div className="student-eval-detail-metric">
               <span>Perguntas</span>
@@ -287,40 +300,70 @@ export default function EvaluationDetailPage({ params }: { params: { id: string 
 
       {physicalData && (
         <section className="student-section-card">
-          <h3>Avaliacao fisica</h3>
+          <h3>Avaliação física</h3>
           <div className="student-eval-detail-grid">
-            <div className="student-eval-detail-metric">
-              <span>Peso</span>
-              <strong>{formatMetric(physicalData.composicaoCorporal?.peso, 'kg')}</strong>
-            </div>
-            <div className="student-eval-detail-metric">
-              <span>IMC</span>
-              <strong>{formatMetric(physicalData.composicaoCorporal?.imc)}</strong>
-            </div>
-            <div className="student-eval-detail-metric">
-              <span>% Gordura</span>
-              <strong>{formatMetric(physicalData.composicaoCorporal?.percentualGordura, '%')}</strong>
-            </div>
-            <div className="student-eval-detail-metric">
-              <span>Massa magra</span>
-              <strong>{formatMetric(physicalData.composicaoCorporal?.massaMagra, 'kg')}</strong>
-            </div>
-            <div className="student-eval-detail-metric">
-              <span>Testes</span>
-              <strong>{physicalData.testes?.length || 0}</strong>
-            </div>
-            <div className="student-eval-detail-metric">
-              <span>Resultados</span>
-              <strong>{physicalData.resultados?.length || 0}</strong>
-            </div>
+            {typeof physicalData.composicaoCorporal?.peso === 'number' && physicalData.composicaoCorporal.peso > 0 && (
+              <div className="student-eval-detail-metric">
+                <span>Peso</span>
+                <strong>{formatMetric(physicalData.composicaoCorporal.peso, 'kg')}</strong>
+              </div>
+            )}
+            {typeof physicalData.composicaoCorporal?.imc === 'number' && physicalData.composicaoCorporal.imc > 0 && (
+              <div className="student-eval-detail-metric">
+                <span>IMC</span>
+                <strong>{formatMetric(physicalData.composicaoCorporal.imc)}</strong>
+              </div>
+            )}
+            {typeof physicalData.composicaoCorporal?.percentualGordura === 'number' && (
+              <div className="student-eval-detail-metric">
+                <span>% Gordura</span>
+                <strong>{formatMetric(physicalData.composicaoCorporal.percentualGordura, '%')}</strong>
+              </div>
+            )}
+            {typeof physicalData.composicaoCorporal?.massaMagra === 'number' && physicalData.composicaoCorporal.massaMagra > 0 && (
+              <div className="student-eval-detail-metric">
+                <span>Massa magra</span>
+                <strong>{formatMetric(physicalData.composicaoCorporal.massaMagra, 'kg')}</strong>
+              </div>
+            )}
+            {!!physicalData.testes?.length && (
+              <div className="student-eval-detail-metric">
+                <span>Testes</span>
+                <strong>{physicalData.testes.length}</strong>
+              </div>
+            )}
+            {!!physicalData.resultados?.length && (
+              <div className="student-eval-detail-metric">
+                <span>Resultados dos testes</span>
+                <strong>{physicalData.resultados.length}</strong>
+              </div>
+            )}
           </div>
           {physicalCirc.length > 0 && (
             <div className="student-eval-detail-tags">
               {physicalCirc.slice(0, 10).map((item) => (
                 <span key={`fisica-${item.label}`} className="student-eval-detail-tag">
-                  {item.label}: {item.value}
+                  {item.label}: {formatMetric(item.value)}
                 </span>
               ))}
+            </div>
+          )}
+          {physicalData.resultado && (
+            <div>
+              <h4>Resultado</h4>
+              <p className="student-eval-detail-note">{physicalData.resultado}</p>
+            </div>
+          )}
+          {!!physicalData.recomendacoes?.length && (
+            <div>
+              <h4>Recomendações</h4>
+              <div className="student-eval-detail-tags">
+                {physicalData.recomendacoes.map((item, index) => (
+                  <span key={`fisica-recomendacao-${index}`} className="student-eval-detail-tag">
+                    {item}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
         </section>
@@ -328,35 +371,43 @@ export default function EvaluationDetailPage({ params }: { params: { id: string 
     </div>
   );
 
+  if (authLoading) {
+    return (
+      <PageShell title="Avaliação" description="Carregando seu perfil de acesso.">
+        <p className="subtle" role="status" aria-live="polite">Carregando perfil…</p>
+      </PageShell>
+    );
+  }
+
   if (isStudent) {
     return (
-      <section className="student-evaluation-detail">
+      <section className={`student-evaluation-detail ${mobileStyles.evaluationContent}`}>
         <header className="student-eval-detail-header">
           <button
             type="button"
             className="student-workout-back"
-            onClick={() => router.back()}
-            aria-label="Voltar"
+            onClick={handleBack}
+            aria-label="Voltar às avaliações"
           >
             <IconArrowLeft />
           </button>
           <div className="student-eval-detail-title">
-            <p>Avaliacoes</p>
-            <h1>{loading ? 'Carregando...' : evaluation ? `Avaliacao ${typeLabel}` : 'Avaliacao'}</h1>
+            <p>Avaliações</p>
+            <h1>{loading ? 'Carregando…' : evaluation ? `Avaliação ${typeLabel}` : 'Avaliação'}</h1>
             {!loading && evaluation && <span>{evaluationDate}</span>}
           </div>
         </header>
 
         {loading ? (
           <div className="student-loading">
-            <p className="student-home-kicker">Carregando avaliacao</p>
+            <p className="student-home-kicker">Carregando avaliação</p>
             <p className="student-home-sub">Buscando detalhes completos.</p>
           </div>
         ) : error || !evaluation ? (
           <div className="student-empty-state">
-            <p>{error || 'Avaliacao nao encontrada.'}</p>
-            <button type="button" className="student-inline-button" onClick={() => router.back()}>
-              Voltar
+            <p>{error || 'Avaliação não encontrada.'}</p>
+            <button type="button" className="student-inline-button" onClick={handleBack}>
+              Voltar às avaliações
             </button>
           </div>
         ) : (
@@ -368,15 +419,15 @@ export default function EvaluationDetailPage({ params }: { params: { id: string 
 
   return (
     <PageShell
-      title={loading ? 'Avaliacao' : evaluation ? `Avaliacao ${typeLabel}` : 'Avaliacao'}
-      description="Detalhes da avaliacao e indicadores do aluno."
-      breadcrumbs={[{ label: 'Avaliacoes', href: '/evaluations' }]}
+      title={loading ? 'Avaliação' : evaluation ? `Avaliação ${typeLabel}` : 'Avaliação'}
+      description="Detalhes da avaliação e indicadores do aluno."
+      breadcrumbs={[{ label: 'Avaliações', href: '/evaluations' }]}
     >
       {loading ? (
-        <p className="subtle">Carregando avaliacao...</p>
+        <p className="subtle">Carregando avaliação…</p>
       ) : error || !evaluation ? (
         <div className="portal-empty">
-          <strong>{error || 'Avaliacao nao encontrada.'}</strong>
+          <strong>{error || 'Avaliação não encontrada.'}</strong>
         </div>
       ) : (
         body

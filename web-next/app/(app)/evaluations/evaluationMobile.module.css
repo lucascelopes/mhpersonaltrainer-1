@@ -1,0 +1,11 @@
+@media (max-width: 640px) {
+  .evaluationContent :global(.student-workout-back) {
+    min-width: 48px;
+    min-height: 48px;
+  }
+
+  .evaluationContent :global(.student-eval-detail-tag) {
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+}
