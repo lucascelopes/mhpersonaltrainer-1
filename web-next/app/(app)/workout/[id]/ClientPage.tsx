@@ -177,7 +177,7 @@ const IconCheck = () => (
 );
 
 export default function WorkoutDetailPage({ params }: { params: { id: string } }) {
-  const { role } = useAuth();
+  const { role, isLoading: authLoading } = useAuth();
   const { userId } = useUserScope();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -187,7 +187,10 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
     const last = parts[parts.length - 1];
     return last && last !== 'workout' ? last : params.id;
   }, [pathname, params.id]);
-  const scopedUserId = searchParams.get('studentId') || userId;
+  const requestedStudentId = searchParams.get('studentId') || '';
+  const scopedUserId = !authLoading && role && role !== 'aluno'
+    ? requestedStudentId || userId
+    : userId;
   const [workout, setWorkout] = useState<WorkoutDetail | null>(null);
   const [source, setSource] = useState<WorkoutSource>('public');
   const [loading, setLoading] = useState(true);
@@ -243,6 +246,14 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
     const loadWorkout = async () => {
       setLoading(true);
       setError('');
+      setWorkout(null);
+      setSource('public');
+      setInsights(null);
+      setInsightsMeta(null);
+      setHasStoredInsights(false);
+      setInsightsError('');
+
+      if (authLoading || !role) return;
 
       if (isStudent) {
         if (!targetUserId) {
@@ -291,7 +302,7 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
     return () => {
       active = false;
     };
-  }, [isStudent, workoutId, scopedUserId, targetUserId]);
+  }, [authLoading, isStudent, role, workoutId, scopedUserId, targetUserId]);
 
   const syncFromWorkout = (nextWorkout: WorkoutDetail | null) => {
     if (!nextWorkout?.treino?.length) {
@@ -392,6 +403,10 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
   };
 
   useEffect(() => {
+    if (isStudent) {
+      setExerciseVideos([]);
+      return;
+    }
     if (!workout?.treino?.length) {
       setExerciseVideos([]);
       return;
@@ -399,7 +414,7 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
     if (editingIndex !== null) return;
     hydrateExerciseVideos(workout.treino.map((item) => String(item || '')));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workout?.treino?.join('||'), editingIndex]);
+  }, [isStudent, workout?.treino?.join('||'), editingIndex]);
 
   const loadExercises = async () => {
     setExerciseLoading(true);
@@ -425,8 +440,8 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
     let active = true;
 
     const loadStudentInfo = async () => {
-      if (!scopedUserId) {
-        setStudentInfo(null);
+      setStudentInfo(null);
+      if (isStudent || !scopedUserId) {
         return;
       }
       try {
@@ -443,21 +458,25 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
     return () => {
       active = false;
     };
-  }, [scopedUserId]);
+  }, [isStudent, scopedUserId]);
 
   useEffect(() => {
     let active = true;
 
     const loadInsightsData = async () => {
-      if (!scopedUserId) {
+      if (isStudent || !scopedUserId) {
         setOverallStats(null);
         setEvaluations([]);
         setInsights(null);
         setInsightsError('');
+        setInsightsDataLoading(false);
         return;
       }
       setInsightsDataLoading(true);
       setInsightsError('');
+      setOverallStats(null);
+      setEvaluations([]);
+      setInsights(null);
       try {
         const [workoutResult, evalResult] = await Promise.all([
           fetchUserWorkouts(scopedUserId, false),
@@ -491,7 +510,7 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
     return () => {
       active = false;
     };
-  }, [scopedUserId]);
+  }, [isStudent, scopedUserId]);
 
   const canEdit =
     (isPersonal && source === 'user' && Boolean(scopedUserId)) ||
@@ -782,20 +801,13 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
   };
 
   useEffect(() => {
+    if (isStudent) return;
     if (!overallStats || !workout) return;
     if (evaluationSummary.total > 0 || overallStats.totalWorkouts > 0) {
       loadStoredInsights();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [insightsCacheKey, insightsCacheVersion, evaluationSummary.total, overallStats]);
-
-  useEffect(() => {
-    if (!hasOpenRouter || !overallStats || !workout) return;
-    if (!hasStoredInsights && (evaluationSummary.total > 0 || overallStats.totalWorkouts > 0)) {
-      loadInsights(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasStoredInsights, hasOpenRouter, overallStats, evaluationSummary.total, workout?.id]);
+  }, [isStudent, insightsCacheKey, insightsCacheVersion, evaluationSummary.total, overallStats]);
 
   const buildWorkoutPayload = (payload?: {
     names: string[];
@@ -1216,7 +1228,7 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
     return `${text}${suffix}`;
   };
 
-  const title = workout?.nomeDoTreino ?? workout?.nome ?? `Detalhe do treino ${workoutId}`;
+  const title = workout?.nomeDoTreino ?? workout?.nome ?? 'Treino';
   const studentExercises = useMemo(() => {
     if (!workout?.treino?.length) return [];
     return workout.treino
@@ -1243,12 +1255,15 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
         completed.getDate() === today.getDate()
       );
     })();
-    const duration = studentExercises.length ? studentExercises.length * 2 : 0;
+    const savedDuration = String(workout?.duracao || '').trim();
+    const duration = savedDuration
+      ? /^\d+(?:[.,]\d+)?$/.test(savedDuration) ? `${savedDuration} min` : savedDuration
+      : '--';
 
     if (loading) {
       return (
-        <section className="student-workout-detail">
-          <div className="student-loading">
+        <section className="student-workout-detail" aria-busy="true">
+          <div className="student-loading" role="status">
             <p className="student-home-kicker">Carregando treino</p>
             <p className="student-home-sub">Buscando informacoes do treino.</p>
           </div>
@@ -1260,8 +1275,8 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
       return (
         <section className="student-workout-detail">
           <div className="student-workout-error">
-            <p>{error || 'Treino nao encontrado.'}</p>
-            <button type="button" className="student-workout-back-btn" onClick={() => router.back()}>
+            <p role="alert">{error || 'Treino não encontrado.'}</p>
+            <button type="button" className="student-workout-back-btn" style={{ minHeight: 48 }} onClick={() => router.back()}>
               <IconArrowLeft />
               Voltar
             </button>
@@ -1273,14 +1288,20 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
     return (
       <section className="student-workout-detail">
         <header className="student-workout-detail-header">
-          <button type="button" className="student-workout-back" onClick={() => router.back()}>
+          <button
+            type="button"
+            className="student-workout-back"
+            style={{ minWidth: 48, minHeight: 48 }}
+            onClick={() => router.back()}
+            aria-label="Voltar para treinos"
+          >
             <IconArrowLeft />
           </button>
           <div className="student-workout-title">
-            <strong>{title}</strong>
+            <strong role="heading" aria-level={1}>{title}</strong>
             <span>{completedToday ? 'Concluido hoje' : 'Treino ativo'}</span>
           </div>
-          <div className="student-workout-header-spacer" />
+          <div className="student-workout-header-spacer" style={{ minWidth: 48, minHeight: 48 }} />
         </header>
 
         <div className="student-workout-info-card">
@@ -1302,7 +1323,7 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                 <IconTime />
               </span>
               <div>
-                <strong>{duration ? `${duration} min` : '--'}</strong>
+                <strong>{duration}</strong>
                 <span>Duracao</span>
               </div>
             </div>
@@ -1353,7 +1374,9 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
             })
           ) : (
             <div className="student-workout-empty">
-              <p>Nenhum exercicio cadastrado.</p>
+              <p id="student-workout-empty-message" role="status">
+                Nenhum exercício cadastrado. Peça ao seu personal para completar o treino.
+              </p>
             </div>
           )}
         </div>
@@ -1363,13 +1386,16 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
             type="button"
             className="student-workout-start"
             onClick={() => router.push(`/start-workout?workoutId=${workout.id}`)}
-            disabled={completedToday}
+            disabled={completedToday || studentExercises.length === 0}
+            aria-describedby={studentExercises.length === 0 ? 'student-workout-empty-message' : undefined}
           >
             {completedToday ? (
               <>
                 <IconCheck />
                 Treino concluido hoje
               </>
+            ) : studentExercises.length === 0 ? (
+              'Treino sem exercícios'
             ) : (
               <>
                 <IconPlay />
