@@ -1,0 +1,19 @@
+.checkins {
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  .checkins :global(.academy-checkins-filters) {
+    display: grid;
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .checkins :global(.academy-checkins-filters input),
+  .checkins :global(.academy-checkins-filters select) {
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    font-size: 16px;
+  }
+}

@@ -7,6 +7,7 @@ import AcademyGate from '@/components/AcademyGate';
 import { formatDate } from '@/lib/firestoreHooks';
 import { useAcademyData } from '@/lib/hooks/useAcademyData';
 import { getFirebaseDb } from '@/lib/services/firebase';
+import styles from './page.module.css';
 
 type CheckinEntry = {
   id: string;
@@ -36,8 +37,8 @@ const validationLabels: Record<string, string> = {
   'photo-ai-match': 'Foto validada por IA',
   'photo-confirmed': 'Foto confirmada',
   'photo-ai-mismatch': 'Foto divergente',
-  'photo-ai-error': 'Falha de validacao',
-  'photo-manual': 'Confirmacao manual',
+  'photo-ai-error': 'Falha de validação',
+  'photo-manual': 'Confirmação manual',
   manual: 'Manual',
 };
 
@@ -66,7 +67,7 @@ export default function AcademyCheckinsPage() {
 
   useEffect(() => {
     if (!academyCodeRaw) {
-      setError('Codigo da academia nao encontrado.');
+      setError('Código da academia não encontrado.');
       setLoading(false);
       return;
     }
@@ -106,7 +107,7 @@ export default function AcademyCheckinsPage() {
         setLoading(false);
       },
       (err) => {
-        setError(err?.message || 'Erro ao carregar historico.');
+        setError(err?.message || 'Erro ao carregar histórico.');
         setLoading(false);
       }
     );
@@ -138,8 +139,8 @@ export default function AcademyCheckinsPage() {
 
   return (
     <PageShell
-      title="Historico de entradas"
-      description="Entradas registradas pela academia, com metodo e validacao."
+      title="Histórico de entradas"
+      description="Entradas registradas pela academia, com método e validação."
     >
       <AcademyGate>
         {error && (
@@ -151,13 +152,13 @@ export default function AcademyCheckinsPage() {
           </div>
         )}
 
-        <div className="academy-dashboard academy-revamp academy-checkins">
+        <div className={`academy-dashboard academy-revamp academy-checkins ${styles.checkins}`}>
           <section className="academy-checkins-hero">
             <div>
               <p className="academy-block-kicker">Controle de entrada</p>
-              <h2>Historico de entradas em tempo real.</h2>
+              <h2>Histórico de entradas em tempo real.</h2>
               <p className="subtle">
-                Acompanhe quem entrou, por qual metodo e a validacao aplicada no acesso.
+                Acompanhe quem entrou, por qual método e a validação aplicada no acesso.
               </p>
             </div>
             <div className="academy-checkins-stats">
@@ -192,24 +193,29 @@ export default function AcademyCheckinsPage() {
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder="Buscar por aluno ou UID"
                 />
-                <select value={methodFilter} onChange={(event) => setMethodFilter(event.target.value)}>
-                  <option value="all">Todos os metodos</option>
+                <select
+                  aria-label="Filtrar por método de entrada"
+                  value={methodFilter}
+                  onChange={(event) => setMethodFilter(event.target.value)}
+                >
+                  <option value="all">Todos os métodos</option>
                   <option value="biometria">Biometria</option>
                   <option value="foto">Foto</option>
                   <option value="nfc">NFC</option>
                 </select>
                 <select
+                  aria-label="Filtrar por validação"
                   value={validationFilter}
                   onChange={(event) => setValidationFilter(event.target.value)}
                 >
-                  <option value="all">Todas as validacoes</option>
+                  <option value="all">Todas as validações</option>
                   <option value="match">Validado</option>
                   <option value="enrolled">Novo cadastro</option>
                   <option value="photo-ai-match">Foto validada por IA</option>
                   <option value="photo-ai-mismatch">Foto divergente</option>
-                  <option value="photo-ai-error">Falha de validacao</option>
+                  <option value="photo-ai-error">Falha de validação</option>
                   <option value="photo-confirmed">Foto confirmada</option>
-                  <option value="photo-manual">Confirmacao manual</option>
+                  <option value="photo-manual">Confirmação manual</option>
                   <option value="manual">Manual</option>
                 </select>
               </div>
@@ -239,7 +245,7 @@ export default function AcademyCheckinsPage() {
                       </span>
                       {entry.method === 'foto' && typeof entry.photoConfidence === 'number' ? (
                         <span className="academy-checkins-pill">
-                          Confianca {Math.round(entry.photoConfidence * 100)}%
+                          Confiança {Math.round(entry.photoConfidence * 100)}%
                         </span>
                       ) : null}
                       {entry.readerToken ? (
