@@ -1,0 +1,31 @@
+.frame {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 158%;
+  max-width: none;
+  height: auto;
+  transform: translate(-50%, -50%);
+}
+
+:global(:root[data-theme='dark']) .image {
+  filter: brightness(0) invert(1);
+}
+
+/* Fixed-color surfaces must not inherit the page's theme treatment. */
+.frame[data-brand-surface='light'] .image {
+  filter: none;
+}
+
+.frame[data-brand-surface='dark'] .image {
+  filter: brightness(0) invert(1);
+}
