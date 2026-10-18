@@ -15,6 +15,7 @@ import {
 import { fetchUserWorkouts } from '@/lib/services/workouts';
 import type { Appointment, AppointmentStatus, AppointmentType } from '@/lib/types/scheduling';
 import type { UserWorkout } from '@/lib/types/workout';
+import './academy-agenda-mobile.css';
 
 type AgendaSource = 'appointment' | 'workout';
 
@@ -43,6 +44,12 @@ const STATUS_LABELS: Record<AppointmentStatus, string> = {
 };
 
 const WEEKDAY_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+const calendarDayFormatter = new Intl.DateTimeFormat('pt-BR', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
 
 const normalizeWeekday = (value: string) =>
   value
@@ -442,6 +449,13 @@ export default function AcademyAgendaPage() {
                     className={`academy-agenda-day ${day.inCurrentMonth ? '' : 'is-outside'} ${
                       day.isToday ? 'is-today' : ''
                     } ${selectedDate && sameDay(day.date, selectedDate) ? 'is-selected' : ''}`}
+                    aria-label={`${calendarDayFormatter.format(day.date)}${
+                      day.eventCount > 0
+                        ? `, ${day.eventCount} ${day.eventCount === 1 ? 'item' : 'itens'} na agenda`
+                        : ''
+                    }`}
+                    aria-current={day.isToday ? 'date' : undefined}
+                    aria-pressed={sameDay(day.date, selectedDate ?? undefined)}
                     onClick={() => handleSelectDay(day.date)}
                   >
                     <span>{day.date.getDate()}</span>

@@ -1,0 +1,22 @@
+@media (max-width: 420px) {
+  .academy-agenda-page .academy-agenda-calendar {
+    width: calc(100vw - 4px);
+    margin-inline: calc(50% - 50vw + 2px);
+  }
+
+  .academy-agenda-page .academy-agenda-weekdays,
+  .academy-agenda-page .academy-agenda-days {
+    width: calc(100vw - 4px);
+    margin-inline: calc(50% - 50vw + 2px);
+    column-gap: 1px;
+  }
+
+  .academy-agenda-page .academy-agenda-days {
+    row-gap: 4px;
+  }
+
+  .academy-agenda-page .academy-agenda-day {
+    min-width: 0;
+    border-radius: 8px;
+  }
+}
