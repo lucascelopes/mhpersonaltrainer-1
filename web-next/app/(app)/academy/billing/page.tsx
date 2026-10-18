@@ -20,6 +20,7 @@ import {
   StripeConnectStatus,
   submitStripeConnectOnboarding,
 } from '@/lib/services/payments';
+import './billing-mobile.css';
 
 const normalizeConnectError = (message: string) => {
   const normalized = message.toLowerCase();
@@ -178,7 +179,9 @@ export default function AcademyBillingPage() {
   }, [invoices, studentsById]);
 
   const filteredInvoices = useMemo(() => {
-    const term = invoiceQuery.trim().toLowerCase();
+    const normalizeSearchText = (value: string) =>
+      value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const term = normalizeSearchText(invoiceQuery.trim());
     return invoices.filter((invoice) => {
       if (invoiceStatusFilter === 'paid' && !invoice.pago) return false;
       if (invoiceStatusFilter === 'open' && invoice.pago) return false;
@@ -186,8 +189,8 @@ export default function AcademyBillingPage() {
       const studentName = (invoice.studentId ? studentsById.get(invoice.studentId) : '') || '';
       const description = invoice.planName || invoice.descricao || '';
       return (
-        studentName.toLowerCase().includes(term) ||
-        description.toLowerCase().includes(term)
+        normalizeSearchText(studentName).includes(term) ||
+        normalizeSearchText(description).includes(term)
       );
     });
   }, [invoiceQuery, invoiceStatusFilter, invoices, studentsById]);

@@ -1,0 +1,76 @@
+.academy-billing-v10 .billing-v10-list-item > div:first-child {
+  display: grid;
+  gap: 4px;
+  overflow-wrap: anywhere;
+}
+
+:root[data-theme='dark'] .academy-billing-v10 {
+  --billing-ink: #e9f2ff;
+  --billing-muted: #b6c6d9;
+  --billing-border: rgba(148, 163, 184, 0.28);
+  --billing-surface: #11243b;
+  --billing-surface-alt: #1b3049;
+  --billing-shadow-soft: 0 12px 24px rgba(0, 0, 0, 0.18);
+}
+
+:root[data-theme='dark'] .academy-billing-v10 .billing-v10-kpi,
+:root[data-theme='dark'] .academy-billing-v10 .billing-v10-card,
+:root[data-theme='dark'] .academy-billing-v10 .billing-v10-row,
+:root[data-theme='dark'] .academy-billing-v10 .billing-v10-list-item {
+  background: var(--billing-surface);
+  border-color: var(--billing-border);
+}
+
+:root[data-theme='dark'] .academy-billing-v10 .billing-v10-table-head {
+  background: var(--billing-surface-alt);
+}
+
+:root[data-theme='dark'] .academy-billing-v10 .billing-v10-badge,
+:root[data-theme='dark'] .academy-billing-v10 .billing-v10-status,
+:root[data-theme='dark'] .academy-billing-v10 .billing-v10-pill {
+  color: #a8c9ff;
+}
+
+:root[data-theme='dark'] .academy-billing-v10 .billing-v10-status.is-active,
+:root[data-theme='dark'] .academy-billing-v10 .billing-v10-pill.is-paid {
+  color: #86efac;
+}
+
+:root[data-theme='dark'] .academy-billing-v10 .billing-v10-status.is-pending,
+:root[data-theme='dark'] .academy-billing-v10 .billing-v10-pill.is-pending,
+:root[data-theme='dark'] .academy-billing-v10 .billing-v10-alert {
+  color: #fcd34d;
+}
+
+@media (max-width: 720px) {
+  .academy-billing-v10 .billing-v10-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .academy-billing-v10 .billing-v10-card > *,
+  .academy-billing-v10 .billing-v10-form,
+  .academy-billing-v10 .billing-v10-split > * {
+    min-width: 0;
+  }
+
+  .academy-billing-v10 .billing-v10-form .academy-form-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .academy-billing-v10 .billing-v10-form input,
+  .academy-billing-v10 .billing-v10-form select,
+  .academy-billing-v10 .billing-v10-form textarea {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .academy-billing-v10 .billing-v10-list-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .academy-billing-v10 .billing-v10-list-meta {
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+}
