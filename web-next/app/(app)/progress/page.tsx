@@ -19,6 +19,7 @@ import { useAuth } from '@/lib/auth';
 import { useDashboardData } from '@/lib/hooks/useDashboardData';
 import type { PhysicalEvaluation } from '@/lib/types/evaluation';
 import type { UserWorkout } from '@/lib/types/workout';
+import styles from './page.module.css';
 
 const IconArrowLeft = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true" className="student-icon">
@@ -51,7 +52,7 @@ function StudentProgress() {
   const completionRate = Number.isFinite(stats.taxaConclusao) ? Math.round(stats.taxaConclusao) : 0;
 
   const getEvaluationLabel = (type?: string) => {
-    if (!type) return 'Avaliacao';
+    if (!type) return 'Avaliação';
     if (type === 'online' || type === 'postural' || type === 'personalizada' || type === 'fisica') {
       return getEvaluationTypeLabel(type);
     }
@@ -60,7 +61,7 @@ function StudentProgress() {
 
   if (loading && !hasLoadedOnce) {
     return (
-      <section className="student-progress">
+      <section className={`student-progress ${styles.progress}`}>
         <div className="student-loading">
           <p className="student-home-kicker">Carregando progresso</p>
           <p className="student-home-sub">Buscando seus dados.</p>
@@ -70,14 +71,14 @@ function StudentProgress() {
   }
 
   return (
-    <section className="student-progress">
+    <section className={`student-progress ${styles.progress}`}>
       <header className="student-workout-detail-header">
         <button type="button" className="student-workout-back" onClick={() => router.back()} aria-label="Voltar">
           <IconArrowLeft />
         </button>
         <div className="student-workout-title">
           <strong>Meu progresso</strong>
-          <span>Resumo dos treinos e avaliacoes recentes</span>
+          <span>Resumo dos treinos e avaliações recentes</span>
         </div>
         <div className="student-workout-header-spacer" />
       </header>
@@ -96,13 +97,13 @@ function StudentProgress() {
           </div>
           <div className="student-progress-metric">
             <strong>{stats.treinosConcluidos}</strong>
-            <span>Concluidos</span>
+            <span>Concluídos</span>
           </div>
         </div>
         <div className="student-progress-row">
           <div className="student-progress-metric">
             <strong>{stats.sequenciaAtual}</strong>
-            <span>Sequencia</span>
+            <span>Sequência</span>
           </div>
           <div className="student-progress-metric">
             <strong>{completionRate}%</strong>
@@ -113,7 +114,7 @@ function StudentProgress() {
 
       <section className="student-section">
         <div className="student-section-header">
-          <h2>Ultimos treinos</h2>
+          <h2>Últimos treinos</h2>
           <Link href="/workouts" className="student-link">
             Ver todos
           </Link>
@@ -122,7 +123,7 @@ function StudentProgress() {
           <div className="student-list">
             {recentWorkouts.map((treino) => {
               const workoutDate = treino.lastCompletedAt || treino.dataCriacao;
-              const statusLabel = treino.concluido ? 'Concluido' : 'Em andamento';
+              const statusLabel = treino.concluido ? 'Concluído' : 'Em andamento';
               return (
                 <Link key={treino.id} href={`/workout/${treino.id}`} className="student-list-item">
                   <div>
@@ -149,7 +150,7 @@ function StudentProgress() {
 
       <section className="student-section">
         <div className="student-section-header">
-          <h2>Avaliacoes recentes</h2>
+          <h2>Avaliações recentes</h2>
           <Link href="/evaluations" className="student-link">
             Ver todas
           </Link>
@@ -163,7 +164,7 @@ function StudentProgress() {
                 className="student-list-item"
               >
                 <div>
-                  <strong>Avaliacao {getEvaluationLabel(avaliacao.tipo)}</strong>
+                  <strong>Avaliação {getEvaluationLabel(avaliacao.tipo)}</strong>
                   <span>Registro recente</span>
                 </div>
                 <div className="student-list-meta">
@@ -175,7 +176,7 @@ function StudentProgress() {
           </div>
         ) : (
           <div className="student-empty-state">
-            <p>Nenhuma avaliacao encontrada.</p>
+            <p>Nenhuma avaliação encontrada.</p>
             <Link href="/chat" className="student-inline-button">
               Falar com personal
             </Link>

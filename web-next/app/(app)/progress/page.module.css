@@ -1,0 +1,28 @@
+.progress {
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  .progress :global(.student-workout-detail-header) {
+    grid-template-columns: 48px minmax(0, 1fr) 48px;
+  }
+
+  .progress :global(.student-workout-back),
+  .progress :global(.student-workout-header-spacer) {
+    min-width: 48px;
+    min-height: 48px;
+  }
+
+  .progress :global(.student-section-header .student-link) {
+    display: inline-flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 8px;
+    white-space: nowrap;
+  }
+
+  .progress :global(.student-inline-button) {
+    min-height: 48px;
+  }
+}
