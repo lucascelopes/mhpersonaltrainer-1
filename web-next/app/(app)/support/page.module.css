@@ -452,3 +452,81 @@
   background: rgba(114, 178, 238, 0.16);
   color: #9fd0ff;
 }
+
+
+/* Connection and composer states shared by desktop and mobile support. */
+.chatCard,
+.chatFeed,
+.chatHeader > div,
+.heroStats article {
+  min-width: 0;
+}
+
+.chatHeader {
+  flex-wrap: wrap;
+}
+
+.chatRecovery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chatForm input,
+.chatForm :global(.button),
+.chatRecovery :global(.button) {
+  min-height: 48px;
+}
+
+.chatForm input {
+  font-size: 16px;
+}
+
+.chatForm input:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.chatBubble span,
+.chatError,
+.heroStats span {
+  overflow-wrap: anywhere;
+}
+
+.livePillUnavailable {
+  background: #edf1f6;
+  color: #4b5d73;
+}
+
+.chatRecovery :global(.button):focus-visible {
+  outline: 3px solid #2683e8;
+  outline-offset: 3px;
+}
+
+:global(:root[data-theme='dark']) .livePillUnavailable {
+  background: #293b52;
+  color: #d0dded;
+}
+
+:global(:root[data-theme='dark']) .chatError {
+  color: #ffb4aa;
+}
+
+@media (max-width: 720px) {
+  .heroActions :global(.button),
+  .queueCard :global(.button),
+  .guideCard :global(.button),
+  .topicCard :global(.button),
+  .realtimeAside :global(.button) {
+    min-height: 48px;
+  }
+
+  .chatRecovery {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .heroStats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

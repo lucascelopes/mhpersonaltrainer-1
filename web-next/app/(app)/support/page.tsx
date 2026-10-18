@@ -123,6 +123,8 @@ export default function SupportHomePage() {
   const [liveSending, setLiveSending] = useState(false);
   const [liveReady, setLiveReady] = useState(false);
   const [liveError, setLiveError] = useState('');
+  const [liveSendError, setLiveSendError] = useState('');
+  const [liveAttempt, setLiveAttempt] = useState(0);
 
   const userIdConstraints = useMemo(
     () => (userId ? [firestoreHelpers.where('userId', '==', userId)] : []),
@@ -178,6 +180,9 @@ export default function SupportHomePage() {
     let active = true;
     let unsubscribe: (() => void) | null = null;
     setLiveError('');
+    setLiveSendError('');
+    setLiveConversationId(null);
+    setLiveMessages([]);
     setLiveReady(false);
 
     const bootLiveChat = async () => {
@@ -195,15 +200,20 @@ export default function SupportHomePage() {
         unsubscribe = listenToMessages(conversation.id, (items) => {
           if (!active) return;
           setLiveMessages(items.slice(-40));
+          setLiveReady(true);
+        }, () => {
+          if (!active) return;
+          setLiveError('A conexão com as mensagens foi interrompida. Tente reconectar ou abra um ticket.');
+          setLiveReady(false);
+          setLiveConversationId(null);
         });
-        await markConversationAsRead(conversation.id, user.uid);
-        if (!active) return;
-        setLiveReady(true);
+        void markConversationAsRead(conversation.id, user.uid);
       } catch (error) {
         console.error('Erro ao iniciar chat ao vivo:', error);
         if (!active) return;
-        setLiveError('Nao foi possivel iniciar o chat ao vivo agora.');
-        setLiveReady(true);
+        setLiveError('Não foi possível conectar ao chat. Tente novamente ou abra um ticket.');
+        setLiveReady(false);
+        setLiveConversationId(null);
       }
     };
 
@@ -213,7 +223,7 @@ export default function SupportHomePage() {
       active = false;
       if (unsubscribe) unsubscribe();
     };
-  }, [user?.uid, user?.displayName, user?.email, user?.photoUrl]);
+  }, [user?.uid, user?.displayName, user?.email, user?.photoUrl, liveAttempt]);
 
   useEffect(() => {
     const node = chatScrollRef.current;
@@ -224,9 +234,9 @@ export default function SupportHomePage() {
   const handleLiveSubmit = async (event: FormEvent) => {
     event.preventDefault();
     const safeMessage = liveInput.trim();
-    if (!safeMessage || !user?.uid || !liveConversationId) return;
+    if (!safeMessage || !user?.uid || !liveConversationId || !liveReady || liveError || liveSending) return;
     setLiveSending(true);
-    setLiveError('');
+    setLiveSendError('');
     setLiveInput('');
     try {
       await sendMessage({
@@ -239,7 +249,7 @@ export default function SupportHomePage() {
       await markConversationAsRead(liveConversationId, user.uid);
     } catch (error) {
       console.error('Erro ao enviar mensagem no suporte:', error);
-      setLiveError('Falha ao enviar mensagem. Tente novamente.');
+      setLiveSendError('Não foi possível enviar. Sua mensagem foi mantida para tentar novamente.');
       setLiveInput(safeMessage);
     } finally {
       setLiveSending(false);
@@ -322,11 +332,13 @@ export default function SupportHomePage() {
                 <h4>Canal ao vivo com suporte MH</h4>
                 <p>Mensagens em tempo real para duvidas rapidas.</p>
               </div>
-              <span className={styles.livePill}>Online</span>
+              <span className={`${styles.livePill} ${!liveReady || liveError ? styles.livePillUnavailable : ''}`} role="status">{liveError ? 'Indisponível' : liveReady ? 'Conectado' : 'Conectando'}</span>
             </header>
 
             <div className={styles.chatFeed} ref={chatScrollRef}>
-              {!liveReady ? (
+              {liveError ? (
+                <div className={styles.chatEmpty}>Você ainda pode abrir um ticket enquanto o chat estiver indisponível.</div>
+              ) : !liveReady ? (
                 <div className={styles.chatEmpty}>Conectando chat...</div>
               ) : liveMessages.length ? (
                 liveMessages.map((message) => {
@@ -346,15 +358,25 @@ export default function SupportHomePage() {
             <form className={styles.chatForm} onSubmit={handleLiveSubmit}>
               <input
                 type="text"
+                aria-label="Mensagem para o suporte"
                 value={liveInput}
+                disabled={!liveReady || Boolean(liveError) || liveSending}
                 onChange={(event) => setLiveInput(event.target.value)}
                 placeholder="Digite sua mensagem para o suporte..."
               />
-              <button className="button sm" type="submit" disabled={liveSending || !liveConversationId}>
+              <button className="button sm" type="submit" disabled={liveSending || !liveConversationId || !liveReady || Boolean(liveError) || !liveInput.trim()}>
                 {liveSending ? 'Enviando...' : 'Enviar'}
               </button>
             </form>
-            {liveError ? <p className={styles.chatError}>{liveError}</p> : null}
+            {liveError || liveSendError ? <p className={styles.chatError} role="alert">{liveError || liveSendError}</p> : null}
+            {liveError && (
+              <div className={styles.chatRecovery}>
+                <button type="button" className="button secondary" onClick={() => setLiveAttempt((value) => value + 1)}>
+                  Reconectar chat
+                </button>
+                <Link href="/support/ticket" className="button secondary">Abrir ticket</Link>
+              </div>
+            )}
           </article>
 
           <aside className={styles.realtimeAside}>

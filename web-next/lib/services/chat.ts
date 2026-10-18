@@ -1,11 +1,11 @@
 import {
-  addDoc,
   collection,
   deleteField,
   doc,
   getDoc,
   getDocs,
   onSnapshot,
+  runTransaction,
   query,
   serverTimestamp,
   setDoc,
@@ -149,25 +149,34 @@ export async function ensureConversation(params: EnsureConversationParams): Prom
     [params.otherUserId]: buildParticipantInfoEntry(params.otherName, params.otherPhoto),
   };
 
-  const docRef = await addDoc(conversationsRef, {
-    key,
-    participants: [params.userId, params.otherUserId],
-    type: params.type || 'direct',
-    participantInfo,
-    createdAt: serverTimestamp(),
-    lastMessage: '',
-    lastMessageAt: serverTimestamp(),
-    lastMessageSenderId: '',
-    unreadCount: {},
-  });
+  // Keep legacy IDs above; concurrent creation of a new pair uses one stable ID.
+  const identity = new TextEncoder().encode(JSON.stringify([params.userId, params.otherUserId].sort()));
+  const digest = await crypto.subtle.digest('SHA-256', identity);
+  const conversationId = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
+  const docRef = doc(conversationsRef, conversationId);
+  return runTransaction(db, async (transaction) => {
+    const snapshot = await transaction.get(docRef);
+    if (snapshot.exists()) return mapConversation(snapshot.id, snapshot.data());
+    transaction.set(docRef, {
+      key,
+      participants: [params.userId, params.otherUserId],
+      type: params.type || 'direct',
+      participantInfo,
+      createdAt: serverTimestamp(),
+      lastMessage: '',
+      lastMessageAt: serverTimestamp(),
+      lastMessageSenderId: '',
+      unreadCount: {},
+    });
 
-  return {
-    id: docRef.id,
-    participants: [params.userId, params.otherUserId],
-    type: params.type || 'direct',
-    createdAt: new Date(),
-    unreadCount: {},
-  };
+    return {
+      id: docRef.id,
+      participants: [params.userId, params.otherUserId],
+      type: params.type || 'direct',
+      createdAt: new Date(),
+      unreadCount: {},
+    };
+  });
 }
 
 export async function fetchConversation(conversationId: string): Promise<Conversation | null> {
@@ -229,7 +238,8 @@ export function listenToSupportConversations(
 
 export function listenToMessages(
   conversationId: string,
-  callback: (items: Message[]) => void
+  callback: (items: Message[]) => void,
+  onError?: (error: Error) => void
 ) {
   const db = getFirebaseDb();
   const messagesRef = collection(db, 'conversations', conversationId, 'messages');
@@ -262,7 +272,8 @@ export function listenToMessages(
     },
     (error) => {
       console.error('Erro ao escutar mensagens:', error);
-      callback([]);
+      if (onError) onError(error);
+      else callback([]);
     }
   );
 }
@@ -283,7 +294,8 @@ export async function sendMessage(params: {
 }) {
   const db = getFirebaseDb();
   const messagesRef = collection(db, 'conversations', params.conversationId, 'messages');
-  await addDoc(messagesRef, {
+  const batch = writeBatch(db);
+  batch.set(doc(messagesRef), {
     senderId: params.senderId,
     senderName: params.senderName || '',
     senderPhoto: params.senderPhoto || '',
@@ -299,7 +311,7 @@ export async function sendMessage(params: {
     readBy: [params.senderId],
   });
 
-  await setDoc(
+  batch.set(
     doc(db, 'conversations', params.conversationId),
     {
       lastMessage: params.content,
@@ -308,6 +320,7 @@ export async function sendMessage(params: {
     },
     { merge: true }
   );
+  await batch.commit();
 
   try {
     const convoRef = doc(db, 'conversations', params.conversationId);
