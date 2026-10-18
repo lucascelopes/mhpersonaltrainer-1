@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import type { QueryConstraint } from 'firebase/firestore';
 import PageShell from '@/components/PageShell';
 import AdminGate from '@/components/AdminGate';
@@ -75,7 +76,11 @@ export default function AdminStudentsPage() {
                     <DataTable
                       rows={filteredStudents}
                       columns={[
-                        { key: 'displayName', label: 'Aluno' },
+                        { key: 'displayName', label: 'Aluno', render: (row) => (
+                          <Link className={styles.rowLink} href={`/admin/student/${encodeURIComponent(row.id)}`}>
+                            {row.displayName}
+                          </Link>
+                        ) },
                         { key: 'email', label: 'Email' },
                         { key: 'accessLabel', label: 'Acesso' },
                         { key: 'createdTime', label: 'Criado em', render: (row) => formatDate(row.createdTime) },
@@ -101,6 +106,13 @@ export default function AdminStudentsPage() {
                               <dd>{formatDate(student.createdTime)}</dd>
                             </div>
                           </dl>
+                          <Link
+                            className={styles.cardLink}
+                            href={`/admin/student/${encodeURIComponent(student.id)}`}
+                            aria-label={`Ver ficha de ${student.displayName}`}
+                          >
+                            Ver ficha do aluno
+                          </Link>
                         </article>
                       </li>
                     ))}

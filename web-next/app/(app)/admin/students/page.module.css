@@ -52,6 +52,32 @@
   color: var(--text-secondary);
 }
 
+.rowLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.cardLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  border-radius: 10px;
+  background: var(--brand-deep);
+  color: var(--surface-strong);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.rowLink:focus-visible,
+.cardLink:focus-visible {
+  outline: 3px solid rgba(29, 111, 191, 0.35);
+  outline-offset: 2px;
+}
+
 @media (max-width: 760px) {
   .toolbar {
     display: grid;
