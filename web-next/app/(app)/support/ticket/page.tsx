@@ -10,6 +10,7 @@ import { useAuth } from '@/lib/auth';
 import { db } from '@/lib/firebaseClient';
 import { firestoreHelpers, formatDate, useCollectionData, useUserScope } from '@/lib/firestoreHooks';
 import styles from './page.module.css';
+import { normalizeSupportPriority, resolveSupportStatus, SUPPORT_PRIORITY_LABELS, SUPPORT_STATUS_LABELS } from '@/lib/supportTicketState';
 
 type TicketPriority = 'baixa' | 'media' | 'alta' | 'critica';
 type TicketQueue = 'administrativo' | 'financeiro' | 'tecnico' | 'produto';
@@ -23,6 +24,7 @@ type TicketRow = {
   priority?: string;
   status?: string;
   resposta?: string;
+  respostaEm?: unknown;
   destino?: TicketQueue | string;
   data?: unknown;
   d?: unknown;
@@ -111,25 +113,8 @@ const toDateValue = (value: unknown): Date | null => {
   return parsed;
 };
 
-const normalizePriorityLabel = (value?: string | null) => {
-  const normalized = String(value || '')
-    .trim()
-    .toLowerCase();
-  if (normalized === 'critica') return 'Critica';
-  if (normalized === 'alta') return 'Alta';
-  if (normalized === 'media') return 'Media';
-  return 'Baixa';
-};
-
-const resolveStatus = (ticket: TicketRow) => {
-  const explicit = String(ticket.status || '')
-    .trim()
-    .toLowerCase();
-  if (explicit === 'resolvido' || explicit === 'fechado') return 'resolvido';
-  if (explicit === 'em_andamento' || explicit === 'em andamento') return 'andamento';
-  if (String(ticket.resposta || '').trim()) return 'respondido';
-  return 'aberto';
-};
+const normalizePriorityLabel = (value?: string | null) => SUPPORT_PRIORITY_LABELS[normalizeSupportPriority(value)];
+const resolveStatus = resolveSupportStatus;
 
 const queueLabelMap: Record<TicketQueue, string> = {
   administrativo: 'Administracao',
@@ -139,15 +124,15 @@ const queueLabelMap: Record<TicketQueue, string> = {
 };
 
 const priorityClassMap: Record<string, string> = {
-  Baixa: styles.priorityLow,
-  Media: styles.priorityMedium,
-  Alta: styles.priorityHigh,
-  Critica: styles.priorityCritical,
+  baixa: styles.priorityLow,
+  media: styles.priorityMedium,
+  alta: styles.priorityHigh,
+  critica: styles.priorityCritical,
 };
 
 const statusClassMap: Record<string, string> = {
   aberto: styles.statusOpen,
-  andamento: styles.statusProgress,
+  em_andamento: styles.statusProgress,
   respondido: styles.statusAnswered,
   resolvido: styles.statusResolved,
 };
@@ -215,9 +200,10 @@ export default function TicketSupportPage() {
   const summary = useMemo(() => {
     const total = tickets.length;
     const abertos = tickets.filter((ticket) => resolveStatus(ticket) === 'aberto').length;
-    const andamento = tickets.filter((ticket) => resolveStatus(ticket) === 'andamento').length;
+    const andamento = tickets.filter((ticket) => resolveStatus(ticket) === 'em_andamento').length;
     const resolvidos = tickets.filter((ticket) => resolveStatus(ticket) === 'resolvido').length;
-    return { total, abertos, andamento, resolvidos };
+    const respondidos = tickets.filter((ticket) => resolveStatus(ticket) === 'respondido').length;
+    return { total, abertos, andamento, respondidos, resolvidos };
   }, [tickets]);
 
   const applyTemplate = (template: (typeof TEMPLATE_OPTIONS)[number]) => {
@@ -242,6 +228,7 @@ export default function TicketSupportPage() {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
+    if (sending) return;
     if (!userId) {
       setSubmitError('Usuario nao identificado. Faca login novamente.');
       return;
@@ -419,8 +406,8 @@ export default function TicketSupportPage() {
               </label>
             </div>
 
-            {submitError ? <p className={styles.error}>{submitError}</p> : null}
-            {submitSuccess ? <p className={styles.success}>{submitSuccess}</p> : null}
+            {submitError ? <p className={styles.error} role="alert">{submitError}</p> : null}
+            {submitSuccess ? <p className={styles.success} role="status">{submitSuccess}</p> : null}
 
             <div className={styles.formActions}>
               <button className="button" type="submit" disabled={sending}>
@@ -447,6 +434,10 @@ export default function TicketSupportPage() {
             <article>
               <span>Em andamento</span>
               <strong>{summary.andamento}</strong>
+            </article>
+            <article>
+              <span>Respondidos</span>
+              <strong>{summary.respondidos}</strong>
             </article>
             <article>
               <span>Resolvidos</span>
@@ -489,11 +480,18 @@ export default function TicketSupportPage() {
                       <h4>{ticket.titulo || 'Ticket sem titulo'}</h4>
                     </div>
                     <div className={styles.badges}>
-                      <span className={`${styles.priorityBadge} ${priorityClassMap[priorityLabel]}`}>{priorityLabel}</span>
-                      <span className={`${styles.statusBadge} ${statusClassMap[status]}`}>{status}</span>
+                      <span className={`${styles.priorityBadge} ${priorityClassMap[normalizeSupportPriority(ticket.priority)]}`}>{priorityLabel}</span>
+                      <span className={`${styles.statusBadge} ${statusClassMap[status]}`}>{SUPPORT_STATUS_LABELS[status]}</span>
                     </div>
                   </header>
                   <p>{ticket.texto || 'Sem descricao registrada.'}</p>
+                  {ticket.resposta?.trim() && (
+                    <section className={styles.ticketReply} aria-label="Resposta da equipe">
+                      <strong>Resposta da equipe</strong>
+                      <p>{ticket.resposta}</p>
+                      {toDateValue(ticket.respostaEm) && <small>{formatDate(toDateValue(ticket.respostaEm))}</small>}
+                    </section>
+                  )}
                   <footer>
                     <span>{ticket.categoria || 'Sem categoria'}</span>
                     <span>{queueLabel}</span>

@@ -9,6 +9,7 @@ import { db } from '@/lib/firebaseClient';
 import { useAuth } from '@/lib/auth';
 import { formatDate, useCollectionData } from '@/lib/firestoreHooks';
 import styles from './page.module.css';
+import { normalizeSupportPriority, resolveSupportStatus, SUPPORT_PRIORITY_LABELS, SUPPORT_STATUS_LABELS } from '@/lib/supportTicketState';
 
 type TicketStatus = 'aberto' | 'em_andamento' | 'respondido' | 'resolvido';
 
@@ -49,26 +50,10 @@ const parseDate = (value: unknown): Date | null => {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 
-const normalizePriority = (value?: string | null) => {
-  const normalized = String(value || '')
-    .trim()
-    .toLowerCase();
-  if (normalized === 'critica') return 'critica';
-  if (normalized === 'alta') return 'alta';
-  if (normalized === 'media') return 'media';
-  return 'baixa';
-};
-
-const normalizeStatus = (ticket: SupportTicketRow): TicketStatus => {
-  const status = String(ticket.status || '')
-    .trim()
-    .toLowerCase();
-  if (status === 'resolvido' || status === 'fechado') return 'resolvido';
-  if (status === 'respondido') return 'respondido';
-  if (status === 'em_andamento' || status === 'em andamento') return 'em_andamento';
-  if (String(ticket.resposta || '').trim()) return 'respondido';
-  return 'aberto';
-};
+const normalizePriority = normalizeSupportPriority;
+const normalizeStatus = resolveSupportStatus;
+const priorityLabel = (value?: string | null) => SUPPORT_PRIORITY_LABELS[normalizeSupportPriority(value)];
+const statusLabel = (value: TicketStatus) => SUPPORT_STATUS_LABELS[value];
 
 const queueLabel = (value?: string | null) => {
   const normalized = String(value || '')
@@ -94,6 +79,7 @@ export default function AdminSupportPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [actionError, setActionError] = useState('');
+  const [feedbackTicketId, setFeedbackTicketId] = useState('');
 
   const normalized = useMemo(() => {
     return data
@@ -120,7 +106,8 @@ export default function AdminSupportPage() {
     const aberto = normalized.filter((item) => item.normalizedStatus === 'aberto').length;
     const andamento = normalized.filter((item) => item.normalizedStatus === 'em_andamento').length;
     const resolvido = normalized.filter((item) => item.normalizedStatus === 'resolvido').length;
-    return { total, aberto, andamento, resolvido };
+    const respondido = normalized.filter((item) => item.normalizedStatus === 'respondido').length;
+    return { total, aberto, andamento, respondido, resolvido };
   }, [normalized]);
 
   const filtered = useMemo(() => {
@@ -163,7 +150,13 @@ export default function AdminSupportPage() {
   };
 
   const updateTicket = async (status: TicketStatus) => {
-    if (!selected || !user?.uid) return;
+    if (!selected || !user?.uid || saving) return;
+    setFeedbackTicketId(selected.id);
+    if (status === 'respondido' && !responseText.trim()) {
+      setActionError('Escreva uma resposta antes de responder o ticket.');
+      setMessage('');
+      return;
+    }
     setSaving(true);
     setMessage('');
     setActionError('');
@@ -172,14 +165,14 @@ export default function AdminSupportPage() {
         status,
         updatedAt: serverTimestamp(),
       };
-      if (responseText.trim()) {
+      if (responseText.trim() && (status === 'respondido' || responseText.trim() !== String(selected.resposta || '').trim())) {
         payload.resposta = responseText.trim();
         payload.respostaPor = user.uid;
         payload.respostaPorNome = user.displayName || user.email || 'Admin';
         payload.respostaEm = serverTimestamp();
       }
       await updateDoc(doc(db, 'supporte', selected.id), payload);
-      setMessage(status === 'resolvido' ? 'Ticket marcado como resolvido.' : 'Resposta enviada.');
+      setMessage(status === 'resolvido' ? 'Ticket marcado como resolvido.' : status === 'em_andamento' ? 'Ticket marcado em andamento.' : 'Resposta enviada.');
     } catch (errorSave) {
       console.error('Erro ao atualizar ticket:', errorSave);
       setActionError('Nao foi possivel atualizar o ticket agora.');
@@ -218,6 +211,10 @@ export default function AdminSupportPage() {
               <article>
                 <span>Em andamento</span>
                 <strong>{stats.andamento}</strong>
+              </article>
+              <article>
+                <span>Respondidos</span>
+                <strong>{stats.respondido}</strong>
               </article>
               <article>
                 <span>Resolvidos</span>
@@ -273,13 +270,13 @@ export default function AdminSupportPage() {
                     >
                       <div className={styles.itemTop}>
                         <strong>{ticket.titulo || 'Ticket sem titulo'}</strong>
-                        <span className={`${styles.badge} ${styles[`priority_${priority}`]}`}>{priority}</span>
+                        <span className={`${styles.badge} ${styles[`priority_${priority}`]}`}>{priorityLabel(priority)}</span>
                       </div>
                       <p>{ticket.texto || 'Sem descricao.'}</p>
                       <div className={styles.itemMeta}>
                         <span>{queueLabel(ticket.destino)}</span>
                         <span className={`${styles.badge} ${styles[`status_${status}`]}`}>
-                          {status.replace('_', ' ')}
+                          {statusLabel(status)}
                         </span>
                         <span>{formatDate(ticket.createdDate)}</span>
                         <span>{requester}</span>
@@ -304,10 +301,10 @@ export default function AdminSupportPage() {
                     </div>
                     <div className={styles.detailBadges}>
                       <span className={`${styles.badge} ${styles[`priority_${selected.normalizedPriority}`]}`}>
-                        {selected.normalizedPriority}
+                        {priorityLabel(selected.normalizedPriority)}
                       </span>
                       <span className={`${styles.badge} ${styles[`status_${selected.normalizedStatus}`]}`}>
-                        {selected.normalizedStatus.replace('_', ' ')}
+                        {statusLabel(selected.normalizedStatus)}
                       </span>
                     </div>
                   </div>
@@ -336,6 +333,7 @@ export default function AdminSupportPage() {
                     <textarea
                       rows={8}
                       value={responseText}
+                      disabled={saving}
                       onChange={(event) => setResponseDrafts((drafts) => ({
                         ...drafts,
                         [selected.id]: event.target.value,
@@ -344,8 +342,8 @@ export default function AdminSupportPage() {
                     />
                   </label>
 
-                  {actionError ? <p className={styles.error}>{actionError}</p> : null}
-                  {message ? <p className={styles.success}>{message}</p> : null}
+                  {actionError && feedbackTicketId === selected.id ? <p className={styles.error} role="alert">{actionError}</p> : null}
+                  {message && feedbackTicketId === selected.id ? <p className={styles.success} role="status">{message}</p> : null}
 
                   <div className={styles.actions}>
                     <button className="button" type="button" disabled={saving} onClick={() => updateTicket('respondido')}>

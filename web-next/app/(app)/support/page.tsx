@@ -11,6 +11,8 @@ import { doc } from 'firebase/firestore';
 import type { Message } from '@/lib/types/chat';
 import { ensureConversation, listenToMessages, markConversationAsRead, sendMessage } from '@/lib/services/chat';
 import styles from './page.module.css';
+import { normalizeSupportPriority, resolveSupportStatus } from '@/lib/supportTicketState';
+
 
 type SupportTicketRow = {
   id: string;
@@ -101,16 +103,6 @@ const SUPPORT_QUEUES = [
   },
 ];
 
-const priorityScore = (value?: string | null) => {
-  const normalized = String(value || '')
-    .trim()
-    .toLowerCase();
-  if (normalized === 'critica') return 4;
-  if (normalized === 'alta') return 3;
-  if (normalized === 'media') return 2;
-  return 1;
-};
-
 export default function SupportHomePage() {
   const { user, role } = useAuth();
   const { userId } = useUserScope();
@@ -148,15 +140,9 @@ export default function SupportHomePage() {
 
   const stats = useMemo(() => {
     const total = tickets.length;
-    const resolvidos = tickets.filter((item) => {
-      const status = String(item.status || '')
-        .trim()
-        .toLowerCase();
-      if (status === 'resolvido' || status === 'fechado') return true;
-      return Boolean(String(item.resposta || '').trim());
-    }).length;
+    const resolvidos = tickets.filter((item) => resolveSupportStatus(item) === 'resolvido').length;
     const abertos = Math.max(total - resolvidos, 0);
-    const urgentes = tickets.filter((item) => priorityScore(item.priority) >= 3).length;
+    const urgentes = tickets.filter((item) => ['alta', 'critica'].includes(normalizeSupportPriority(item.priority))).length;
     return { total, abertos, resolvidos, urgentes };
   }, [tickets]);
 

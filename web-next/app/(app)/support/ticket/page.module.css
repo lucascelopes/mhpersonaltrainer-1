@@ -383,3 +383,95 @@
 :global(:root[data-theme='dark']) .sideTips {
   background: rgba(20, 36, 58, 0.56);
 }
+
+
+.ticketReply {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid #c4d8ef;
+  border-radius: 14px;
+  background: #edf5ff;
+  color: #173b67;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.ticketReply p {
+  margin: 0;
+  white-space: pre-wrap;
+  color: inherit;
+}
+
+:global(:root[data-theme='dark']) .ticketReply {
+  border-color: #3e6089;
+  background: #1b304c;
+  color: #dcecff;
+}
+
+.templateButton,
+.formActions :global(.button) {
+  min-height: 48px;
+}
+
+:global(:root[data-theme='dark']) .error {
+  color: #ffb4aa;
+}
+
+.sideStats article:first-child {
+  grid-column: 1 / -1;
+}
+
+.form input,
+.form select {
+  min-height: 48px;
+  font-size: 16px;
+}
+
+.form textarea {
+  font-size: 16px;
+}
+
+:global(:root[data-theme='dark']) .success {
+  color: #a7f3d0;
+}
+
+:global(:root[data-theme='dark']) .priorityLow {
+  background: #1e3554;
+  color: #c4dcff;
+}
+
+:global(:root[data-theme='dark']) .priorityMedium {
+  background: #3f331b;
+  color: #ffdda0;
+}
+
+:global(:root[data-theme='dark']) .priorityHigh {
+  background: #442c1d;
+  color: #ffd0a3;
+}
+
+:global(:root[data-theme='dark']) .priorityCritical {
+  background: #49262e;
+  color: #ffbcc3;
+}
+
+:global(:root[data-theme='dark']) .statusOpen {
+  background: #1e3554;
+  color: #c4dcff;
+}
+
+:global(:root[data-theme='dark']) .statusProgress {
+  background: #342b4a;
+  color: #e3c6ff;
+}
+
+:global(:root[data-theme='dark']) .statusAnswered {
+  background: #173a49;
+  color: #b0e7ff;
+}
+
+:global(:root[data-theme='dark']) .statusResolved {
+  background: #183d34;
+  color: #a7f3d0;
+}

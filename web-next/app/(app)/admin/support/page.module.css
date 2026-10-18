@@ -368,3 +368,79 @@
 :global(:root[data-theme='dark']) .stats article {
   background: rgba(20, 31, 50, 0.86);
 }
+
+
+.controls input,
+.controls select,
+.actions :global(.button) {
+  min-height: 48px;
+}
+
+.controls input,
+.controls select,
+.replyLabel textarea {
+  font-size: 16px;
+}
+
+.detail,
+.detailHead > div,
+.itemTop > strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+:global(:root[data-theme='dark']) .error {
+  color: #ffb4aa;
+}
+
+.stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.stats article:first-child {
+  grid-column: 1 / -1;
+}
+
+:global(:root[data-theme='dark']) .success {
+  color: #a7f3d0;
+}
+
+:global(:root[data-theme='dark']) .priority_baixa {
+  background: #1e3554;
+  color: #c4dcff;
+}
+
+:global(:root[data-theme='dark']) .priority_media {
+  background: #3f331b;
+  color: #ffdda0;
+}
+
+:global(:root[data-theme='dark']) .priority_alta {
+  background: #442c1d;
+  color: #ffd0a3;
+}
+
+:global(:root[data-theme='dark']) .priority_critica {
+  background: #49262e;
+  color: #ffbcc3;
+}
+
+:global(:root[data-theme='dark']) .status_aberto {
+  background: #1e3554;
+  color: #c4dcff;
+}
+
+:global(:root[data-theme='dark']) .status_em_andamento {
+  background: #342b4a;
+  color: #e3c6ff;
+}
+
+:global(:root[data-theme='dark']) .status_respondido {
+  background: #173a49;
+  color: #b0e7ff;
+}
+
+:global(:root[data-theme='dark']) .status_resolvido {
+  background: #183d34;
+  color: #a7f3d0;
+}
