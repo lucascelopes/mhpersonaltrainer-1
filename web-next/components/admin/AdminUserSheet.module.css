@@ -1,0 +1,39 @@
+@media (max-width: 720px) {
+  .sheet {
+    padding: 12px;
+  }
+
+  .sheet :global(.admin-user-sheet-panel) {
+    width: 100%;
+    min-width: 0;
+    max-height: calc(100vh - 24px);
+  }
+
+  .sheet :global(.admin-user-sheet-header),
+  .sheet :global(.admin-user-sheet-title),
+  .sheet :global(.admin-user-sheet-main),
+  .sheet :global(.admin-user-sheet-identity) {
+    min-width: 0;
+  }
+
+  .sheet :global(.admin-user-sheet-title) {
+    flex: 1 1 100%;
+  }
+
+  .sheet :global(.admin-user-sheet-identity) {
+    flex: 1 1 0;
+  }
+
+  .sheet :global(.admin-user-sheet-identity > span),
+  .sheet :global(.admin-user-sheet-meta strong) {
+    overflow-wrap: anywhere;
+  }
+
+  .sheet :global(.admin-user-sheet-actions .button) {
+    min-height: 48px;
+  }
+
+  .sheet :global(.admin-user-sheet-grid) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
