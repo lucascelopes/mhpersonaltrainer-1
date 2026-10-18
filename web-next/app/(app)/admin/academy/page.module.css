@@ -2,6 +2,12 @@
   min-width: 0;
 }
 
+:global(:root[data-theme='dark']) .portal :global(.academy-hero-metrics) {
+  background: var(--surface-soft);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
 @media (max-width: 640px) {
   .portal :global(.academy-entry-grid) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
