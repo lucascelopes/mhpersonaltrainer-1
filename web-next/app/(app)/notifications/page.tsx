@@ -7,6 +7,7 @@ import PageShell from '@/components/PageShell';
 import { formatDate } from '@/lib/firestoreHooks';
 import { useAuth } from '@/lib/auth';
 import { fetchNotificationsForUser, respondToSecurityLoginAlert } from '@/lib/services/notificationCenter';
+import styles from './page.module.css';
 
 interface NotificationRow {
   id: string;
@@ -24,6 +25,8 @@ export default function NotificationsPage() {
   const router = useRouter();
   const [rows, setRows] = useState<NotificationRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const [search, setSearch] = useState('');
   const [view, setView] = useState<'all' | 'recent'>('all');
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
@@ -32,21 +35,24 @@ export default function NotificationsPage() {
   useEffect(() => {
     let active = true;
     const load = async () => {
+      setRows([]);
+      setLoadError(false);
       if (!user?.uid) {
         setLoading(false);
         return;
       }
       setLoading(true);
-      const result = await fetchNotificationsForUser(user.uid);
+      const result = await fetchNotificationsForUser(user.uid, { freshOnly: false });
       if (!active) return;
       setRows(result.data || []);
+      setLoadError(Boolean(result.error));
       setLoading(false);
     };
     load();
     return () => {
       active = false;
     };
-  }, [user?.uid]);
+  }, [user?.uid, loadAttempt]);
 
   const recentCutoff = useMemo(() => {
     const date = new Date();
@@ -130,7 +136,7 @@ export default function NotificationsPage() {
       description="Alertas de treinos, agenda e sistema."
       actions={actions}
     >
-      <div className="notifications-layout">
+      <div className={`${styles.inbox} notifications-layout`}>
         <section className="card notifications-panel">
           <div className="notifications-header">
             <div>
@@ -168,23 +174,37 @@ export default function NotificationsPage() {
           <div className="notifications-stats">
             <div className="notifications-stat">
               <span>Total</span>
-              <strong>{rows.length}</strong>
+              <strong>{loading || loadError ? '—' : rows.length}</strong>
             </div>
             <div className="notifications-stat">
               <span>Ultimos 7 dias</span>
-              <strong>{recentCount}</strong>
+              <strong>{loading || loadError ? '—' : recentCount}</strong>
             </div>
           </div>
 
           <div className="notifications-list">
-            {loading && <p className="subtle">Carregando notificacoes...</p>}
-            {!loading && !filteredRows.length && (
-              <div className="notifications-empty">
-                <h4>Nenhuma notificacao encontrada</h4>
-                <p className="subtle">Assim que houver novidades, elas aparecem aqui.</p>
+            {loading && <p className="subtle" role="status">Carregando notificações...</p>}
+            {!loading && loadError && (
+              <div className="notifications-empty" role="alert">
+                <h4>Não foi possível carregar suas notificações</h4>
+                <p className="subtle">Verifique sua conexão e tente novamente.</p>
+                <button type="button" className="button secondary" onClick={() => setLoadAttempt((value) => value + 1)}>
+                  Tentar novamente
+                </button>
               </div>
             )}
-            {!loading &&
+            {!loading && !loadError && !filteredRows.length && (
+              <div className="notifications-empty" role="status">
+                <h4>Nenhuma notificação encontrada</h4>
+                <p className="subtle">{search.trim() || view === 'recent' ? 'Tente outra busca ou consulte todas as notificações.' : 'Assim que houver novidades, elas aparecem aqui.'}</p>
+                {(search.trim() || view === 'recent') && (
+                  <button type="button" className="button secondary" onClick={() => { setSearch(''); setView('all'); }}>
+                    Limpar filtros
+                  </button>
+                )}
+              </div>
+            )}
+            {!loading && !loadError &&
               filteredRows.map((row) => (
                 <div key={row.id} className="notifications-item">
                   <div>

@@ -1,0 +1,162 @@
+.inbox {
+  --inbox-surface: #fff;
+  --inbox-soft: #f2f6fb;
+  --inbox-text: #15365d;
+  --inbox-muted: #52647b;
+  --inbox-border: #d7e0eb;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
+  align-items: start;
+  gap: 24px;
+}
+
+:global(:root[data-theme='dark']) .inbox {
+  --inbox-surface: #142033;
+  --inbox-soft: #1c2c43;
+  --inbox-text: #edf4ff;
+  --inbox-muted: #bccbe0;
+  --inbox-border: #3f526d;
+}
+
+.inbox :global(.notifications-stat),
+.inbox :global(.notifications-empty),
+.inbox :global(.notifications-toggle) {
+  background: var(--inbox-soft);
+  border-color: var(--inbox-border);
+  color: var(--inbox-text);
+}
+
+.inbox :global(.notifications-item),
+.inbox :global(.notifications-input) {
+  background: var(--inbox-surface);
+  border-color: var(--inbox-border);
+  color: var(--inbox-text);
+}
+
+.inbox :global(.notifications-item h4),
+.inbox :global(.notifications-stat strong),
+.inbox :global(.notifications-meta span) {
+  color: var(--inbox-text);
+}
+
+.inbox :global(.notifications-toggle button),
+.inbox :global(.notifications-stat span),
+.inbox :global(.notifications-item-desc),
+.inbox :global(.notifications-security-status),
+.inbox :global(.notifications-meta) {
+  color: var(--inbox-muted);
+}
+
+.inbox :global(.notifications-input)::placeholder {
+  color: var(--inbox-muted);
+  opacity: 1;
+}
+
+.inbox :global(.notifications-toggle button.is-active) {
+  background: var(--inbox-surface);
+  color: var(--inbox-text);
+}
+
+.inbox :global(button):focus-visible,
+.inbox :global(a):focus-visible,
+.inbox :global(input):focus-visible {
+  outline: 3px solid #2683e8;
+  outline-offset: 3px;
+}
+
+.inbox :global(.notifications-panel),
+.inbox :global(.notifications-item),
+.inbox :global(.notifications-item > div),
+.inbox :global(.notifications-side) {
+  min-width: 0;
+}
+
+.inbox :global(.notifications-header),
+.inbox :global(.notifications-controls),
+.inbox :global(.notifications-security-actions) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.inbox :global(.notifications-controls) {
+  flex: 1 1 280px;
+  justify-content: flex-end;
+}
+
+.inbox :global(.notifications-input) {
+  flex: 1 1 240px;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  font-size: 16px;
+}
+
+.inbox :global(.notifications-toggle) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 100%;
+}
+
+.inbox :global(.notifications-toggle button),
+.inbox :global(.button) {
+  min-height: 48px;
+  white-space: normal;
+}
+
+.inbox :global(.notifications-item h4),
+.inbox :global(.notifications-item-desc),
+.inbox :global(.notifications-meta) {
+  overflow-wrap: anywhere;
+}
+
+.inbox :global(.notifications-item-desc) {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  white-space: pre-line;
+}
+
+.inbox :global(.notifications-empty .button) {
+  margin-top: 16px;
+}
+
+@media (max-width: 1100px) {
+  .inbox {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .inbox :global(.notifications-controls) {
+    flex-basis: 100%;
+  }
+
+  .inbox :global(.notifications-toggle) {
+    width: 100%;
+  }
+
+  .inbox :global(.notifications-toggle button) {
+    flex: 1 1 auto;
+  }
+
+  .inbox :global(.notifications-item) {
+    grid-template-columns: minmax(0, 1fr);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .inbox :global(.notifications-meta) {
+    justify-items: start;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .inbox :global(.notifications-security-actions .button),
+  .inbox :global(.notifications-side .button),
+  .inbox :global(.notifications-empty .button) {
+    width: 100%;
+  }
+}
