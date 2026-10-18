@@ -10,7 +10,7 @@ const normalizeCode = (value?: string | null) => (value ? value.trim() : '');
 
 const resolveCodigoPersonal = (code: string) => {
   const numeric = Number(code);
-  return Number.isNaN(numeric) ? null : numeric;
+  return Number.isSafeInteger(numeric) && numeric > 0 ? numeric : null;
 };
 
 export default function InvitePage() {
@@ -19,11 +19,12 @@ export default function InvitePage() {
   const searchParams = useSearchParams();
   const codeParam = searchParams.get('code');
   const code = normalizeCode(codeParam);
-  const [mobileAllowed, setMobileAllowed] = useState<boolean | null>(null);
 
   const [profile, setProfile] = useState<PersonalProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileError, setProfileError] = useState('');
+  const [profileAttempt, setProfileAttempt] = useState(0);
+  const [profileFailed, setProfileFailed] = useState(false);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -36,18 +37,6 @@ export default function InvitePage() {
   const codigoPersonal = useMemo(() => resolveCodigoPersonal(code), [code]);
 
   useEffect(() => {
-    const updateViewport = () => {
-      if (typeof window === 'undefined') return;
-      setMobileAllowed(window.innerWidth < 1000);
-    };
-    updateViewport();
-    window.addEventListener('resize', updateViewport);
-    return () => {
-      window.removeEventListener('resize', updateViewport);
-    };
-  }, []);
-
-  useEffect(() => {
     if (isAuthenticated) {
       router.replace('/app');
     }
@@ -55,19 +44,17 @@ export default function InvitePage() {
 
   useEffect(() => {
     let active = true;
-    if (mobileAllowed !== true) {
-      return () => {
-        active = false;
-      };
-    }
-    if (!code) {
+    setProfile(null);
+    setProfileLoading(false);
+    setProfileFailed(false);
+    if (!code || codigoPersonal === null) {
       setProfile(null);
-      setProfileError('Codigo nao informado.');
+      setProfileError(code ? 'Código do convite inválido.' : 'Código não informado.');
       return;
     }
     setProfileLoading(true);
     setProfileError('');
-    firestoreService.getPersonalProfileByCode(code).then((result) => {
+    firestoreService.getPersonalProfileByCode(code, { throwOnError: true }).then((result) => {
       if (!active) return;
       if (result) {
         setProfile(result);
@@ -76,11 +63,17 @@ export default function InvitePage() {
         setProfileError('Personal nao encontrado.');
       }
       setProfileLoading(false);
+    }).catch(() => {
+      if (!active) return;
+      setProfile(null);
+      setProfileError('Não foi possível carregar o convite. Tente novamente.');
+      setProfileFailed(true);
+      setProfileLoading(false);
     });
     return () => {
       active = false;
     };
-  }, [code, mobileAllowed]);
+  }, [code, codigoPersonal, profileAttempt]);
 
   const validate = () => {
     if (!code || codigoPersonal === null) {
@@ -99,7 +92,7 @@ export default function InvitePage() {
       setError('Email obrigatorio.');
       return false;
     }
-    if (!/\\S+@\\S+\\.\\S+/.test(email)) {
+    if (!/\S+@\S+\.\S+/.test(email)) {
       setError('Email invalido.');
       return false;
     }
@@ -135,40 +128,6 @@ export default function InvitePage() {
     }
   };
 
-  if (mobileAllowed === null) {
-    return (
-      <div className="auth-card auth-card--student">
-        <div className="auth-card-header">
-          <p className="auth-kicker">Convite</p>
-          <h1>Verificando dispositivo</h1>
-          <p className="subtle">Aguarde um momento.</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!mobileAllowed) {
-    return (
-      <div className="auth-card auth-card--student">
-        <div className="auth-card-header">
-          <p className="auth-kicker">Convite</p>
-          <h1>Acesso apenas no celular</h1>
-          <p className="subtle">
-            Para criar a conta de aluno, abra este link em um dispositivo com largura menor que 1000px.
-          </p>
-        </div>
-        <div className="auth-links">
-          <Link href="/login" className="auth-link">
-            Entrar como personal
-          </Link>
-          <Link href="/login-aluno" className="auth-link">
-            Entrar como aluno
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="auth-card auth-card--student">
       <div className="auth-card-header">
@@ -180,7 +139,12 @@ export default function InvitePage() {
       </div>
 
       {profileLoading && <p className="subtle">Carregando dados do personal...</p>}
-      {profileError && <p className="auth-error">{profileError}</p>}
+      {profileError && <p className="auth-error" role="alert">{profileError}</p>}
+      {profileFailed && (
+        <button type="button" className="auth-secondary" onClick={() => setProfileAttempt((value) => value + 1)}>
+          Tentar carregar convite novamente
+        </button>
+      )}
       {profile && (
         <div className="invite-personal">
           <div className="invite-personal-avatar">
@@ -205,7 +169,7 @@ export default function InvitePage() {
         </div>
       )}
 
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="auth-form" onSubmit={handleSubmit} noValidate>
         <label className="auth-field">
           <span>Nome completo</span>
           <input
@@ -252,7 +216,7 @@ export default function InvitePage() {
             Entrar agora
           </button>
         ) : (
-          <button type="submit" className="auth-submit" disabled={loading}>
+          <button type="submit" className="auth-submit" disabled={loading || profileLoading || !profile}>
             {loading ? 'Salvando...' : 'Criar conta'}
           </button>
         )}

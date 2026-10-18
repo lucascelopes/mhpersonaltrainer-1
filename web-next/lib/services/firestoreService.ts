@@ -664,7 +664,10 @@ async function getPersonalAccount(uid: string): Promise<PersonalAccount | null> 
   }
 }
 
-async function getPersonalProfileByCode(code: number | string): Promise<PersonalProfile | null> {
+async function getPersonalProfileByCode(
+  code: number | string,
+  options?: { throwOnError?: boolean }
+): Promise<PersonalProfile | null> {
   try {
     const db = getFirebaseDb();
     const { numeric, string } = normalizePersonalCode(code);
@@ -788,6 +791,7 @@ async function getPersonalProfileByCode(code: number | string): Promise<Personal
     return null;
   } catch (error) {
     console.error('Error fetching personal profile:', error);
+    if (options?.throwOnError) throw error;
     return null;
   }
 }

@@ -22,3 +22,51 @@
   border-color: var(--border);
   color: var(--text-primary);
 }
+
+/* The student home uses the same theme surfaces as its navigation and detail pages. */
+:root[data-theme='dark'] .student-home .student-home-hero {
+  background: radial-gradient(circle at 16% 10%, rgba(56, 182, 255, 0.12), transparent 55%), var(--surface-strong);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+:root[data-theme='dark'] .student-home .student-hero-card,
+:root[data-theme='dark'] .student-home .student-section-card,
+:root[data-theme='dark'] .student-home .student-function-tile {
+  background: var(--surface-strong);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+:root[data-theme='dark'] .app-shell-student .student-home.student-home--rn .student-home-action,
+:root[data-theme='dark'] .app-shell-student .student-home.student-home--rn .student-home-avatar,
+:root[data-theme='dark'] .student-home .student-hero-icon,
+:root[data-theme='dark'] .student-home .student-function-icon.is-treinos {
+  background: var(--surface-soft);
+  border-color: var(--border);
+  color: var(--brand-deep);
+}
+
+:root[data-theme='dark'] .student-home .student-function-icon.is-avaliacoes,
+:root[data-theme='dark'] .student-home .student-function-icon.is-financeiro,
+:root[data-theme='dark'] .student-home .student-hero-pill.is-success,
+:root[data-theme='dark'] .student-home .student-hero-icon.is-success {
+  color: #8ce7b0;
+}
+
+:root[data-theme='dark'] .student-home .student-function-icon.is-agenda { color: #ffd18a; }
+:root[data-theme='dark'] .student-home .student-function-icon.is-feedbacks { color: #e0b8f4; }
+:root[data-theme='dark'] .student-home .student-function-icon.is-arquivos { color: #a6d6ff; }
+:root[data-theme='dark'] .student-home .student-function-icon.is-notificacoes { color: #ffb1a8; }
+
+.app-shell-student .student-home.student-home--rn .student-home-action,
+.app-shell-student .student-home.student-home--rn .student-home-avatar,
+.app-shell-student .student-home.student-home--rn .student-inline-button {
+  min-width: 48px;
+  min-height: 48px;
+}
+
+.student-home a:focus-visible {
+  outline: 3px solid var(--brand-deep);
+  outline-offset: 3px;
+}

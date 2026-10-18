@@ -20,7 +20,6 @@ export default function LoginAlunoPage() {
   const redirectParam = searchParams.get('redirect');
   const redirectTo = resolveRedirect(redirectParam);
 
-  const [mobileAllowed, setMobileAllowed] = useState<boolean | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -29,21 +28,9 @@ export default function LoginAlunoPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const updateViewport = () => {
-      if (typeof window === 'undefined') return;
-      setMobileAllowed(window.innerWidth < 1000);
-    };
-    updateViewport();
-    window.addEventListener('resize', updateViewport);
-    return () => {
-      window.removeEventListener('resize', updateViewport);
-    };
-  }, []);
-
-  useEffect(() => {
     if (!isAuthenticated || !role) return;
     if (role !== 'aluno') {
-      setError('Este acesso e exclusivo para aluno.');
+      setError('Este acesso é exclusivo para aluno.');
       logout();
       return;
     }
@@ -52,11 +39,11 @@ export default function LoginAlunoPage() {
 
   const validate = () => {
     if (!email || !password) {
-      setError('Informe email e senha.');
+      setError('Informe e-mail e senha.');
       return false;
     }
     if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Email invalido.');
+      setError('E-mail inválido.');
       return false;
     }
     setError('');
@@ -92,52 +79,19 @@ export default function LoginAlunoPage() {
     }
   };
 
-  if (mobileAllowed === null) {
-    return (
-      <div className="auth-card auth-card--student">
-        <div className="auth-card-header">
-          <p className="auth-kicker">Aluno</p>
-          <h1>Verificando dispositivo</h1>
-          <p className="subtle">Aguarde um momento.</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!mobileAllowed) {
-    return (
-      <div className="auth-card auth-card--student">
-        <div className="auth-card-header">
-          <p className="auth-kicker">Aluno</p>
-          <h1>Acesso apenas no celular</h1>
-          <p className="subtle">
-            Este login e liberado somente em dispositivos com largura menor que 1000px.
-          </p>
-        </div>
-        <div className="auth-links">
-          <Link href="/login" className="auth-link">
-            Entrar como personal
-          </Link>
-          <Link href="/register-aluno" className="auth-link">
-            Criar conta de aluno
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="auth-card auth-card--student">
       <div className="auth-card-header">
         <p className="auth-kicker">Aluno</p>
         <h1>Entrar no painel do aluno</h1>
-        <p className="subtle">Acesse seus treinos, progresso e mensagens pelo celular.</p>
+        <p className="subtle">Acesse seus treinos, progresso e mensagens no celular ou computador.</p>
       </div>
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="auth-form" onSubmit={handleSubmit} noValidate>
         <label className="auth-field">
-          <span>Email</span>
+          <span>E-mail</span>
           <input
             type="email"
+            autoComplete="email"
             placeholder="aluno@mhpersonal.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
@@ -149,6 +103,7 @@ export default function LoginAlunoPage() {
           <div className="auth-password">
             <input
               type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
               placeholder="********"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
@@ -163,7 +118,7 @@ export default function LoginAlunoPage() {
             </button>
           </div>
         </label>
-        {error && <p className="auth-error">{error}</p>}
+        {error && <p className="auth-error" role="alert">{error}</p>}
         <button type="submit" className="auth-submit" disabled={loading || socialLoading}>
           {loading ? 'Entrando...' : 'Entrar'}
         </button>
