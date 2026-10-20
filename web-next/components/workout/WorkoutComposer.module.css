@@ -185,7 +185,7 @@
 
 .customExercise button,
 .exercise button {
-  min-height: 44px;
+  min-height: 48px;
   padding: 8px 13px;
   border: 1px solid #183e69;
   border-radius: 12px;
@@ -274,7 +274,7 @@
 
 .loadMore {
   width: 100%;
-  min-height: 46px;
+  min-height: 48px;
   border: 1px solid #9db7d1;
   border-radius: 12px;
   background: #fff;
@@ -342,7 +342,7 @@
 }
 
 .remove {
-  min-height: 40px;
+  min-height: 48px;
   padding: 7px 9px;
   border: 1px solid #c8d4e0;
   border-radius: 10px;
@@ -430,7 +430,7 @@
   .exercise button {
     grid-column: 2;
     width: 100%;
-    min-height: 44px;
+    min-height: 48px;
     padding: 7px 9px;
     font-size: 0.76rem;
   }
@@ -458,9 +458,13 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .metrics input {
+    min-height: 48px;
+  }
+
   .remove {
     grid-column: 2;
     justify-self: start;
-    min-height: 42px;
+    min-height: 48px;
   }
 }
