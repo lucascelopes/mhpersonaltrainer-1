@@ -1,9 +1,455 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Adjust to your auth model. This is permissive for prototyping.
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function userPath(uid) {
+      return /databases/$(database)/documents/users/$(uid);
+    }
+
+    function userExists(uid) {
+      return exists(userPath(uid));
+    }
+
+    function userData(uid) {
+      return get(userPath(uid)).data;
+    }
+
+    function hasField(data, field) {
+      return data.keys().hasAny([field]);
+    }
+
+    function hasString(data, field) {
+      return hasField(data, field) && data[field] is string && data[field].size() > 0;
+    }
+
+    function hasNestedPersonalId(data) {
+      return hasField(data, 'personalAccount') &&
+        data.personalAccount is map &&
+        data.personalAccount.keys().hasAny(['id']) &&
+        data.personalAccount.id is string &&
+        data.personalAccount.id.size() > 0;
+    }
+
+    function hasPersonalReference(data) {
+      return hasField(data, 'personalAccount') && data.personalAccount is path;
+    }
+
+    function hasStudentLink(data) {
+      return hasString(data, 'personalAccountId') ||
+        hasString(data, 'nameDoSeuPersonal') ||
+        hasNestedPersonalId(data) ||
+        hasPersonalReference(data);
+    }
+
+    function hasValue(data, field) {
+      return hasField(data, field) && data[field] != null && data[field] != '';
+    }
+
+    function hasStudentProfileData(data) {
+      return hasValue(data, 'objetivoNoApp') ||
+        hasValue(data, 'expericencia') ||
+        hasValue(data, 'experiencia') ||
+        hasValue(data, 'equipamento') ||
+        hasValue(data, 'tempoPorSessao') ||
+        hasValue(data, 'diasDeTreino') ||
+        hasValue(data, 'limitacao') ||
+        hasValue(data, 'peso') ||
+        hasValue(data, 'altura') ||
+        hasValue(data, 'nivelDeAtividade');
+    }
+
+    function hasPersonalProfileData(data) {
+      return hasValue(data, 'codigoPersonalRef') ||
+        hasValue(data, 'codigoPersonalTexto') ||
+        hasValue(data, 'cref') ||
+        hasValue(data, 'bio') ||
+        hasValue(data, 'especializacao') ||
+        hasValue(data, 'servicos') ||
+        hasValue(data, 'horarioAtendimento') ||
+        hasValue(data, 'stripeAccountId') ||
+        hasValue(data, 'stripeAtivo') ||
+        hasValue(data, 'chavePixDoPersonal') ||
+        (hasField(data, 'alunos') && data.alunos is list && data.alunos.size() > 0);
+    }
+
+    function isTruthy(value) {
+      return value == true || value == 'true';
+    }
+
+    function isExplicitPersonalData(data) {
+      return hasField(data, 'professorAccount') &&
+        isTruthy(data.professorAccount) &&
+        !hasStudentLink(data) &&
+        !(hasField(data, 'accountType') && data.accountType == 'aluno') &&
+        (
+          (hasField(data, 'accountType') && data.accountType == 'personal') ||
+          !hasStudentProfileData(data) ||
+          hasPersonalProfileData(data)
+        );
+    }
+
+    function isAdmin() {
+      return signedIn() &&
+        userExists(request.auth.uid) &&
+        isTruthy(userData(request.auth.uid).admin);
+    }
+
+    function isExplicitPersonal(uid) {
+      return signedIn() && userExists(uid) && isExplicitPersonalData(userData(uid));
+    }
+
+    function linkedToCurrentPersonal(data) {
+      return signedIn() &&
+        isExplicitPersonal(request.auth.uid) &&
+        (
+          (hasString(data, 'personalAccountId') && data.personalAccountId == request.auth.uid) ||
+          (hasNestedPersonalId(data) && data.personalAccount.id == request.auth.uid) ||
+          (hasPersonalReference(data) && data.personalAccount == userPath(request.auth.uid)) ||
+          currentPersonalListsData(data)
+        );
+    }
+
+    function currentPersonalListHas(values) {
+      return signedIn() &&
+        userExists(request.auth.uid) &&
+        hasField(userData(request.auth.uid), 'alunos') &&
+        userData(request.auth.uid).alunos is list &&
+        userData(request.auth.uid).alunos.hasAny(values);
+    }
+
+    function currentPersonalListsUser(uid) {
+      return isExplicitPersonal(request.auth.uid) &&
+        currentPersonalListHas([uid, userPath(uid)]);
+    }
+
+    function currentPersonalListsData(data) {
+      return isExplicitPersonal(request.auth.uid) &&
+        hasString(data, 'uid') &&
+        currentPersonalListHas([data.uid, userPath(data.uid)]);
+    }
+
+    function canAccessUser(uid) {
+      return signedIn() &&
+        (
+          request.auth.uid == uid ||
+          isAdmin() ||
+          currentPersonalListsUser(uid) ||
+          (userExists(uid) && linkedToCurrentPersonal(userData(uid)))
+        );
+    }
+
+    function canGetUser(uid) {
+      return canAccessUser(uid) ||
+        (signedIn() && userExists(uid) && isExplicitPersonalData(userData(uid)));
+    }
+
+    function canListUser(data) {
+      return isAdmin() ||
+        (linkedToCurrentPersonal(data)) ||
+        (signedIn() && isExplicitPersonalData(data));
+    }
+
+    function canAccessOwnerData(data) {
+      return isAdmin() ||
+        (hasString(data, 'uid') && canAccessUser(data.uid)) ||
+        (hasString(data, 'userId') && canAccessUser(data.userId));
+    }
+
+    function canWriteOwnerData(data) {
+      return signedIn() && canAccessOwnerData(data);
+    }
+
+    function isParticipant(data) {
+      return signedIn() &&
+        data.participants is list &&
+        data.participants.hasAny([request.auth.uid]);
+    }
+
+    function isAppointmentParticipant(data) {
+      return isAdmin() ||
+        (signedIn() && (
+          data.alunoId == request.auth.uid ||
+          data.personalId == request.auth.uid
+        ));
+    }
+
+    function canSeeNotification(data) {
+      return isAdmin() ||
+        (signedIn() && (
+          data.paraTodos == true ||
+          data.para == request.auth.uid ||
+          data.userId == request.auth.uid ||
+          data.recipientId == request.auth.uid
+        ));
+    }
+
+    function canCreateNotification(data) {
+      return isAdmin() ||
+        (signedIn() && (
+          data.para == request.auth.uid ||
+          (hasString(data, 'para') && canAccessUser(data.para))
+        ));
+    }
+
+    function onlyNotificationStatusChanged() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+        'read',
+        'readBy',
+        'readAt',
+        'securityStatus',
+        'securityResolvedAt',
+        'securityResolvedBy'
+      ]);
+    }
+
+    function safeOwnUserCreate(uid) {
+      return signedIn() &&
+        request.auth.uid == uid &&
+        request.resource.data.uid == uid &&
+        !isTruthy(request.resource.data.admin) &&
+        !(
+          isTruthy(request.resource.data.professorAccount) &&
+          (
+            hasStudentLink(request.resource.data) ||
+            (hasField(request.resource.data, 'accountType') && request.resource.data.accountType == 'aluno') ||
+            (hasStudentProfileData(request.resource.data) && !hasPersonalProfileData(request.resource.data))
+          )
+        );
+    }
+
+    function safeOwnUserUpdate(uid) {
+      return signedIn() &&
+        request.auth.uid == uid &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin']) &&
+        !(
+          request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountType']) &&
+          request.resource.data.accountType == 'personal' &&
+          !(hasField(resource.data, 'accountType') && resource.data.accountType == 'personal')
+        ) &&
+        !(
+          request.resource.data.diff(resource.data).affectedKeys().hasAny(['professorAccount']) &&
+          isTruthy(request.resource.data.professorAccount) &&
+          !isTruthy(resource.data.professorAccount)
+        );
+    }
+
+    function safeManagedUserUpdate() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+        'admin',
+        'professorAccount'
+      ]);
+    }
+
+    match /users/{userId} {
+      allow get: if canGetUser(userId);
+      allow list: if canListUser(resource.data);
+      allow create: if safeOwnUserCreate(userId) || isAdmin();
+      allow update: if isAdmin() ||
+        safeOwnUserUpdate(userId) ||
+        (linkedToCurrentPersonal(resource.data) && safeManagedUserUpdate());
+      allow delete: if isAdmin();
+    }
+
+    match /users/{userId}/{collectionId}/{document=**} {
+      allow read, write: if canAccessUser(userId);
+    }
+
+    match /personalCodes/{code} {
+      allow get: if signedIn();
+      allow list: if isAdmin();
+      allow create: if signedIn() &&
+        isExplicitPersonal(request.auth.uid) &&
+        request.resource.data.uid == request.auth.uid &&
+        request.resource.data.code == code &&
+        request.resource.data.owner == userPath(request.auth.uid);
+      allow update, delete: if isAdmin() ||
+        (
+          signedIn() &&
+          resource.data.uid == request.auth.uid &&
+          isExplicitPersonal(request.auth.uid)
+        );
+    }
+
+    match /{path=**}/feedback/{feedbackId} {
+      allow read: if canAccessOwnerData(resource.data);
+      allow create: if canWriteOwnerData(request.resource.data);
+      allow update: if canAccessOwnerData(resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /professorAccount/{document} {
+      allow get, list: if isAdmin() ||
+        (signedIn() && resource.data.uid == request.auth.uid);
+      allow create, update: if isAdmin() ||
+        (
+          signedIn() &&
+          request.resource.data.uid == request.auth.uid &&
+          isExplicitPersonal(request.auth.uid)
+        );
+      allow delete: if isAdmin();
+    }
+
+    match /treinos/{workoutId} {
+      allow read: if canAccessOwnerData(resource.data);
+      allow create: if canWriteOwnerData(request.resource.data);
+      allow update, delete: if canAccessOwnerData(resource.data);
+
+      match /exercicios/{exerciseId} {
+        allow read, write: if canAccessOwnerData(
+          get(/databases/$(database)/documents/treinos/$(workoutId)).data
+        );
+      }
+    }
+
+    match /workout_logs/{document} {
+      allow read: if canAccessOwnerData(resource.data);
+      allow create: if canWriteOwnerData(request.resource.data);
+      allow update, delete: if canAccessOwnerData(resource.data);
+    }
+
+    match /avaliacaoOnline/{document} {
+      allow read: if canAccessOwnerData(resource.data);
+      allow create: if canWriteOwnerData(request.resource.data);
+      allow update, delete: if canAccessOwnerData(resource.data);
+    }
+
+    match /avaliacaoPersonalizada/{document} {
+      allow read: if canAccessOwnerData(resource.data);
+      allow create: if canWriteOwnerData(request.resource.data);
+      allow update, delete: if canAccessOwnerData(resource.data);
+    }
+
+    match /avaliacaoPostural/{document} {
+      allow read: if canAccessOwnerData(resource.data);
+      allow create: if canWriteOwnerData(request.resource.data);
+      allow update, delete: if canAccessOwnerData(resource.data);
+    }
+
+    match /avaliacoesFisicas/{document} {
+      allow read: if canAccessOwnerData(resource.data);
+      allow create: if canWriteOwnerData(request.resource.data);
+      allow update, delete: if canAccessOwnerData(resource.data);
+    }
+
+    match /avaliacoes/{document} {
+      allow read: if canAccessOwnerData(resource.data) || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /evaluationInsights/{document} {
+      allow read: if canAccessOwnerData(resource.data);
+      allow create: if canWriteOwnerData(request.resource.data);
+      allow update, delete: if canAccessOwnerData(resource.data);
+    }
+
+    match /feedbackIA/{document} {
+      allow read: if canAccessOwnerData(resource.data);
+      allow create: if canWriteOwnerData(request.resource.data);
+      allow update, delete: if isAdmin();
+    }
+
+    match /supporte/{document} {
+      allow read: if canAccessOwnerData(resource.data);
+      allow create: if canWriteOwnerData(request.resource.data);
+      allow update: if canAccessOwnerData(resource.data) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /agendamento_mh_agendamento/{document} {
+      allow read: if isAppointmentParticipant(resource.data);
+      allow create: if isAppointmentParticipant(request.resource.data);
+      allow update, delete: if isAppointmentParticipant(resource.data);
+    }
+
+    match /notificacao/{document} {
+      allow read: if canSeeNotification(resource.data);
+      allow create: if canCreateNotification(request.resource.data);
+      allow update: if canSeeNotification(resource.data) && onlyNotificationStatusChanged();
+      allow delete: if isAdmin();
+    }
+
+    match /conversations/{conversationId} {
+      allow read: if isAdmin() || isParticipant(resource.data);
+      allow create: if isAdmin() || isParticipant(request.resource.data);
+      allow update: if isAdmin() || isParticipant(resource.data);
+      allow delete: if isAdmin();
+
+      match /messages/{messageId} {
+        allow read: if isAdmin() || isParticipant(
+          get(/databases/$(database)/documents/conversations/$(conversationId)).data
+        );
+        allow create: if (isAdmin() || isParticipant(
+          get(/databases/$(database)/documents/conversations/$(conversationId)).data
+        )) && request.resource.data.senderId == request.auth.uid;
+        allow update: if isAdmin() || isParticipant(
+          get(/databases/$(database)/documents/conversations/$(conversationId)).data
+        );
+        allow delete: if isAdmin();
+      }
+    }
+
+    match /conversa/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    match /workout_party_presence/{userId} {
+      allow read: if signedIn();
+      allow create, update, delete: if signedIn() && request.auth.uid == userId;
+    }
+
+    match /treinors/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /treinosWithVideo/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /treinoPeitoral/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /treinosPrescritos/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /seriesPrescritas/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /treinosChatGpt/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /publicFoodCatalogIndex/{document} {
+      allow read: if signedIn();
+      allow create, update: if signedIn();
+      allow delete: if isAdmin();
+    }
+
+    match /publicFoodCatalogIndex_queries/{document} {
+      allow read: if signedIn();
+      allow create, update: if signedIn();
+      allow delete: if isAdmin();
+    }
+
+    match /ff_user_push_notifications/{id} {
+      allow read, update, delete: if false;
+      allow create: if signedIn() && request.resource.data.sender == userPath(request.auth.uid);
+    }
+
     match /{document=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if false;
     }
   }
 }
