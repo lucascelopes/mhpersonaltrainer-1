@@ -109,27 +109,12 @@ service cloud.firestore {
           (hasString(data, 'personalAccountId') && data.personalAccountId == request.auth.uid) ||
           (hasNestedPersonalId(data) && data.personalAccount.id == request.auth.uid) ||
           (hasPersonalReference(data) && data.personalAccount == userPath(request.auth.uid)) ||
-          currentPersonalListsData(data)
+          (
+            hasValue(data, 'codigoPersonal') &&
+            hasValue(userData(request.auth.uid), 'codigoPersonal') &&
+            string(data.codigoPersonal) == string(userData(request.auth.uid).codigoPersonal)
+          )
         );
-    }
-
-    function currentPersonalListHas(values) {
-      return signedIn() &&
-        userExists(request.auth.uid) &&
-        hasField(userData(request.auth.uid), 'alunos') &&
-        userData(request.auth.uid).alunos is list &&
-        userData(request.auth.uid).alunos.hasAny(values);
-    }
-
-    function currentPersonalListsUser(uid) {
-      return isExplicitPersonal(request.auth.uid) &&
-        currentPersonalListHas([uid, userPath(uid)]);
-    }
-
-    function currentPersonalListsData(data) {
-      return isExplicitPersonal(request.auth.uid) &&
-        hasString(data, 'uid') &&
-        currentPersonalListHas([data.uid, userPath(data.uid)]);
     }
 
     function canAccessUser(uid) {
@@ -137,7 +122,6 @@ service cloud.firestore {
         (
           request.auth.uid == uid ||
           isAdmin() ||
-          currentPersonalListsUser(uid) ||
           (userExists(uid) && linkedToCurrentPersonal(userData(uid)))
         );
     }
@@ -226,6 +210,11 @@ service cloud.firestore {
         request.auth.uid == uid &&
         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin']) &&
         !(
+          isExplicitPersonalData(resource.data) &&
+          hasValue(resource.data, 'codigoPersonal') &&
+          request.resource.data.diff(resource.data).affectedKeys().hasAny(['codigoPersonal'])
+        ) &&
+        !(
           request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountType']) &&
           request.resource.data.accountType == 'personal' &&
           !(hasField(resource.data, 'accountType') && resource.data.accountType == 'personal')
@@ -250,7 +239,7 @@ service cloud.firestore {
       allow create: if safeOwnUserCreate(userId) || isAdmin();
       allow update: if isAdmin() ||
         safeOwnUserUpdate(userId) ||
-        (linkedToCurrentPersonal(resource.data) && safeManagedUserUpdate());
+        (request.auth.uid != userId && linkedToCurrentPersonal(resource.data) && safeManagedUserUpdate());
       allow delete: if isAdmin();
     }
 
