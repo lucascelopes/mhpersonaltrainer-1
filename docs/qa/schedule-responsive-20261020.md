@@ -19,3 +19,10 @@ The schedule page uses the existing locally developed desktop/mobile calendar de
 
 - Data and accounts were synthetic in local emulators. The checks do not prove behavior for real appointments or every role and device.
 - The repository's current Firestore rules permit broad authenticated access. This agenda change does not fix that authorization gap.
+
+## Firebase review publication
+
+- Updated only Hosting review channel `revisao-20261018` in `profissions-2746d` to version `3132b2a2327d9d27`, expiring 2026-10-27. The main Hosting channel was not updated.
+- The Hosting export came from the active QA checkout, which contains other ongoing local changes. This branch contains only the schedule files and this QA record, so its Git commit is not a byte-for-byte description of the full preview build.
+- External HTTP returned 200 for `/login`, `/schedule`, `/progress`, a schedule detail route, and `/invite`. All 24 JavaScript and CSS assets referenced by `/schedule` returned 200.
+- The authenticated agenda interactions above were verified locally against emulators; no production appointment was opened or changed.
