@@ -20,4 +20,11 @@ The invitation page now resolves a Personal through callable Functions rather th
 
 - These are local emulator checks with synthetic accounts. They do not prove live signup, email delivery, or real subscription behavior.
 - The repository's current `firestore.rules` still permits all authenticated reads and writes. This change does not close that broader authorization gap; production rules need a separate migration and regression review.
-- The new Functions must be deployed before a Hosting build containing this invitation page can work in the Firebase preview channel.
+
+## Firebase review publication
+
+- Created only `previewPersonalInvite`, `registerStudentWithInvite`, and `claimPersonalInvite` in `profissions-2746d`, region `southamerica-east1`; the CLI reported successful creation for each and the subsequent function listing contained all three.
+- Published Hosting review channel `revisao-20261018` as version `c2e211bf23809eea`, expiring 2026-10-27. The main Hosting channel was not updated.
+- External HTTP returned 200 for `/login`, `/invite`, `/admin`, `/app`, and sampled JavaScript assets. The live preview function returned 400 for malformed code `0`. In a browser, a nonexistent invite code displayed `Personal não encontrado.` and disabled account creation.
+- Visually inspected the published login at 320 and 390 px. Its logo is visible with dark contrast, and there is no horizontal overflow at 320, 390, 768, or 1440 px.
+- No real production account or invitation was used to exercise live signup or linking.
