@@ -7,3 +7,5 @@ Verified with an authenticated synthetic Academy account and local Auth/Firestor
 Billing had no page-level horizontal overflow at 320, 390, 768, or 1440 px after the decorative background fix. The dark 390 px error state was inspected visually; the billing and dashboard retry buttons measured 48 px. TypeScript validation passed in the isolated branch. Authenticated tests were local only.
 
 The integrated Hosting review channel is built from a separate QA checkout with other ongoing local changes, so it is not a byte-for-byte build of this branch alone.
+
+The full Hosting export generated 108 routes. Firebase Hosting review channel `revisao-20261018` in `profissions-2746d` was updated to version `8ea9791cd5e3cc14`, expiring 2026-10-27. External HTTP returned 200 for `/login`, `/academy`, `/academy/billing`, and `/start-workout`; all 26 JavaScript/CSS assets referenced by `/academy/billing` returned 200. The main Hosting channel was unchanged. Public availability does not prove an authenticated production billing workflow.
