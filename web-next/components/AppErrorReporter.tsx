@@ -35,7 +35,7 @@ const safeString = (value: unknown, fallback = '') => {
   if (typeof value === 'string') return value;
   if (typeof value === 'number' || typeof value === 'boolean') return String(value);
   try {
-    return JSON.stringify(value);
+    return JSON.stringify(value) || fallback;
   } catch (error) {
     return fallback;
   }
@@ -69,24 +69,32 @@ const normalizeError = (value: unknown) => {
 
 export default function AppErrorReporter() {
   const { user, role } = useAuth();
-  const lastErrorRef = useRef<{ key: string; at: number } | null>(null);
+  const recentErrors = useRef(new Map<string, number>());
+  const pendingErrors = useRef(new Set<string>());
 
   useEffect(() => {
     const logError = async (payload: ErrorPayload) => {
-      const key = `${payload.type}-${payload.message}-${payload.code || ''}-${payload.source || ''}`;
+      const key = `${user?.uid || ''}-${payload.type}-${payload.message}-${payload.code || ''}-${payload.source || ''}`;
       const now = Date.now();
-      const last = lastErrorRef.current;
-      if (last && last.key === key && now - last.at < DEDUPE_WINDOW_MS) {
-        return;
+      for (const [entry, at] of recentErrors.current) {
+        if (now - at >= DEDUPE_WINDOW_MS) recentErrors.current.delete(entry);
       }
-      lastErrorRef.current = { key, at: now };
+      if (pendingErrors.current.has(key) || recentErrors.current.has(key)) return;
+      pendingErrors.current.add(key);
       try {
+        const fields = Object.fromEntries(Object.entries(payload).filter(([, value]) => value !== undefined));
         await addDoc(collection(db, 'appErrors'), {
-          ...payload,
+          ...fields,
           createdAt: serverTimestamp(),
         });
+        recentErrors.current.set(key, Date.now());
+        if (recentErrors.current.size > 100) {
+          recentErrors.current.delete(recentErrors.current.keys().next().value!);
+        }
       } catch (error) {
         console.warn('Falha ao registrar erro do app.', error);
+      } finally {
+        pendingErrors.current.delete(key);
       }
     };
 

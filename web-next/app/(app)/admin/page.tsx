@@ -19,6 +19,7 @@ import AdminUserSheet, { type AdminUserSheetSeed } from '@/components/admin/Admi
 import { formatDate, useCollectionData } from '@/lib/firestoreHooks';
 import { useAdminDashboardData } from '@/lib/hooks/useAdminDashboardData';
 import { limit, orderBy } from 'firebase/firestore';
+import styles from './page.module.css';
 
 const hasToDate = (value: unknown): value is { toDate: () => Date } => {
   return Boolean(
@@ -121,8 +122,17 @@ const extractErrorSource = (row: AppErrorRow) => {
 };
 
 export default function AdminIndexPage() {
+  const [attempt, setAttempt] = useState(0);
+  return <AdminOverview key={attempt} onRetry={() => setAttempt((value) => value + 1)} />;
+}
+
+function AdminOverview({ onRetry }: { onRetry: () => void }) {
   const { overview, loading, error } = useAdminDashboardData(true);
   const recentUsers = overview?.recentUsers || [];
+  const userMetric = (value: number) => loading ? '...' : error || !overview ? '—' : value;
+  const errorMetric = (value: number) => errorsLoading ? '...' : errorsError ? '—' : value;
+  const noticeMetric = (value: number) => notificationsLoading ? '...' : notificationsError ? '—' : value;
+  const shareLabel = (value: number) => loading ? '...' : error || !overview ? '—' : `${value}%`;
   const [sheetUser, setSheetUser] = useState<AdminUserSheetSeed | null>(null);
   const [isThemeDark, setIsThemeDark] = useState(false);
   const errorConstraints = useMemo(() => [orderBy('createdAt', 'desc'), limit(160)], []);
@@ -311,10 +321,10 @@ export default function AdminIndexPage() {
     return { count7, count30, broadcast30, direct30, recipients30 };
   }, [estimateRecipients, normalizedNotifications]);
 
-  const errorStatusLabel = errorSummary.count24 > 0 ? 'Atencao' : 'Estavel';
-  const errorStatusClass = errorSummary.count24 > 0 ? 'is-danger' : 'is-info';
+  const errorStatusLabel = errorsLoading ? 'Carregando' : errorsError ? 'Indisponível' : errorSummary.count24 > 0 ? 'Atenção' : 'Estável';
+  const errorStatusClass = errorsError || errorSummary.count24 > 0 ? 'is-danger' : 'is-info';
   const recipientsLabel =
-    loading || notificationsLoading ? '...' : String(notificationSummary.recipients30);
+    loading || notificationsLoading ? '...' : error || notificationsError ? '—' : String(notificationSummary.recipients30);
 
   const chartAxisColor = isThemeDark ? '#aebad1' : '#5f6b7a';
   const signupLineColor = isThemeDark ? '#72b2ee' : '#2563eb';
@@ -377,25 +387,26 @@ export default function AdminIndexPage() {
   }, []);
 
   return (
-    <PageShell title="Resumo admin" description="Indicadores gerais, integracoes e atividade do painel.">
+    <PageShell title="Resumo admin" description="Indicadores gerais, integrações e atividade do painel.">
       <AdminGate>
-        <section className={`admin-overview${isThemeDark ? ' is-theme-dark' : ''}`}>
+        <section className={`${styles.overview} admin-overview${isThemeDark ? ' is-theme-dark' : ''}`}>
+          <div className={styles.toolbar}><button type="button" className="button secondary" onClick={onRetry} disabled={loading || errorsLoading || notificationsLoading}>Atualizar dados</button></div>
           <header className="admin-overview-hero">
             <div className="admin-overview-hero-copy">
               <span className="admin-overview-kicker">Central admin</span>
-              <h1>Visao geral do MH Personal</h1>
+              <h1>Visão geral do MH Personal</h1>
               <p>
-                Monitore a base, os riscos e o volume de envios com um painel direto e facil de ler.
+                Monitore a base, os riscos e o volume de envios com um painel direto e fácil de ler.
               </p>
               <div className="admin-overview-actions">
                 <Link href="/admin/users" className="button">
-                  Gerenciar usuarios
+                  Gerenciar usuários
                 </Link>
                 <Link href="/admin/support" className="button secondary">
                   Suporte
                 </Link>
                 <Link href="/notifications/admin" className="button secondary">
-                  Notificar usuarios
+                  Notificar usuários
                 </Link>
                 <Link href="/ai/assistant" className="button secondary">
                   Abrir IA
@@ -407,10 +418,10 @@ export default function AdminIndexPage() {
                 <div className="admin-overview-status-card">
                   <div>
                     <strong>OpenRouter IA</strong>
-                    <span className="subtle">Assistente e recomendacoes</span>
+                    <span className="subtle">Assistente e recomendações</span>
                   </div>
                   <span className={`admin-overview-chip ${hasOpenRouter ? 'is-on' : 'is-off'}`}>
-                    {hasOpenRouter ? 'Ativo' : 'Pendente'}
+                    {hasOpenRouter ? 'Configurado' : 'Não verificado'}
                   </span>
                 </div>
                 <div className="admin-overview-status-card">
@@ -419,7 +430,7 @@ export default function AdminIndexPage() {
                     <span className="subtle">Checkouts e conectados</span>
                   </div>
                   <span className={`admin-overview-chip ${stripeReady ? 'is-on' : 'is-off'}`}>
-                    {stripeReady ? 'Ativo' : 'Pendente'}
+                    {stripeReady ? 'Configurado' : 'Não verificado'}
                   </span>
                 </div>
                 <div className="admin-overview-status-card">
@@ -433,11 +444,11 @@ export default function AdminIndexPage() {
               <div className="admin-overview-signal">
                 <div>
                   <span>Erros 24h</span>
-                  <strong>{errorSummary.count24}</strong>
+                  <strong>{errorMetric(errorSummary.count24)}</strong>
                 </div>
                 <div>
-                  <span>Notificacoes 30 dias</span>
-                  <strong>{notificationSummary.count30}</strong>
+                  <span>Notificações 30 dias</span>
+                  <strong>{noticeMetric(notificationSummary.count30)}</strong>
                 </div>
                 <div>
                   <span>Destinos estimados</span>
@@ -449,35 +460,35 @@ export default function AdminIndexPage() {
 
           {error && (
             <div className="admin-overview-alert">
-              <p>{error}</p>
+              <p role="alert">Não foi possível carregar os usuários. Atualize os dados para tentar novamente.</p>
             </div>
           )}
 
           <div className="admin-overview-kpis">
             <div className="admin-overview-kpi is-primary">
-              <span>Total de usuarios</span>
-              <strong>{loading ? '...' : totalUsers}</strong>
+              <span>Total de usuários</span>
+              <strong>{userMetric(totalUsers)}</strong>
               <small>Base ativa</small>
             </div>
             <div className="admin-overview-kpi">
               <span>Personals</span>
-              <strong>{loading ? '...' : totalPersonals}</strong>
-              <small>{personalShare}% da base</small>
+              <strong>{userMetric(totalPersonals)}</strong>
+              <small>{shareLabel(personalShare)} da base</small>
             </div>
             <div className="admin-overview-kpi">
               <span>Academias</span>
-              <strong>{loading ? '...' : totalAcademies}</strong>
-              <small>{academyShare}% da base</small>
+              <strong>{userMetric(totalAcademies)}</strong>
+              <small>{shareLabel(academyShare)} da base</small>
             </div>
             <div className="admin-overview-kpi">
               <span>Alunos</span>
-              <strong>{loading ? '...' : totalAlunos}</strong>
-              <small>{alunoShare}% da base</small>
+              <strong>{userMetric(totalAlunos)}</strong>
+              <small>{shareLabel(alunoShare)} da base</small>
             </div>
             <div className="admin-overview-kpi">
               <span>Admins</span>
-              <strong>{loading ? '...' : totalAdmins}</strong>
-              <small>{adminShare}% do total</small>
+              <strong>{userMetric(totalAdmins)}</strong>
+              <small>{shareLabel(adminShare)} do total</small>
             </div>
           </div>
 
@@ -486,9 +497,9 @@ export default function AdminIndexPage() {
               <div className="admin-overview-card-header">
                 <div>
                   <h3>Cadastros recentes</h3>
-                  <p className="subtle">Tendencia dos ultimos registros carregados.</p>
+                  <p className="subtle">Tendência dos últimos registros carregados.</p>
                 </div>
-                <span className="admin-overview-pill">Ultimos 30 dias</span>
+                <span className="admin-overview-pill">Últimos 30 dias</span>
               </div>
               <div className="admin-overview-chart">
                 {signupsChartData.length ? (
@@ -510,17 +521,17 @@ export default function AdminIndexPage() {
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
-                  <p className="subtle">Sem dados para exibir.</p>
+                  <p className="subtle">{loading ? 'Carregando cadastros...' : error ? 'Dados indisponíveis.' : 'Sem dados para exibir.'}</p>
                 )}
               </div>
               <div className="admin-overview-foot">
                 <div>
-                  <span>Ultimos 7 dias</span>
-                  <strong>{signupsSummary.count7}</strong>
+                  <span>Últimos 7 dias</span>
+                  <strong>{userMetric(signupsSummary.count7)}</strong>
                 </div>
                 <div>
-                  <span>Ultimos 30 dias</span>
-                  <strong>{signupsSummary.count30}</strong>
+                  <span>Últimos 30 dias</span>
+                  <strong>{userMetric(signupsSummary.count30)}</strong>
                 </div>
               </div>
             </div>
@@ -528,7 +539,7 @@ export default function AdminIndexPage() {
             <div className="admin-overview-card">
               <div className="admin-overview-card-header">
                 <div>
-                  <h3>Distribuicao de perfis</h3>
+                  <h3>Distribuição de perfis</h3>
                   <p className="subtle">Admins, personals, academias e alunos.</p>
                 </div>
                 <span className="admin-overview-pill">Base total</span>
@@ -565,30 +576,30 @@ export default function AdminIndexPage() {
                 <div>
                   <span>Personals</span>
                   <div>
-                    <span style={{ width: `${personalShare}%` }} />
+                    <span style={{ width: `${loading || error ? 0 : personalShare}%` }} />
                   </div>
-                  <strong>{personalShare}%</strong>
+                  <strong>{shareLabel(personalShare)}</strong>
                 </div>
                 <div>
                   <span>Academias</span>
                   <div>
-                    <span style={{ width: `${academyShare}%` }} />
+                    <span style={{ width: `${loading || error ? 0 : academyShare}%` }} />
                   </div>
-                  <strong>{academyShare}%</strong>
+                  <strong>{shareLabel(academyShare)}</strong>
                 </div>
                 <div>
                   <span>Alunos</span>
                   <div>
-                    <span style={{ width: `${alunoShare}%` }} />
+                    <span style={{ width: `${loading || error ? 0 : alunoShare}%` }} />
                   </div>
-                  <strong>{alunoShare}%</strong>
+                  <strong>{shareLabel(alunoShare)}</strong>
                 </div>
                 <div>
                   <span>Admins</span>
                   <div>
-                    <span style={{ width: `${adminShare}%` }} />
+                    <span style={{ width: `${loading || error ? 0 : adminShare}%` }} />
                   </div>
-                  <strong>{adminShare}%</strong>
+                  <strong>{shareLabel(adminShare)}</strong>
                 </div>
               </div>
             </div>
@@ -604,7 +615,7 @@ export default function AdminIndexPage() {
                 <span className={`admin-overview-pill ${errorStatusClass}`}>{errorStatusLabel}</span>
               </div>
               <div className="admin-overview-chart">
-                {errorsLoading ? (
+                {errorsError ? (<p className="subtle">Erros indisponíveis.</p>) : errorsLoading ? (
                   <p className="subtle">Carregando alertas...</p>
                 ) : (
                   <ResponsiveContainer>
@@ -627,8 +638,8 @@ export default function AdminIndexPage() {
                 )}
               </div>
               {errorsError && (
-                <p className="admin-overview-inline-alert">
-                  {errorsError.message || 'Erro ao carregar alertas.'}
+                <p className="admin-overview-inline-alert" role="alert">
+                  Não foi possível carregar os erros do aplicativo.
                 </p>
               )}
               {topErrors.length ? (
@@ -647,16 +658,16 @@ export default function AdminIndexPage() {
                   ))}
                 </div>
               ) : (
-                !errorsLoading && <p className="subtle">Sem erros registrados.</p>
+                !errorsLoading && !errorsError && <p className="subtle">Sem erros registrados.</p>
               )}
               <div className="admin-overview-foot">
                 <div>
-                  <span>Ultimas 24h</span>
-                  <strong>{errorSummary.count24}</strong>
+                  <span>Últimas 24h</span>
+                  <strong>{errorMetric(errorSummary.count24)}</strong>
                 </div>
                 <div>
-                  <span>Ultimos 7 dias</span>
-                  <strong>{errorSummary.count7}</strong>
+                  <span>Últimos 7 dias</span>
+                  <strong>{errorMetric(errorSummary.count7)}</strong>
                 </div>
               </div>
             </div>
@@ -664,14 +675,14 @@ export default function AdminIndexPage() {
             <div className="admin-overview-card">
               <div className="admin-overview-card-header">
                 <div>
-                  <h3>Notificacoes disparadas</h3>
+                  <h3>Notificações disparadas</h3>
                   <p className="subtle">Envios recentes e alcance estimado.</p>
                 </div>
-                <span className="admin-overview-pill">Ultimos 30 dias</span>
+                <span className="admin-overview-pill">Últimos 30 dias</span>
               </div>
               <div className="admin-overview-chart">
-                {notificationsLoading ? (
-                  <p className="subtle">Carregando notificacoes...</p>
+                {notificationsError ? (<p className="subtle">Notificações indisponíveis.</p>) : notificationsLoading ? (
+                  <p className="subtle">Carregando notificações...</p>
                 ) : (
                   <ResponsiveContainer>
                     <LineChart data={notificationChartData}>
@@ -698,22 +709,22 @@ export default function AdminIndexPage() {
                 )}
               </div>
               {notificationsError && (
-                <p className="admin-overview-inline-alert">
-                  {notificationsError.message || 'Erro ao carregar notificacoes.'}
+                <p className="admin-overview-inline-alert" role="alert">
+                  Não foi possível carregar as notificações.
                 </p>
               )}
               <div className="admin-overview-note">
-                Para todos: <strong>{notificationSummary.broadcast30}</strong> | Diretos:{' '}
-                <strong>{notificationSummary.direct30}</strong>
+                Para todos: <strong>{noticeMetric(notificationSummary.broadcast30)}</strong> | Diretos:{' '}
+                <strong>{noticeMetric(notificationSummary.direct30)}</strong>
               </div>
               <div className="admin-overview-foot">
                 <div>
-                  <span>Ultimos 7 dias</span>
-                  <strong>{notificationSummary.count7}</strong>
+                  <span>Últimos 7 dias</span>
+                  <strong>{noticeMetric(notificationSummary.count7)}</strong>
                 </div>
                 <div>
-                  <span>Ultimos 30 dias</span>
-                  <strong>{notificationSummary.count30}</strong>
+                  <span>Últimos 30 dias</span>
+                  <strong>{noticeMetric(notificationSummary.count30)}</strong>
                 </div>
               </div>
             </div>
@@ -722,56 +733,107 @@ export default function AdminIndexPage() {
           <div className="admin-overview-card admin-overview-card--table">
             <div className="admin-overview-card-header">
               <div>
-                <h3>Usuarios recentes</h3>
-                <p className="subtle">Ultimos cadastros no painel.</p>
+                <h3>Usuários recentes</h3>
+                <p className="subtle">Últimos cadastros no painel.</p>
               </div>
               <Link href="/admin/users" className="button secondary">
                 Ver todos
               </Link>
             </div>
-            <DataTable
-              rows={recentUsers}
-              columns={[
-                {
-                  key: 'name',
-                  label: 'Usuario',
-                  render: (row) => {
-                    const name = row.name || 'Usuario';
-                    const initial = String(name).trim().charAt(0).toUpperCase() || 'U';
-                    return (
-                      <div className="admin-overview-user">
-                        <span className="admin-overview-avatar">{initial}</span>
-                        <div>
-                          <strong className="admin-overview-user-name">{name}</strong>
+            <div className="admin-overview-recent-users-desktop">
+              <DataTable
+                rows={recentUsers}
+                columns={[
+                  {
+                    key: 'name',
+                    label: 'Usuário',
+                    render: (row) => {
+                      const name = row.name || 'Usuário';
+                      const initial = String(name).trim().charAt(0).toUpperCase() || 'U';
+                      return (
+                        <div className="admin-overview-user">
+                          <span className="admin-overview-avatar">{initial}</span>
+                          <div>
+                            <strong className="admin-overview-user-name">{name}</strong>
+                          </div>
                         </div>
-                      </div>
-                    );
+                      );
+                    },
                   },
-                },
-                { key: 'email', label: 'Email', render: (row) => row.email || '-' },
-                {
-                  key: 'role',
-                  label: 'Perfil',
-                  render: (row) => <span className="admin-overview-role">{row.role || '-'}</span>,
-                },
-                {
-                  key: 'createdAt',
-                  label: 'Criado em',
-                  render: (row) => (
-                    <span className="admin-overview-date">{formatDate(row.createdAt)}</span>
-                  ),
-                },
-              ]}
-              emptyMessage={loading ? 'Carregando...' : 'Nenhum usuario recente.'}
-              onRowClick={(row) =>
-                setSheetUser({
-                  id: row.id,
-                  name: row.name,
-                  email: row.email,
-                  role: row.role,
+                  { key: 'email', label: 'Email', render: (row) => row.email || '-' },
+                  {
+                    key: 'role',
+                    label: 'Perfil',
+                    render: (row) => <span className="admin-overview-role">{row.role || '-'}</span>,
+                  },
+                  {
+                    key: 'createdAt',
+                    label: 'Criado em',
+                    render: (row) => (
+                      <span className="admin-overview-date">{formatDate(row.createdAt)}</span>
+                    ),
+                  },
+                ]}
+                emptyMessage={loading ? 'Carregando...' : error ? 'Usuários indisponíveis.' : 'Nenhum usuário recente.'}
+                onRowClick={(row) =>
+                  setSheetUser({
+                    id: row.id,
+                    name: row.name,
+                    email: row.email,
+                    role: row.role,
+                  })
+                }
+              />
+            </div>
+            <ul className="admin-overview-recent-users-mobile" aria-label="Usuários recentes">
+              {recentUsers.length ? (
+                recentUsers.map((row, index) => {
+                  const name = row.name || 'Usuário';
+                  const initial = String(name).trim().charAt(0).toUpperCase() || 'U';
+                  return (
+                    <li key={row.id ?? `recent-user-${index}`}>
+                      <button
+                        type="button"
+                        className="admin-overview-recent-user-button"
+                        aria-label={`Abrir usuário ${name}`}
+                        onClick={() =>
+                          setSheetUser({
+                            id: row.id,
+                            name: row.name,
+                            email: row.email,
+                            role: row.role,
+                          })
+                        }
+                      >
+                        <span className="admin-overview-avatar" aria-hidden="true">
+                          {initial}
+                        </span>
+                        <span className="admin-overview-recent-user-copy">
+                          <strong className="admin-overview-user-name">{name}</strong>
+                          <span>{row.email || '-'}</span>
+                        </span>
+                        <span className="admin-overview-recent-user-fields">
+                          <span>
+                            <small>Perfil</small>
+                            <strong>{row.role || '-'}</strong>
+                          </span>
+                          <span>
+                            <small>Criado em</small>
+                            <strong>{formatDate(row.createdAt)}</strong>
+                          </span>
+                        </span>
+                      </button>
+                    </li>
+                  );
                 })
-              }
-            />
+              ) : (
+                <li>
+                  <p className="subtle admin-overview-recent-users-empty">
+                    {loading ? 'Carregando...' : error ? 'Usuários indisponíveis.' : 'Nenhum usuário recente.'}
+                  </p>
+                </li>
+              )}
+            </ul>
           </div>
           <AdminUserSheet
             open={Boolean(sheetUser?.id)}

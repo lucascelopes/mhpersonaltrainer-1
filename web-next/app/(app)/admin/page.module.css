@@ -1,0 +1,51 @@
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+.toolbar button {
+  min-height: 48px;
+}
+.overview {
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+}
+.overview:global(.admin-overview)::before {
+  right: 0;
+  width: min(320px, 100%);
+}
+.overview:global(.admin-overview)::after {
+  left: 0;
+  width: min(320px, 100%);
+}
+.overview > *,
+.overview :global(.admin-overview-hero-copy),
+.overview :global(.admin-overview-hero-side),
+.overview :global(.admin-overview-card),
+.overview :global(.admin-overview-chart),
+.overview :global(.admin-overview-status-card > div) {
+  min-width: 0;
+}
+.overview :global(.admin-overview-alert-item strong),
+.overview :global(.admin-overview-alert-item span),
+.overview :global(.admin-overview-status-card strong),
+.overview :global(.admin-overview-status-card .subtle) {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 640px) {
+  .overview :global(.admin-overview-actions) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .overview :global(.admin-overview-actions .button) {
+    width: 100%;
+    min-height: 48px;
+  }
+}
+.overview :global(.admin-overview-hero) {
+  background: linear-gradient(135deg, #edf6ff, #ffffff);
+}
+.overview :global(.admin-overview-hero)::before,
+.overview :global(.admin-overview-hero)::after {
+  display: none;
+}
