@@ -38,6 +38,18 @@ const coerceDate = (value: any): Date | undefined => {
   return Number.isNaN(parsed.getTime()) ? undefined : parsed;
 };
 
+const normalizeWorkoutExerciseNames = (value: unknown): string[] => {
+  if (!Array.isArray(value)) return [];
+  return value.map((item) => {
+    if (typeof item === 'string') return item.trim();
+    if (!item || typeof item !== 'object') return '';
+    const exercise = item as Record<string, unknown>;
+    const name = [exercise.nome, exercise.name, exercise.nomeDoExercicio, exercise.nomeDoTreino, exercise.exerciseName]
+      .find((candidate) => typeof candidate === 'string' && candidate.trim());
+    return typeof name === 'string' ? name.trim() : '';
+  });
+};
+
 export type TreinorExercisePayload = {
   nomeDoTreino: string;
   treinosNoLIst?: string | null;
@@ -473,7 +485,7 @@ export async function fetchUserWorkouts(
       id: doc.id,
       nomeDoTreino: doc.data().nomeDoTreino || 'Treino',
       obsInstrucao: doc.data().obsInstrucao,
-      treino: doc.data().treino || [],
+      treino: normalizeWorkoutExerciseNames(doc.data().treino),
       seriesRep: doc.data().seriesRep || [],
       repeticoes: doc.data().repeticoes || [],
       carga: doc.data().carga || [],
@@ -499,7 +511,7 @@ export async function fetchUserWorkouts(
         id: doc.id,
         nomeDoTreino: doc.data().nomeDoTreino || 'Treino',
         obsInstrucao: doc.data().obsInstrucao,
-        treino: doc.data().treino || [],
+        treino: normalizeWorkoutExerciseNames(doc.data().treino),
         seriesRep: doc.data().seriesRep || [],
         repeticoes: doc.data().repeticoes || [],
         carga: doc.data().carga || [],
@@ -542,7 +554,7 @@ export async function fetchUserWorkoutById(
       id: snapshot.id,
       nomeDoTreino: data.nomeDoTreino || 'Treino',
       obsInstrucao: data.obsInstrucao,
-      treino: data.treino || [],
+      treino: normalizeWorkoutExerciseNames(data.treino),
       seriesRep: data.seriesRep || [],
       repeticoes: data.repeticoes || [],
       carga: data.carga || [],
