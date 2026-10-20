@@ -1,0 +1,5 @@
+# Start-workout save and responsive QA — 2026-10-20
+
+Completing a workout now navigates back only after the Firestore write succeeds. If saving fails, the student remains on the workout and sees a retryable error. The same feedback is available in the non-student checklist. The desktop workout content is centered at a maximum width of 960 px.
+
+Verified against a synthetic authenticated student and local Firebase emulators. A one-exercise workout advanced to the completion action. A temporary emulator rule denied updates to `lastCompletedAt`: the completion action stayed on `/start-workout` and displayed the error. After restoring the original emulator rules, retry returned to `/app`, and the timestamp was verified on the workout document. The synthetic pending fixture was then reset. At 320, 390, 768, and 1440 px, the error and 52 px completion button were visible without page-level horizontal overflow. Inspected 390 and 1440 px screenshots. No production workout or rules were changed.

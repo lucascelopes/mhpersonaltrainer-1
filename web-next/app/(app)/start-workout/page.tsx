@@ -86,6 +86,7 @@ export default function StartWorkoutPage() {
   const [workout, setWorkout] = useState<UserWorkout | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [paused, setPaused] = useState(false);
   const [completedExercises, setCompletedExercises] = useState<Set<number>>(new Set());
@@ -164,6 +165,7 @@ export default function StartWorkoutPage() {
     setCurrentExerciseIndex(0);
     setCurrentSetIndex(0);
     setReadyToFinish(false);
+    setSaveError('');
   }, [workout?.id]);
 
   useEffect(() => {
@@ -277,11 +279,21 @@ export default function StartWorkoutPage() {
   };
 
   const handleComplete = async () => {
-    if (!workout || !targetUserId) return;
+    if (!workout || !targetUserId || saving) return;
+    setSaveError('');
     setSaving(true);
-    await updateUserWorkout(targetUserId, workout.id, { lastCompletedAt: new Date() });
-    setSaving(false);
-    router.back();
+    try {
+      const result = await updateUserWorkout(targetUserId, workout.id, { lastCompletedAt: new Date() });
+      if (result.error) {
+        setSaveError('Não foi possível concluir o treino. Tente novamente.');
+        return;
+      }
+      router.back();
+    } catch {
+      setSaveError('Não foi possível concluir o treino. Tente novamente.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (isStudent) {
@@ -502,6 +514,7 @@ export default function StartWorkoutPage() {
 
         {readyToFinish && (
           <div className="student-start-footer">
+            {saveError && <p role="alert" className={styles.saveError}>{saveError}</p>}
             <button
               type="button"
               className="student-start-button"
@@ -522,6 +535,7 @@ export default function StartWorkoutPage() {
       description="Comece o treino atual com timer e checklist."
       breadcrumbs={[{ label: 'Treinos', href: '/workouts' }]}
     >
+      {saveError && <p role="alert" className={styles.saveError}>{saveError}</p>}
       {loading ? (
         <p className="subtle">Carregando treino...</p>
       ) : workout ? (
