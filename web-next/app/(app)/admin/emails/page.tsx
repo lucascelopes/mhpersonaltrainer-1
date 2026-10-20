@@ -71,6 +71,7 @@ export default function AdminEmailsPage() {
   const sendMessage = useMemo(() => httpsCallable(functions, 'adminEmailSend'), [functions]);
 
   const [loading, setLoading] = useState(true);
+  const [inboxError, setInboxError] = useState('');
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
@@ -95,6 +96,7 @@ export default function AdminEmailsPage() {
 
   const fetchInbox = useCallback(async () => {
     setLoading(true);
+    setInboxError('');
     setError('');
     setInfo('');
     try {
@@ -104,7 +106,9 @@ export default function AdminEmailsPage() {
       setEmails(items);
       setSelectedId((prev) => (prev || !items.length ? prev : items[0].uid));
     } catch (err: any) {
-      setError(err?.message || 'Nao foi possivel carregar a caixa de entrada.');
+      const message = err?.message || 'Nao foi possivel carregar a caixa de entrada.';
+      setInboxError(message);
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -338,6 +342,13 @@ export default function AdminEmailsPage() {
                     </p>
                   </button>
                 ))
+              ) : inboxError ? (
+                <div className="admin-email-empty" role="alert">
+                  <p>Não foi possível carregar as mensagens.</p>
+                  <button type="button" className="button secondary" onClick={fetchInbox}>
+                    Tentar novamente
+                  </button>
+                </div>
               ) : (
                 <div className="admin-email-empty">Nenhum email encontrado.</div>
               )}
