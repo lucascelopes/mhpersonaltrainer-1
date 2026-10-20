@@ -448,6 +448,25 @@ service cloud.firestore {
       allow create: if signedIn() && request.resource.data.sender == userPath(request.auth.uid);
     }
 
+    match /appErrors/{errorId} {
+      allow get, list: if isAdmin();
+      allow create: if signedIn() &&
+        request.resource.data.keys().hasAll(['type', 'message', 'userId', 'createdAt']) &&
+        request.resource.data.keys().hasOnly([
+          'type', 'message', 'name', 'code', 'stack', 'source', 'url',
+          'line', 'column', 'userId', 'role', 'userAgent', 'createdAt'
+        ]) &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.type in ['error', 'unhandledrejection'] &&
+        request.resource.data.message is string &&
+        request.resource.data.message.size() > 0 &&
+        request.resource.data.message.size() <= 420 &&
+        request.resource.data.createdAt == request.time &&
+        (!hasField(request.resource.data, 'stack') ||
+          (request.resource.data.stack is string && request.resource.data.stack.size() <= 1400));
+      allow update, delete: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

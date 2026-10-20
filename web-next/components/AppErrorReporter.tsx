@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
 import { useAuth } from '@/lib/auth';
+import { shouldReportAppError } from '@/lib/services/errorReporting';
 
 type ErrorPayload = {
   type: 'error' | 'unhandledrejection';
@@ -74,6 +75,7 @@ export default function AppErrorReporter() {
 
   useEffect(() => {
     const logError = async (payload: ErrorPayload) => {
+      if (!user?.uid || !shouldReportAppError(payload)) return;
       const key = `${user?.uid || ''}-${payload.type}-${payload.message}-${payload.code || ''}-${payload.source || ''}`;
       const now = Date.now();
       for (const [entry, at] of recentErrors.current) {

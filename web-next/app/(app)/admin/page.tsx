@@ -18,6 +18,7 @@ import DataTable from '@/components/data/DataTable';
 import AdminUserSheet, { type AdminUserSheetSeed } from '@/components/admin/AdminUserSheet';
 import { formatDate, useCollectionData } from '@/lib/firestoreHooks';
 import { useAdminDashboardData } from '@/lib/hooks/useAdminDashboardData';
+import { shouldReportAppError } from '@/lib/services/errorReporting';
 import { limit, orderBy } from 'firebase/firestore';
 import styles from './page.module.css';
 
@@ -213,7 +214,7 @@ function AdminOverview({ onRetry }: { onRetry: () => void }) {
   const alunoShare = totalUsers ? Math.round((totalAlunos / totalUsers) * 100) : 0;
 
   const normalizedErrors = useMemo(() => {
-    return errorRows.map((row) => ({
+    return errorRows.filter(shouldReportAppError).map((row) => ({
       ...row,
       date: parseDate(row.createdAt),
     }));
