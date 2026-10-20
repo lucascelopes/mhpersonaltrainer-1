@@ -5,7 +5,7 @@ import {
   doc, 
   getDoc, 
   getDocs, 
-  getCountFromServer,
+  getDocsFromServer,
   onSnapshot,
   query, 
   where, 
@@ -21,6 +21,7 @@ import { getFirebaseDb } from './firebase';
 import { User } from '../types/user';
 import { fetchEvaluations } from './evaluations';
 import { isPremiumUserRecord } from './aiAccess';
+import { getUserDisplayRole } from '../userRole';
 
 export interface Treino {
   id: string;
@@ -1102,45 +1103,27 @@ export const firestoreService = {
 async function getAdminOverview(): Promise<AdminOverview> {
   const db = getFirebaseDb();
   const usersRef = collection(db, 'users');
-
-  const getCount = async (q: ReturnType<typeof query> | typeof usersRef) => {
-    try {
-      const snapshot = await getCountFromServer(q);
-      return snapshot.data().count || 0;
-    } catch (error) {
-      const fallback = await getDocs(q as any);
-      return fallback.size;
-    }
-  };
-
-  const [totalUsers, totalAdmins, totalPersonals, totalAcademies] = await Promise.all([
-    getCount(usersRef),
-    getCount(query(usersRef, where('admin', '==', true))),
-    getCount(query(usersRef, where('professorAccount', '==', true))),
-    getCount(query(usersRef, where('academyAccount', '==', true))),
-  ]);
-
-  const totalAlunos = Math.max(0, totalUsers - totalAdmins - totalPersonals - totalAcademies);
-
-  const recentQuery = query(usersRef, orderBy('created_time', 'desc'), limit(10));
-  const recentSnapshot = await getDocs(recentQuery);
-  const recentUsers: AdminUserSummary[] = recentSnapshot.docs.map((doc) => {
+  const usersSnapshot = await getDocsFromServer(usersRef);
+  const totals = { admin: 0, academy: 0, personal: 0, aluno: 0 };
+  usersSnapshot.forEach((user) => {
+    totals[getUserDisplayRole(user.data())] += 1;
+  });
+  const totalUsers = usersSnapshot.size;
+  const totalAdmins = totals.admin;
+  const totalAcademies = totals.academy;
+  const totalPersonals = totals.personal;
+  const totalAlunos = totals.aluno;
+  const recentUsers: AdminUserSummary[] = usersSnapshot.docs.map((doc) => {
     const data = doc.data();
-    const role = data.admin
-      ? 'admin'
-      : data.academyAccount
-      ? 'academy'
-      : data.professorAccount
-      ? 'personal'
-      : 'aluno';
+    const role = getUserDisplayRole(data);
     return {
       id: doc.id,
-      name: data.display_name || 'Usuario',
+      name: data.display_name || 'Usuário',
       email: data.email || '',
       role,
-      createdAt: data.created_time?.toDate(),
+      createdAt: data.created_time?.toDate?.(),
     };
-  });
+  }).sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0)).slice(0, 10);
 
   return {
     totalUsers,

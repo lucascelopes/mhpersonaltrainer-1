@@ -7,6 +7,7 @@ import PageShell from '@/components/PageShell';
 import AdminGate from '@/components/AdminGate';
 import DataTable from '@/components/data/DataTable';
 import { formatDate, useCollectionData } from '@/lib/firestoreHooks';
+import { getUserDisplayRole } from '@/lib/userRole';
 import styles from './page.module.css';
 
 interface UserRow {
@@ -30,7 +31,7 @@ export default function AdminStudentsPage() {
   const { data, loading, error } = useCollectionData<UserRow>(['users'], EMPTY_QUERY_CONSTRAINTS);
   const [search, setSearch] = useState('');
   const students = useMemo(() => data.flatMap((user) => {
-    if (toBool(user.admin) || toBool(user.academyAccount) || toBool(user.professorAccount)) return [];
+    if (getUserDisplayRole(user) !== 'aluno') return [];
 
     return [{
       ...user,

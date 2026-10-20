@@ -8,6 +8,7 @@ import DataTable from '@/components/data/DataTable';
 import AdminUserSheet, { type AdminUserSheetSeed } from '@/components/admin/AdminUserSheet';
 import { formatDate, useCollectionData } from '@/lib/firestoreHooks';
 import { firestoreService } from '@/lib/services/firestoreService';
+import { getUserDisplayRole } from '@/lib/userRole';
 import styles from './page.module.css';
 
 interface RawUserRow {
@@ -56,13 +57,7 @@ export default function AdminUsersPage() {
       const email = item.email || '';
       const displayName =
         item.displayName || item.display_name || (email ? email.split('@')[0] : 'Usuário');
-      const role = toBool(item.admin)
-        ? 'admin'
-        : toBool(item.academyAccount)
-          ? 'academy'
-          : toBool(item.professorAccount)
-            ? 'personal'
-            : 'aluno';
+      const role = getUserDisplayRole(item);
       const status = toBool(item.acessoSuspenso) ? 'suspenso' : 'ativo';
       return {
         id: item.id,

@@ -7,6 +7,7 @@ import { formatDate } from '@/lib/firestoreHooks';
 import { firestoreService, type Avaliacao, type PersonalProfile, type Treino } from '@/lib/services/firestoreService';
 import styles from './AdminUserSheet.module.css';
 import type { User } from '@/lib/types/user';
+import { getUserDisplayRole } from '@/lib/userRole';
 
 export type AdminUserSheetSeed = {
   id: string;
@@ -33,13 +34,7 @@ const roleLabel = (role?: string) => {
 
 const getRole = (user?: User | null, seed?: AdminUserSheetSeed | null) => {
   if (user) {
-    return user.admin
-      ? 'admin'
-      : user.academyAccount
-      ? 'academy'
-      : user.professorAccount
-      ? 'personal'
-      : 'aluno';
+    return getUserDisplayRole(user);
   }
   return seed?.role || 'aluno';
 };

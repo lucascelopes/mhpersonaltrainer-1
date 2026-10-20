@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import PageShell from '@/components/PageShell';
 import AdminGate from '@/components/AdminGate';
 import { formatDate, useDocumentData } from '@/lib/firestoreHooks';
+import { getUserDisplayRole } from '@/lib/userRole';
 import styles from './page.module.css';
 
 type StudentDoc = {
@@ -55,7 +56,7 @@ export default function AdminStudentDetailPage({ params }: { params: { id: strin
 
 function StudentDetails({ studentId }: { studentId: string }) {
   const { data, loading, error } = useDocumentData<StudentDoc>(['users', studentId]);
-  const isStudent = data && !isTrue(data.admin) && !isTrue(data.professorAccount) && !isTrue(data.academyAccount);
+  const isStudent = data && getUserDisplayRole(data) === 'aluno';
   const name = data?.displayName || data?.display_name || data?.email?.split('@')[0] || 'Aluno sem nome';
   const joinedAt = data?.alunoDesde || data?.created_time || data?.createdTime;
   const location = [data?.cidade, data?.estado].filter(Boolean).join(' · ');
