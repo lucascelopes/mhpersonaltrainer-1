@@ -2,6 +2,75 @@
   min-width: 0;
 }
 
+.progress :global(.student-workout-back) {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.progress :global(.student-section-header .student-link) {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: flex-end;
+  padding-inline: 8px;
+}
+
+.progress :global(.student-inline-button) {
+  min-height: 48px;
+}
+
+@media (min-width: 900px) {
+  .progress {
+    width: 100%;
+    max-width: 1180px;
+    margin-inline: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+
+  .progress :global(.student-workout-detail-header),
+  .progress :global(.student-progress-card),
+  .progress :global(.student-banner) {
+    grid-column: 1 / -1;
+  }
+
+  .progress :global(.student-workout-title strong) {
+    font-size: clamp(1.5rem, 2.1vw, 2rem);
+  }
+
+  .progress :global(.student-progress-card) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .progress :global(.student-progress-row) {
+    display: contents;
+  }
+
+  .progress :global(.student-progress-metric) {
+    min-height: 100px;
+    padding: 18px 20px;
+  }
+
+  .progress :global(.student-progress-metric strong) {
+    font-size: 1.55rem;
+  }
+
+  .progress :global(.student-section) {
+    align-content: start;
+  }
+
+  .progress :global(.student-empty-state) {
+    min-height: 144px;
+    align-content: center;
+  }
+
+  .progress :global(.student-inline-button) {
+    width: auto;
+    min-width: 180px;
+    justify-self: start;
+  }
+}
+
 .progress :global(.student-list-item > div:first-child) {
   display: grid;
   gap: 4px;
