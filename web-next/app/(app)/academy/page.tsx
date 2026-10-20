@@ -41,6 +41,9 @@ const getInvoiceErrorMessage = (value: string) => {
   if (value.includes('COLLECTION_GROUP_ASC')) {
     return 'Indice do Firestore necessario para carregar faturas.';
   }
+  if (/permission|allow statements|unauthorized/i.test(value)) {
+    return 'Sem permissão para carregar as faturas.';
+  }
   return value;
 };
 
@@ -134,8 +137,11 @@ export default function AcademyDashboardPage() {
     loadingPlans,
     loadingInvoices,
     academyError,
+    plansError,
     invoicesError,
     reloadAcademy,
+    reloadPlans,
+    reloadInvoices,
   } = useAcademyData();
   const [checkinOpen, setCheckinOpen] = useState(false);
   const [checkinMethod, setCheckinMethod] = useState<CheckinMethod>('biometria');
@@ -278,6 +284,8 @@ export default function AcademyDashboardPage() {
     if (!invoicesError) return '';
     return getInvoiceErrorMessage(invoicesError);
   }, [invoicesError]);
+  const invoiceMetric = (value: string | number) => loadingInvoices ? '...' : invoicesError ? '—' : value;
+  const planMetric = (value: number) => loadingPlans ? '...' : plansError ? '—' : value;
 
   const selectedCheckinStudent = useMemo(
     () => students.find((item) => item.id === checkinStudentId) || null,
@@ -978,12 +986,12 @@ export default function AcademyDashboardPage() {
             </article>
             <article className="academy-ops-strip-item">
               <span>Faturas pendentes</span>
-              <strong>{loadingInvoices ? '...' : pendingInvoicesCount}</strong>
-              <small>{loadingInvoices ? '...' : formatCurrency(pendingTotal)}</small>
+              <strong>{invoiceMetric(pendingInvoicesCount)}</strong>
+              <small>{invoiceMetric(formatCurrency(pendingTotal))}</small>
             </article>
             <article className="academy-ops-strip-item">
               <span>Recebido</span>
-              <strong>{loadingInvoices ? '...' : formatCurrency(paidTotal)}</strong>
+              <strong>{invoiceMetric(formatCurrency(paidTotal))}</strong>
               <small>Pagamentos confirmados</small>
             </article>
           </section>
@@ -1059,9 +1067,9 @@ export default function AcademyDashboardPage() {
                   <span>Alunos sem personal</span>
                   <strong>{loadingAcademy ? '...' : summary.unassignedStudents}</strong>
                 </li>
-                <li className={!loadingInvoices && pendingInvoicesCount === 0 ? 'is-ok' : ''}>
+                <li className={!loadingInvoices && !invoicesError && pendingInvoicesCount === 0 ? 'is-ok' : ''}>
                   <span>Pendencias financeiras</span>
-                  <strong>{loadingInvoices ? '...' : pendingInvoicesCount}</strong>
+                  <strong>{invoiceMetric(pendingInvoicesCount)}</strong>
                 </li>
                 <li className={hasOpenRouter ? 'is-ok' : ''}>
                   <span>Comparacao facial IA</span>
@@ -1081,9 +1089,9 @@ export default function AcademyDashboardPage() {
                 <p className="subtle">Resumo de caixa, pendencias e ultimas cobrancas.</p>
               </header>
               {invoicesError && (
-                <div className="academy-alert">
+                <div className="academy-alert" role="alert" style={{ flexWrap: 'wrap' }}>
                   <div>
-                    <strong>Indice pendente</strong>
+                    <strong>{invoicesError.includes('COLLECTION_GROUP_ASC') ? 'Índice pendente' : 'Faturas indisponíveis'}</strong>
                     <span>{invoiceErrorMessage}</span>
                   </div>
                   {invoiceErrorLink && (
@@ -1091,24 +1099,37 @@ export default function AcademyDashboardPage() {
                       Criar indice
                     </a>
                   )}
+                  <button type="button" className="button secondary sm" style={{ minHeight: 48 }} onClick={reloadInvoices} disabled={loadingInvoices}>
+                    Tentar novamente
+                  </button>
+                </div>
+              )}
+              {plansError && (
+                <div className="academy-alert" role="alert" style={{ flexWrap: 'wrap' }}>
+                  <div><strong>Planos indisponíveis</strong><span>{plansError}</span></div>
+                  <button type="button" className="button secondary sm" style={{ minHeight: 48 }} onClick={reloadPlans} disabled={loadingPlans}>
+                    Tentar novamente
+                  </button>
                 </div>
               )}
               <div className="academy-ops-money-grid">
                 <div>
                   <span>Recebido</span>
-                  <strong>{loadingInvoices ? '...' : formatCurrency(paidTotal)}</strong>
+                  <strong>{invoiceMetric(formatCurrency(paidTotal))}</strong>
                 </div>
                 <div>
                   <span>Pendente</span>
-                  <strong>{loadingInvoices ? '...' : formatCurrency(pendingTotal)}</strong>
+                  <strong>{invoiceMetric(formatCurrency(pendingTotal))}</strong>
                 </div>
                 <div>
                   <span>Planos ativos</span>
-                  <strong>{loadingPlans ? '...' : activePlans.length}</strong>
+                  <strong>{planMetric(activePlans.length)}</strong>
                 </div>
               </div>
               {loadingInvoices ? (
                 <p className="subtle">Carregando faturas...</p>
+              ) : invoicesError ? (
+                <p className="subtle">As faturas estão indisponíveis no momento.</p>
               ) : recentInvoices.length ? (
                 <div className="academy-ops-feed">
                   {recentInvoices.map((invoice) => (

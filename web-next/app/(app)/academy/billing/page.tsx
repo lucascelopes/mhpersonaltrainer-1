@@ -36,6 +36,11 @@ const normalizeConnectError = (message: string) => {
   return message;
 };
 
+const getInvoiceReadErrorMessage = (message: string) =>
+  /permission|allow statements|unauthorized/i.test(message)
+    ? 'Sem permissão para carregar as faturas.'
+    : message;
+
 const initialConnectForm = {
   email: '',
   firstName: '',
@@ -65,6 +70,7 @@ export default function AcademyBillingPage() {
     invoices,
     loadingPlans,
     loadingInvoices,
+    plansError,
     invoicesError,
     reloadPlans,
     reloadInvoices,
@@ -122,6 +128,7 @@ export default function AcademyBillingPage() {
     return (totals.totalPaid + totals.totalPending) / totals.total;
   }, [totals]);
   const activePlans = useMemo(() => plans.filter((plan) => plan.ativo).length, [plans]);
+  const invoiceMetric = (value: string | number) => loadingInvoices ? '...' : invoicesError ? '—' : value;
   const pendingStudentsTotal = useMemo(() => {
     const set = new Set<string>();
     invoices.forEach((invoice) => {
@@ -521,22 +528,22 @@ export default function AcademyBillingPage() {
           <section className="billing-v10-kpis">
             <div className="billing-v10-kpi" data-tone="success">
               <span>Recebido</span>
-              <strong>{loadingInvoices ? '...' : formatCurrency(totals.totalPaid)}</strong>
+              <strong>{invoiceMetric(formatCurrency(totals.totalPaid))}</strong>
               <small>Faturas pagas</small>
             </div>
             <div className="billing-v10-kpi" data-tone="warning">
               <span>Pendente</span>
-              <strong>{loadingInvoices ? '...' : formatCurrency(totals.totalPending)}</strong>
+              <strong>{invoiceMetric(formatCurrency(totals.totalPending))}</strong>
               <small>Em aberto</small>
             </div>
             <div className="billing-v10-kpi" data-tone="danger">
               <span>Atrasadas</span>
-              <strong>{loadingInvoices ? '...' : overdueCount}</strong>
+              <strong>{invoiceMetric(overdueCount)}</strong>
               <small>Vencidas</small>
             </div>
             <div className="billing-v10-kpi" data-tone="info">
               <span>Taxa de pagamento</span>
-              <strong>{loadingInvoices ? '...' : `${paidRate}%`}</strong>
+              <strong>{invoiceMetric(`${paidRate}%`)}</strong>
               <small>Nos ultimos registros</small>
             </div>
           </section>
@@ -550,23 +557,23 @@ export default function AcademyBillingPage() {
                   <p>Filtre por status e aluno para operar rapido.</p>
                 </div>
               </div>
-              {invoicesError && <p className="billing-v10-alert">{invoicesError}</p>}
+              {invoicesError && <p className="billing-v10-alert" role="alert">{getInvoiceReadErrorMessage(invoicesError)}</p>}
               <div className="billing-v10-summary">
                 <div className="billing-v10-chip">
                   <span>Total</span>
-                  <strong>{loadingInvoices ? '...' : totals.total}</strong>
+                  <strong>{invoiceMetric(totals.total)}</strong>
                 </div>
                 <div className="billing-v10-chip">
                   <span>Pagos</span>
-                  <strong>{loadingInvoices ? '...' : paidCount}</strong>
+                  <strong>{invoiceMetric(paidCount)}</strong>
                 </div>
                 <div className="billing-v10-chip">
                   <span>Pendentes</span>
-                  <strong>{loadingInvoices ? '...' : pendingCount}</strong>
+                  <strong>{invoiceMetric(pendingCount)}</strong>
                 </div>
                 <div className="billing-v10-chip">
                   <span>Ticket medio</span>
-                  <strong>{loadingInvoices ? '...' : formatCurrency(avgTicket)}</strong>
+                  <strong>{invoiceMetric(formatCurrency(avgTicket))}</strong>
                 </div>
               </div>
               <div className="billing-v10-toolbar">
@@ -622,6 +629,8 @@ export default function AcademyBillingPage() {
                 </div>
                 {loadingInvoices ? (
                   <p className="billing-v10-muted">Carregando faturas...</p>
+                ) : invoicesError ? (
+                  <p className="billing-v10-muted">As faturas estão indisponíveis no momento.</p>
                 ) : filteredInvoices.length ? (
                   filteredInvoices.map((invoice) => {
                     const dueDay = invoice.todoDiaDoMes ?? invoice.diaDoPagamento;
@@ -817,12 +826,14 @@ export default function AcademyBillingPage() {
                     <p>Priorize quem precisa de contato imediato.</p>
                   </div>
                   <div className="billing-v10-badge">
-                    {loadingInvoices ? '...' : `${pendingStudentsTotal} alunos`}
+                    {invoiceMetric(`${pendingStudentsTotal} alunos`)}
                   </div>
                 </div>
                 <div className="billing-v10-list">
                   {loadingInvoices ? (
                     <p className="billing-v10-muted">Carregando pendencias...</p>
+                  ) : invoicesError ? (
+                    <p className="billing-v10-muted">Pendências indisponíveis.</p>
                   ) : topPendingStudents.length ? (
                     topPendingStudents.map((item) => (
                       <div key={item.id} className="billing-v10-list-item">
@@ -920,6 +931,11 @@ export default function AcademyBillingPage() {
               <div className="billing-v10-list">
                 {loadingPlans ? (
                   <p className="billing-v10-muted">Carregando planos...</p>
+                ) : plansError ? (
+                  <div className="billing-v10-alert" role="alert">
+                    <p>{plansError}</p>
+                    <button type="button" className="button secondary sm" onClick={reloadPlans}>Tentar novamente</button>
+                  </div>
                 ) : plans.length ? (
                   plans.map((plan) => (
                     <div key={plan.id} className="billing-v10-list-item">

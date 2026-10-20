@@ -1,0 +1,9 @@
+# Academy billing read-state QA — 2026-10-20
+
+The Academy billing page and dashboard now distinguish loading, unavailable data, and real zero values for invoices and plans. Failed reads show accessible alerts and retry actions; financial metrics become unknown rather than displaying false zeroes. The plan list and invoice list no longer claim to be empty when their reads fail. A decorative background is contained within the tablet viewport, and retry controls have at least 48 px height.
+
+Verified with an authenticated synthetic Academy account and local Auth/Firestore emulators under `demo-mhpersonal`. One plan for R$ 120 and one pending invoice appeared on both routes. A temporary emulator rule denied nested reads while preserving profile access. Before the fix, the invoice disappeared, the balance changed to R$ 0, and the plan list claimed there were no plans. After the fix, the billing page showed eight unknown metrics, two error alerts, and no false empty states. The dashboard showed unknown finance values and separate invoice/plan alerts. Restoring the original emulator rules and using retry recovered R$ 120 and one active plan; the alerts cleared. Deleting the two synthetic records then produced genuine zero values and empty states. The task-specific emulator account and records were removed after testing. No production data or rules were changed.
+
+Billing had no page-level horizontal overflow at 320, 390, 768, or 1440 px after the decorative background fix. The dark 390 px error state was inspected visually; the billing and dashboard retry buttons measured 48 px. TypeScript validation passed in the isolated branch. Authenticated tests were local only.
+
+The integrated Hosting review channel is built from a separate QA checkout with other ongoing local changes, so it is not a byte-for-byte build of this branch alone.

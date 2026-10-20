@@ -1,3 +1,12 @@
+.app-shell-academy .academy-billing-v10::before {
+  inset: -30px 0 auto;
+}
+
+.academy-billing-v10 .billing-v10-alert .button {
+  min-height: 48px;
+  margin-top: 8px;
+}
+
 .academy-billing-v10 .billing-v10-list-item > div:first-child {
   display: grid;
   gap: 4px;

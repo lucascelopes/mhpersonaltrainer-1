@@ -179,6 +179,7 @@ export function useAcademyData() {
   const [loadingPlans, setLoadingPlans] = useState(true);
   const [loadingInvoices, setLoadingInvoices] = useState(true);
   const [academyError, setAcademyError] = useState('');
+  const [plansError, setPlansError] = useState('');
   const [invoicesError, setInvoicesError] = useState('');
 
   const academyCodeRaw = user?.codigoAcademia ?? '';
@@ -304,11 +305,13 @@ export function useAcademyData() {
   const loadPlans = useCallback(async () => {
     if (role !== 'academy' || !user?.uid) {
       setPlans([]);
+      setPlansError('');
       setLoadingPlans(false);
       return;
     }
 
     setLoadingPlans(true);
+    setPlansError('');
     try {
       const db = getFirebaseDb();
       const ref = collection(db, 'users', user.uid, 'academyPlans');
@@ -330,6 +333,7 @@ export function useAcademyData() {
       setPlans(items);
     } catch (err) {
       setPlans([]);
+      setPlansError('Não foi possível carregar os planos. Tente novamente.');
     } finally {
       setLoadingPlans(false);
     }
@@ -338,6 +342,7 @@ export function useAcademyData() {
   const loadInvoices = useCallback(async () => {
     if (role !== 'academy' || !academyCodeRaw) {
       setInvoices([]);
+      setInvoicesError('');
       setLoadingInvoices(false);
       return;
     }
@@ -440,6 +445,7 @@ export function useAcademyData() {
     loadingPlans,
     loadingInvoices,
     academyError,
+    plansError,
     invoicesError,
     reloadAcademy: loadAcademy,
     reloadPlans: loadPlans,
