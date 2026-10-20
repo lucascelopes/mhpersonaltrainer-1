@@ -13,6 +13,16 @@ const nextConfig = {
   outputFileTracing: false,
 };
 
+// Firebase Hosting serves a static client bundle, so replace the server key with a harmless marker.
+// The marker keeps accidental direct OpenRouter calls unauthorized and cannot reveal the real key.
+if (isHostingBuild) {
+  nextConfig.env = {
+    ...nextConfig.env,
+    NEXT_PUBLIC_OPENROUTER_API_KEY: 'hosting-preview-disabled',
+    EXPO_PUBLIC_OPENROUTER_API_KEY: 'hosting-preview-disabled',
+  };
+}
+
 if ((isTauriBuild && isProduction) || isHostingBuild) {
   if (isTauriBuild && isProduction) {
     nextConfig.distDir = '.next-tauri';
