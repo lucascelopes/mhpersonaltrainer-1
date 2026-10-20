@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import BrandLockup from '@/components/BrandLockup';
 
 export const metadata: Metadata = {
   robots: {
@@ -16,14 +17,14 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <div className="auth-shell">
       <div className="container auth-grid">
         <aside className="auth-hero">
-          <Link href="/" className="auth-brand">
-            MH PERSONAL
+          <Link href="/" className="auth-brand" aria-label="MH Personal Trainer — início">
+            <BrandLockup width={164} height={52} priority />
           </Link>
           <span className="auth-eyebrow">Plataforma completa</span>
-          <h1 className="auth-title">Treinos, avaliacoes e agenda no mesmo lugar.</h1>
+          <h1 className="auth-title">Treinos, avaliações e agenda no mesmo lugar.</h1>
           <p className="auth-lead">
             Tudo o que aluno, personal e academia precisam para evoluir: IA para treinos,
-            avaliacao completa, chat direto e relatorios de progresso.
+            avaliação completa, chat direto e relatórios de progresso.
           </p>
           <div className="auth-pill-row">
             <span className="auth-pill">Web</span>
@@ -33,15 +34,15 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <div className="auth-highlight-grid">
             <div className="auth-highlight-card">
               <strong>Aluno engajado</strong>
-              <span>Plano claro, notificacoes e progresso visivel.</span>
+              <span>Plano claro, notificações e progresso visível.</span>
             </div>
             <div className="auth-highlight-card">
               <strong>Personal eficiente</strong>
-              <span>IA para montar treinos e avaliar rapido.</span>
+              <span>IA para montar treinos e avaliar rápido.</span>
             </div>
             <div className="auth-highlight-card">
               <strong>Academia no controle</strong>
-              <span>Gestao, repasses e indicadores em tempo real.</span>
+              <span>Gestão, repasses e indicadores em tempo real.</span>
             </div>
           </div>
         </aside>

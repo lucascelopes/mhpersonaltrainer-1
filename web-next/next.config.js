@@ -6,7 +6,10 @@ const isProduction = process.env.NODE_ENV === 'production';
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  distDir: '.next',
+  experimental: {
+    externalDir: true,
+  },
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   images: {
     unoptimized: true,
   },

@@ -1,0 +1,491 @@
+.loginPage {
+  min-width: 0;
+}
+
+.loginPage :global(.auth-link-chip) {
+  min-height: 44px;
+}
+
+.loginCard {
+  display: contents;
+}
+
+.mobileIntro,
+.mobileSubtitle,
+.mobileForgot,
+.mobileDivider,
+.mobileSecurity,
+.mobileFooter,
+.inputIcon,
+.mobileToggleIcon,
+.mobileButtonIcon,
+.socialIcon {
+  display: none;
+}
+
+.inputWrap {
+  position: relative;
+}
+
+@media (max-width: 960px) {
+  :global(.auth-shell):has(.loginPage) {
+    position: relative;
+    min-height: 100svh;
+    overflow: hidden;
+    padding: 0;
+    background: linear-gradient(155deg, #f8fcff 0%, #eaf5ff 54%, #f4faff 100%);
+  }
+
+  :global(.auth-shell):has(.loginPage)::before,
+  :global(.auth-shell):has(.loginPage)::after {
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    border: 1px solid rgba(83, 151, 219, 0.16);
+    border-radius: 50%;
+    content: '';
+    pointer-events: none;
+  }
+
+  :global(.auth-shell):has(.loginPage)::before {
+    top: -340px;
+    right: -290px;
+  }
+
+  :global(.auth-shell):has(.loginPage)::after {
+    right: -300px;
+    bottom: -300px;
+  }
+
+  :global(.auth-shell):has(.loginPage) :global(.auth-grid) {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: min(100%, 480px);
+  }
+
+  :global(.auth-shell):has(.loginPage) :global(.auth-hero),
+  :global(.auth-shell):has(.loginPage) :global(.auth-note) {
+    display: none;
+  }
+
+  :global(.auth-shell):has(.loginPage) :global(.auth-panel) {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .loginPage {
+    padding: 24px 20px 34px;
+    color: #142b4c;
+  }
+
+  .mobileIntro {
+    display: block;
+  }
+
+  .mobileBrandRow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .mobileBrandRow a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 50px;
+  }
+
+  .mobileBrandWords {
+    color: #536b86;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.19em;
+    line-height: 1.5;
+    text-align: right;
+    text-transform: uppercase;
+  }
+
+  .mobileKicker {
+    margin-top: 30px;
+    color: #0967d6;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.27em;
+    text-transform: uppercase;
+  }
+
+  .mobileHeadline {
+    margin-top: 13px;
+    color: #172d50;
+    font-family: var(--font-body), sans-serif;
+    font-size: clamp(2rem, 8vw, 2.65rem);
+    font-weight: 800;
+    letter-spacing: -0.055em;
+    line-height: 1.08;
+  }
+
+  .mobileHeadline span {
+    display: block;
+    color: #0871ed;
+  }
+
+  .mobileLead {
+    margin-top: 12px;
+    color: #536b86;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .roleNav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 3px;
+    margin-top: 22px;
+    padding: 4px;
+    border: 1px solid #d5e4f3;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.76);
+    box-shadow: 0 8px 24px rgba(48, 97, 146, 0.08);
+  }
+
+  .roleNav a,
+  .roleActive {
+    display: flex;
+    min-width: 0;
+    min-height: 50px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 14px;
+    color: #1b3455;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .roleNav svg {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+  }
+
+  .roleNav a:hover,
+  .roleNav a:focus-visible {
+    background: #e8f3ff;
+  }
+
+  .roleActive {
+    background: #0872f4;
+    box-shadow: 0 5px 12px rgba(8, 114, 244, 0.2);
+    color: #fff;
+  }
+
+  .loginPage :global(.auth-card) {
+    gap: 16px;
+  }
+
+  .loginCard {
+    display: grid;
+    gap: 16px;
+    margin-top: 18px;
+    padding: 24px 20px 20px;
+    border: 1px solid #d5e3f1;
+    border-radius: 26px;
+    background: #fff;
+    box-shadow: 0 18px 38px rgba(28, 70, 111, 0.09);
+  }
+
+  .loginCard :global(.auth-card-header) {
+    gap: 4px;
+  }
+
+  .loginCard :global(.auth-kicker),
+  .desktopSubtitle,
+  .desktopToggleText,
+  .desktopDivider {
+    display: none;
+  }
+
+  .loginCard :global(.auth-card-header h1) {
+    color: #142b4c;
+    font-family: var(--font-body), sans-serif;
+    font-size: 1.55rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.2;
+  }
+
+  .mobileSubtitle {
+    display: block;
+    color: #536b86;
+    font-size: 0.84rem;
+  }
+
+  .loginCard :global(.auth-form) {
+    gap: 12px;
+  }
+
+  .loginCard :global(.auth-field) {
+    gap: 6px;
+    color: #162b49;
+    font-size: 0.84rem;
+    font-weight: 700;
+  }
+
+  .inputWrap,
+  .loginCard :global(.auth-password) {
+    position: relative;
+  }
+
+  .inputIcon {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 14px;
+    display: block;
+    width: 19px;
+    height: 19px;
+    color: #7489a4;
+    pointer-events: none;
+    transform: translateY(-50%);
+  }
+
+  .loginCard :global(.auth-input),
+  :global(:root[data-theme='dark']) .loginCard :global(.auth-input) {
+    min-height: 49px;
+    padding: 10px 44px;
+    border: 1px solid #cedceb;
+    border-radius: 10px;
+    background: #fff;
+    color: #193455;
+    font-size: 16px;
+  }
+
+  .loginCard :global(.auth-input::placeholder),
+  :global(:root[data-theme='dark']) .loginCard :global(.auth-input::placeholder) {
+    color: #596f8a;
+  }
+
+  .loginCard :global(.auth-input:focus-visible) {
+    outline: 2px solid #a7d0ff;
+    outline-offset: 1px;
+  }
+
+  .loginCard :global(.auth-password) {
+    gap: 0;
+  }
+
+  .loginCard :global(.auth-toggle),
+  :global(:root[data-theme='dark']) .loginCard :global(.auth-toggle) {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #7086a4;
+  }
+
+  .mobileToggleIcon {
+    display: block;
+    width: 20px;
+    height: 20px;
+  }
+
+  .mobileForgot {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: -3px;
+    color: #096bdc;
+    font-size: 0.79rem;
+    font-weight: 700;
+    text-align: right;
+  }
+
+  .loginCard :global(.auth-error) {
+    font-size: 0.8rem;
+  }
+
+  .loginCard :global(.auth-submit) {
+    display: flex;
+    min-height: 50px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border-radius: 10px;
+    background: #086af0;
+    box-shadow: 0 8px 20px rgba(8, 106, 240, 0.18);
+    font-size: 0.96rem;
+  }
+
+  .loginCard :global(.auth-submit:disabled) {
+    cursor: wait;
+    opacity: 0.65;
+  }
+
+  .mobileButtonIcon {
+    display: block;
+    width: 17px;
+    height: 17px;
+  }
+
+  .loginCard :global(.auth-divider) {
+    color: #536b86;
+    font-size: 0.76rem;
+  }
+
+  .mobileDivider {
+    display: inline;
+  }
+
+  .loginCard :global(.auth-secondary),
+  :global(:root[data-theme='dark']) .loginCard :global(.auth-secondary) {
+    display: flex;
+    min-height: 47px;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    border: 1px solid #d0ddeb;
+    border-radius: 10px;
+    background: #fff;
+    color: #193455;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .socialIcon {
+    display: block;
+    width: 19px;
+    height: 19px;
+    color: #3577db;
+  }
+
+  .mobileSecurity {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    color: #536b86;
+    font-size: 0.66rem;
+    text-align: center;
+  }
+
+  .mobileSecurity svg {
+    width: 17px;
+    height: 17px;
+    flex: 0 0 auto;
+  }
+
+  .loginPage :global(.auth-access) {
+    gap: 10px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .loginPage :global(.auth-access-header) {
+    color: #536b86;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .loginPage :global(.auth-access-header .subtle) {
+    color: #536b86;
+  }
+
+  .loginPage :global(.auth-access-header .auth-link) {
+    display: none;
+  }
+
+  .loginPage :global(.auth-access-item),
+  :global(:root[data-theme='dark']) .loginPage :global(.auth-access-item) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid #d6e4f2;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.82);
+  }
+
+  .loginPage :global(.auth-access-item .subtle) {
+    display: none;
+  }
+
+  .loginPage :global(.auth-access-title) {
+    color: #193455;
+    font-size: 0.8rem;
+  }
+
+  .loginPage :global(.auth-access-actions) {
+    justify-content: flex-end;
+    gap: 5px;
+  }
+
+  .loginPage :global(.auth-link-chip) {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 9px;
+    font-size: 0.75rem;
+    text-align: center;
+  }
+
+  .mobileFooter {
+    display: block;
+    margin-top: 28px;
+    padding-left: 4px;
+    color: #536b86;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    line-height: 1.55;
+    text-transform: uppercase;
+  }
+}
+
+@media (max-width: 360px) {
+  .loginPage {
+    padding-inline: 14px;
+  }
+
+  .roleNav a,
+  .roleActive {
+    gap: 3px;
+    font-size: 0.68rem;
+  }
+
+  .roleNav svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .loginCard {
+    padding-inline: 16px;
+  }
+}
+
+@media (min-width: 961px) and (max-width: 1200px) {
+  .loginPage :global(.auth-access-item) {
+    min-height: 68px;
+  }
+
+  .loginPage :global(.auth-access-item .subtle) {
+    display: none;
+  }
+
+  .loginPage :global(.auth-link-chip) {
+    min-height: 44px;
+  }
+}
