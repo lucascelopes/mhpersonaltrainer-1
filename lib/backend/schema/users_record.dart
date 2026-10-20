@@ -242,11 +242,6 @@ class UsersRecord extends FirestoreRecord {
   DateTime? get desde => _desde;
   bool hasDesde() => _desde != null;
 
-  // "password" field.
-  String? _password;
-  String get password => _password ?? '';
-  bool hasPassword() => _password != null;
-
   // "satisfacaocomoapp" field.
   double? _satisfacaocomoapp;
   double get satisfacaocomoapp => _satisfacaocomoapp ?? 0.0;
@@ -366,7 +361,6 @@ class UsersRecord extends FirestoreRecord {
     _metodoDePagamento = snapshotData['metodoDePagamento'] as String?;
     _chavePixDoPersonal = snapshotData['chavePixDoPersonal'] as String?;
     _desde = snapshotData['desde'] as DateTime?;
-    _password = snapshotData['password'] as String?;
     _satisfacaocomoapp = castToType<double>(snapshotData['satisfacaocomoapp']);
     _suprallicas = getDataList(snapshotData['suprallicas']);
     _subescapilar = getDataList(snapshotData['subescapilar']);
@@ -474,7 +468,6 @@ Map<String, dynamic> createUsersRecordData({
   String? metodoDePagamento,
   String? chavePixDoPersonal,
   DateTime? desde,
-  String? password,
   double? satisfacaocomoapp,
   String? subscribeId,
   LatLng? location,
@@ -525,7 +518,6 @@ Map<String, dynamic> createUsersRecordData({
       'metodoDePagamento': metodoDePagamento,
       'chavePixDoPersonal': chavePixDoPersonal,
       'desde': desde,
-      'password': password,
       'satisfacaocomoapp': satisfacaocomoapp,
       'subscribeId': subscribeId,
       'location': location,
@@ -593,7 +585,6 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e1?.metodoDePagamento == e2?.metodoDePagamento &&
         e1?.chavePixDoPersonal == e2?.chavePixDoPersonal &&
         e1?.desde == e2?.desde &&
-        e1?.password == e2?.password &&
         e1?.satisfacaocomoapp == e2?.satisfacaocomoapp &&
         listEquality.equals(e1?.suprallicas, e2?.suprallicas) &&
         listEquality.equals(e1?.subescapilar, e2?.subescapilar) &&
@@ -658,7 +649,6 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e?.metodoDePagamento,
         e?.chavePixDoPersonal,
         e?.desde,
-        e?.password,
         e?.satisfacaocomoapp,
         e?.suprallicas,
         e?.subescapilar,

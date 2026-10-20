@@ -71,3 +71,8 @@ const personalInvites = require('./personal_invites.js');
 exports.previewPersonalInvite = personalInvites.previewPersonalInvite;
 exports.registerStudentWithInvite = personalInvites.registerStudentWithInvite;
 exports.claimPersonalInvite = personalInvites.claimPersonalInvite;
+
+const sensitiveFields = require('./sensitive_fields.js');
+exports.stripUserPlaintextPassword = sensitiveFields.stripUserPlaintextPassword;
+exports.stripPersonalAccountPlaintextPassword = sensitiveFields.stripPersonalAccountPlaintextPassword;
+exports.stripProfessorAccountPlaintextPassword = sensitiveFields.stripProfessorAccountPlaintextPassword;

@@ -66,11 +66,6 @@ class ProfessorAccountRecord extends FirestoreRecord {
   bool get userAccount => _userAccount ?? false;
   bool hasUserAccount() => _userAccount != null;
 
-  // "password" field.
-  String? _password;
-  String get password => _password ?? '';
-  bool hasPassword() => _password != null;
-
   // "codigoPersonal" field.
   int? _codigoPersonal;
   int get codigoPersonal => _codigoPersonal ?? 0;
@@ -87,7 +82,6 @@ class ProfessorAccountRecord extends FirestoreRecord {
     _bio = snapshotData['bio'] as String?;
     _userName = snapshotData['user_name'] as String?;
     _userAccount = snapshotData['userAccount'] as bool?;
-    _password = snapshotData['password'] as String?;
     _codigoPersonal = castToType<int>(snapshotData['codigoPersonal']);
   }
 
@@ -137,7 +131,6 @@ Map<String, dynamic> createProfessorAccountRecordData({
   String? bio,
   String? userName,
   bool? userAccount,
-  String? password,
   int? codigoPersonal,
 }) {
   final firestoreData = mapToFirestore(
@@ -152,7 +145,6 @@ Map<String, dynamic> createProfessorAccountRecordData({
       'bio': bio,
       'user_name': userName,
       'userAccount': userAccount,
-      'password': password,
       'codigoPersonal': codigoPersonal,
     }.withoutNulls,
   );
@@ -176,7 +168,6 @@ class ProfessorAccountRecordDocumentEquality
         e1?.bio == e2?.bio &&
         e1?.userName == e2?.userName &&
         e1?.userAccount == e2?.userAccount &&
-        e1?.password == e2?.password &&
         e1?.codigoPersonal == e2?.codigoPersonal;
   }
 
@@ -192,7 +183,6 @@ class ProfessorAccountRecordDocumentEquality
         e?.bio,
         e?.userName,
         e?.userAccount,
-        e?.password,
         e?.codigoPersonal
       ]);
 

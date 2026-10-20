@@ -736,8 +736,6 @@ class _CriacaoDeContasPersonalTrainerWidgetState
                                       await currentUserReference!
                                           .update(createUsersRecordData(
                                         professorAccount: true,
-                                        password:
-                                            _model.passwordTextController.text,
                                       ));
                                       logFirebaseEvent('Button_bottom_sheet');
                                       await showModalBottomSheet(

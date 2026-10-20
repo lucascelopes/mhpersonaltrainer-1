@@ -66,11 +66,6 @@ class PersonalAccountRecord extends FirestoreRecord {
   bool get userAccount => _userAccount ?? false;
   bool hasUserAccount() => _userAccount != null;
 
-  // "password" field.
-  String? _password;
-  String get password => _password ?? '';
-  bool hasPassword() => _password != null;
-
   // "codigoPersonal" field.
   int? _codigoPersonal;
   int get codigoPersonal => _codigoPersonal ?? 0;
@@ -99,7 +94,6 @@ class PersonalAccountRecord extends FirestoreRecord {
     _bio = snapshotData['bio'] as String?;
     _userName = snapshotData['user_name'] as String?;
     _userAccount = snapshotData['userAccount'] as bool?;
-    _password = snapshotData['password'] as String?;
     _codigoPersonal = castToType<int>(snapshotData['codigoPersonal']);
     _userList = getDataList(snapshotData['userList']);
     _location = snapshotData['location'] as LatLng?;
@@ -155,7 +149,6 @@ Map<String, dynamic> createPersonalAccountRecordData({
   String? bio,
   String? userName,
   bool? userAccount,
-  String? password,
   int? codigoPersonal,
   LatLng? location,
 }) {
@@ -171,7 +164,6 @@ Map<String, dynamic> createPersonalAccountRecordData({
       'bio': bio,
       'user_name': userName,
       'userAccount': userAccount,
-      'password': password,
       'codigoPersonal': codigoPersonal,
       'location': location,
     }.withoutNulls,
@@ -197,7 +189,6 @@ class PersonalAccountRecordDocumentEquality
         e1?.bio == e2?.bio &&
         e1?.userName == e2?.userName &&
         e1?.userAccount == e2?.userAccount &&
-        e1?.password == e2?.password &&
         e1?.codigoPersonal == e2?.codigoPersonal &&
         listEquality.equals(e1?.userList, e2?.userList) &&
         e1?.location == e2?.location;
@@ -215,7 +206,6 @@ class PersonalAccountRecordDocumentEquality
         e?.bio,
         e?.userName,
         e?.userAccount,
-        e?.password,
         e?.codigoPersonal,
         e?.userList,
         e?.location
