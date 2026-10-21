@@ -29,7 +29,7 @@ export default function PersonalLoginPage() {
       return false;
     }
     if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Email invalido.');
+      setError('E-mail inválido.');
       return false;
     }
     setError('');
@@ -52,17 +52,18 @@ export default function PersonalLoginPage() {
   return (
     <div className="auth-card">
       <div className="auth-card-header">
-        <p className="auth-kicker">Area do personal</p>
+        <p className="auth-kicker">Área do personal</p>
         <h1>Entrar no painel profissional</h1>
         <p className="subtle">
           Acesso exclusivo para personal trainer, professor ou admin.
         </p>
       </div>
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="auth-form" onSubmit={handleSubmit} noValidate>
         <label className="auth-field">
           <span>Email</span>
           <input
             type="email"
+            required
             autoComplete="email"
             placeholder="seu@email.com"
             value={email}
@@ -70,11 +71,13 @@ export default function PersonalLoginPage() {
             className="auth-input"
           />
         </label>
-        <label className="auth-field">
-          <span>Senha</span>
+        <div className="auth-field">
+          <label htmlFor="auth-password">Senha</label>
           <div className="auth-password">
             <input
+              id="auth-password"
               type={showPassword ? 'text' : 'password'}
+              required
               autoComplete="current-password"
               placeholder="********"
               value={password}
@@ -85,12 +88,14 @@ export default function PersonalLoginPage() {
               type="button"
               className="auth-toggle"
               onClick={() => setShowPassword((prev) => !prev)}
+              aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+              aria-pressed={showPassword}
             >
               {showPassword ? 'Ocultar' : 'Mostrar'}
             </button>
           </div>
-        </label>
-        {error && <p className="auth-error">{error}</p>}
+        </div>
+        {error && <p className="auth-error" role="alert">{error}</p>}
         <button type="submit" className="auth-submit" disabled={loading}>
           {loading ? 'Entrando...' : 'Entrar no painel'}
         </button>

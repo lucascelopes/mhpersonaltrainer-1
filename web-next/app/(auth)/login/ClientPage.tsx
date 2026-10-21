@@ -159,6 +159,7 @@ export default function LoginPage() {
                 <EnvelopeSimple className={styles.inputIcon} aria-hidden="true" />
                 <input
                   type="email"
+                  required
                   placeholder="seu@email.com"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
@@ -167,12 +168,14 @@ export default function LoginPage() {
                 />
               </div>
             </label>
-            <label className="auth-field">
-              <span>Senha</span>
+            <div className="auth-field">
+              <label htmlFor="auth-password">Senha</label>
               <div className="auth-password">
                 <LockKey className={styles.inputIcon} aria-hidden="true" />
                 <input
+                  id="auth-password"
                   type={showPassword ? 'text' : 'password'}
+                  required
                   placeholder="Sua senha"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
@@ -184,6 +187,7 @@ export default function LoginPage() {
                   className="auth-toggle"
                   onClick={() => setShowPassword((prev) => !prev)}
                   aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                  aria-pressed={showPassword}
                 >
                   <span className={styles.desktopToggleText}>
                     {showPassword ? 'Ocultar' : 'Mostrar'}
@@ -195,7 +199,7 @@ export default function LoginPage() {
                   )}
                 </button>
               </div>
-            </label>
+            </div>
             <Link href="/forgot-password" className={styles.mobileForgot}>
               Esqueci a senha
             </Link>

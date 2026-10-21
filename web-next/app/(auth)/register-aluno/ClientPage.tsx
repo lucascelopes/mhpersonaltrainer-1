@@ -48,15 +48,15 @@ export default function RegisterAlunoPage() {
 
   const validate = () => {
     if (!name) {
-      setError('Nome obrigatorio.');
+      setError('Nome obrigatório.');
       return false;
     }
     if (!email) {
-      setError('Email obrigatorio.');
+      setError('E-mail obrigatório.');
       return false;
     }
     if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Email invalido.');
+      setError('E-mail inválido.');
       return false;
     }
     if (!password) {
@@ -68,11 +68,11 @@ export default function RegisterAlunoPage() {
       return false;
     }
     if (password !== confirmPassword) {
-      setError('Senhas nao coincidem.');
+      setError('As senhas não coincidem.');
       return false;
     }
     if (personalCode.trim() && parsePersonalCode(personalCode) === null) {
-      setError('Codigo do personal invalido.');
+      setError('Código do personal inválido.');
       return false;
     }
     setError('');
@@ -139,14 +139,15 @@ export default function RegisterAlunoPage() {
         <p className="auth-kicker">Aluno</p>
         <h1>Crie sua conta de aluno</h1>
         <p className="subtle">
-          Cadastro rapido para acessar seus treinos e progresso no celular.
+          Cadastro rápido para acessar seus treinos e progresso no celular.
         </p>
       </div>
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="auth-form" onSubmit={handleSubmit} noValidate>
         <label className="auth-field">
           <span>Nome completo</span>
           <input
             type="text"
+            required
             autoComplete="name"
             placeholder="Seu nome"
             value={name}
@@ -158,6 +159,7 @@ export default function RegisterAlunoPage() {
           <span>Email</span>
           <input
             type="email"
+            required
             autoComplete="email"
             placeholder="seu@email.com"
             value={email}
@@ -169,6 +171,7 @@ export default function RegisterAlunoPage() {
           <span>Senha</span>
           <input
             type="password"
+            required
             autoComplete="new-password"
             placeholder="********"
             value={password}
@@ -180,6 +183,7 @@ export default function RegisterAlunoPage() {
           <span>Confirmar senha</span>
           <input
             type="password"
+            required
             autoComplete="new-password"
             placeholder="********"
             value={confirmPassword}
@@ -188,7 +192,7 @@ export default function RegisterAlunoPage() {
           />
         </label>
         <label className="auth-field">
-          <span>Codigo do personal (opcional)</span>
+          <span>Código do personal (opcional)</span>
           <input
             type="text"
             placeholder="Ex: 1234"
@@ -197,7 +201,7 @@ export default function RegisterAlunoPage() {
             className="auth-input"
           />
         </label>
-        {error && <p className="auth-error">{error}</p>}
+        {error && <p className="auth-error" role="alert">{error}</p>}
         {success ? (
           <button type="button" className="auth-submit" onClick={() => router.replace('/app')}>
             Ir para o painel
@@ -209,7 +213,7 @@ export default function RegisterAlunoPage() {
         )}
       </form>
       <div className="auth-links">
-        <span className="subtle">Ja tem conta?</span>
+        <span className="subtle">Já tem conta?</span>
         <Link href="/login-aluno" className="auth-link">
           Entrar
         </Link>

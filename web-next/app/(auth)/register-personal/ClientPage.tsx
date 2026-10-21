@@ -30,15 +30,15 @@ export default function RegisterPersonalPage() {
 
   const validate = () => {
     if (!name) {
-      setError('Nome obrigatorio.');
+      setError('Nome obrigatório.');
       return false;
     }
     if (!email) {
-      setError('Email obrigatorio.');
+      setError('E-mail obrigatório.');
       return false;
     }
     if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Email invalido.');
+      setError('E-mail inválido.');
       return false;
     }
     if (!password) {
@@ -50,7 +50,7 @@ export default function RegisterPersonalPage() {
       return false;
     }
     if (password !== confirmPassword) {
-      setError('Senhas nao coincidem.');
+      setError('As senhas não coincidem.');
       return false;
     }
     setError('');
@@ -81,14 +81,15 @@ export default function RegisterPersonalPage() {
         <p className="auth-kicker">Cadastro profissional</p>
         <h1>Crie sua conta de personal</h1>
         <p className="subtle">
-          Tenha um painel completo para treinos, avaliacoes, agenda e comunicacao.
+          Tenha um painel completo para treinos, avaliações, agenda e comunicação.
         </p>
       </div>
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="auth-form" onSubmit={handleSubmit} noValidate>
         <label className="auth-field">
           <span>Nome completo</span>
           <input
             type="text"
+            required
             autoComplete="name"
             placeholder="Seu nome"
             value={name}
@@ -100,6 +101,7 @@ export default function RegisterPersonalPage() {
           <span>Email</span>
           <input
             type="email"
+            required
             autoComplete="email"
             placeholder="seu@email.com"
             value={email}
@@ -111,6 +113,7 @@ export default function RegisterPersonalPage() {
           <span>Senha</span>
           <input
             type="password"
+            required
             autoComplete="new-password"
             placeholder="********"
             value={password}
@@ -122,6 +125,7 @@ export default function RegisterPersonalPage() {
           <span>Confirmar senha</span>
           <input
             type="password"
+            required
             autoComplete="new-password"
             placeholder="********"
             value={confirmPassword}
@@ -129,10 +133,10 @@ export default function RegisterPersonalPage() {
             className="auth-input"
           />
         </label>
-        {error && <p className="auth-error">{error}</p>}
+        {error && <p className="auth-error" role="alert">{error}</p>}
         {personalCode && (
           <div className="auth-code">
-            <span>Seu codigo de personal</span>
+            <span>Seu código de personal</span>
             <strong>{personalCode}</strong>
           </div>
         )}
@@ -151,7 +155,7 @@ export default function RegisterPersonalPage() {
         )}
       </form>
       <div className="auth-links">
-        <span className="subtle">Ja tem conta?</span>
+        <span className="subtle">Já tem conta?</span>
         <Link href="/personal-login" className="auth-link">
           Entrar
         </Link>

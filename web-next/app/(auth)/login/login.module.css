@@ -405,7 +405,7 @@
     justify-content: center;
     gap: 7px;
     color: #536b86;
-    font-size: 0.66rem;
+    font-size: 0.75rem;
     text-align: center;
   }
 
@@ -470,7 +470,7 @@
     border-radius: 12px;
     background: #f7fbff;
     color: #0b5fc1;
-    font-size: 0.76rem;
+    font-size: 0.875rem;
     font-weight: 700;
     line-height: 1.2;
     text-align: center;
@@ -607,6 +607,10 @@
 @media (max-width: 360px) {
   .loginPage {
     padding-inline: 14px;
+  }
+
+  .loginPage :global(.auth-link-chip) {
+    padding-inline: 6px;
   }
 
   .roleNav a,

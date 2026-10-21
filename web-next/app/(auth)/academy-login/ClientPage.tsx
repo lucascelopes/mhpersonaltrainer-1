@@ -37,7 +37,7 @@ export default function AcademyLoginPage() {
     if (!isAuthenticated) return;
     if (!role) return;
     if (role === 'aluno') {
-      setError('Esta conta nao tem acesso ao painel da academia.');
+      setError('Esta conta não tem acesso ao painel da academia.');
       logout();
       return;
     }
@@ -50,7 +50,7 @@ export default function AcademyLoginPage() {
       return false;
     }
     if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Email invalido.');
+      setError('E-mail inválido.');
       return false;
     }
     setError('');
@@ -95,11 +95,12 @@ export default function AcademyLoginPage() {
           Use este acesso para academia, personal ou admin.
         </p>
       </div>
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="auth-form" onSubmit={handleSubmit} noValidate>
         <label className="auth-field">
           <span>Email</span>
           <input
             type="email"
+            required
             autoComplete="email"
             placeholder="seu@email.com"
             value={email}
@@ -107,11 +108,13 @@ export default function AcademyLoginPage() {
             className="auth-input"
           />
         </label>
-        <label className="auth-field">
-          <span>Senha</span>
+        <div className="auth-field">
+          <label htmlFor="auth-password">Senha</label>
           <div className="auth-password">
             <input
+              id="auth-password"
               type={showPassword ? 'text' : 'password'}
+              required
               autoComplete="current-password"
               placeholder="********"
               value={password}
@@ -122,12 +125,14 @@ export default function AcademyLoginPage() {
               type="button"
               className="auth-toggle"
               onClick={() => setShowPassword((prev) => !prev)}
+              aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+              aria-pressed={showPassword}
             >
               {showPassword ? 'Ocultar' : 'Mostrar'}
             </button>
           </div>
-        </label>
-        {error && <p className="auth-error">{error}</p>}
+        </div>
+        {error && <p className="auth-error" role="alert">{error}</p>}
         <button type="submit" className="auth-submit" disabled={loading || socialLoading}>
           {loading ? 'Entrando...' : 'Entrar no painel'}
         </button>

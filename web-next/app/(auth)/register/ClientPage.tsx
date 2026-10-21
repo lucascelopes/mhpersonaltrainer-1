@@ -39,15 +39,15 @@ export default function RegisterPage() {
 
   const validate = () => {
     if (!name) {
-      setError('Nome obrigatorio.');
+      setError('Nome obrigatório.');
       return false;
     }
     if (!email) {
-      setError('Email obrigatorio.');
+      setError('E-mail obrigatório.');
       return false;
     }
     if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Email invalido.');
+      setError('E-mail inválido.');
       return false;
     }
     if (!password) {
@@ -59,7 +59,7 @@ export default function RegisterPage() {
       return false;
     }
     if (password !== confirmPassword) {
-      setError('Senhas nao coincidem.');
+      setError('As senhas não coincidem.');
       return false;
     }
     setError('');
@@ -95,15 +95,16 @@ export default function RegisterPage() {
       </div>
       {personalCode && (
         <div className="auth-code">
-          <span>Seu codigo de personal</span>
+          <span>Seu código de personal</span>
           <strong>{personalCode}</strong>
         </div>
       )}
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="auth-form" onSubmit={handleSubmit} noValidate>
         <label className="auth-field">
           <span>Nome completo</span>
           <input
             type="text"
+            required
             autoComplete="name"
             placeholder="Seu nome"
             value={name}
@@ -115,6 +116,7 @@ export default function RegisterPage() {
           <span>Email</span>
           <input
             type="email"
+            required
             autoComplete="email"
             placeholder="seu@email.com"
             value={email}
@@ -126,6 +128,7 @@ export default function RegisterPage() {
           <span>Senha</span>
           <input
             type="password"
+            required
             autoComplete="new-password"
             placeholder="********"
             value={password}
@@ -137,6 +140,7 @@ export default function RegisterPage() {
           <span>Confirmar senha</span>
           <input
             type="password"
+            required
             autoComplete="new-password"
             placeholder="********"
             value={confirmPassword}
@@ -144,7 +148,7 @@ export default function RegisterPage() {
             className="auth-input"
           />
         </label>
-        {error && <p className="auth-error">{error}</p>}
+        {error && <p className="auth-error" role="alert">{error}</p>}
         {success ? (
           <button type="button" className="auth-submit" onClick={() => router.replace(redirectTo)}>
             Ir para o painel
@@ -156,7 +160,7 @@ export default function RegisterPage() {
         )}
       </form>
       <div className="auth-links">
-        <span className="subtle">Ja tem conta?</span>
+        <span className="subtle">Já tem conta?</span>
         <Link href="/login" className="auth-link">
           Entrar
         </Link>

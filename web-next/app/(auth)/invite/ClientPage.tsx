@@ -62,7 +62,7 @@ export default function InvitePage() {
     }
     if (!code) {
       setProfile(null);
-      setProfileError('Codigo nao informado.');
+      setProfileError('Código não informado.');
       return;
     }
     setProfileLoading(true);
@@ -73,7 +73,7 @@ export default function InvitePage() {
         setProfile(result);
       } else {
         setProfile(null);
-        setProfileError('Personal nao encontrado.');
+        setProfileError('Personal não encontrado.');
       }
       setProfileLoading(false);
     });
@@ -84,23 +84,23 @@ export default function InvitePage() {
 
   const validate = () => {
     if (!code || codigoPersonal === null) {
-      setError('Codigo do convite nao encontrado.');
+      setError('Código do convite não encontrado.');
       return false;
     }
     if (!profile) {
-      setError(profileError || 'Personal nao encontrado.');
+      setError(profileError || 'Personal não encontrado.');
       return false;
     }
     if (!name) {
-      setError('Nome obrigatorio.');
+      setError('Nome obrigatório.');
       return false;
     }
     if (!email) {
-      setError('Email obrigatorio.');
+      setError('E-mail obrigatório.');
       return false;
     }
     if (!/\\S+@\\S+\\.\\S+/.test(email)) {
-      setError('Email invalido.');
+      setError('E-mail inválido.');
       return false;
     }
     if (!password) {
@@ -112,7 +112,7 @@ export default function InvitePage() {
       return false;
     }
     if (password !== confirmPassword) {
-      setError('Senhas nao coincidem.');
+      setError('As senhas não coincidem.');
       return false;
     }
     setError('');
@@ -180,7 +180,7 @@ export default function InvitePage() {
       </div>
 
       {profileLoading && <p className="subtle">Carregando dados do personal...</p>}
-      {profileError && <p className="auth-error">{profileError}</p>}
+      {profileError && <p className="auth-error" role="alert">{profileError}</p>}
       {profile && (
         <div className="invite-personal">
           <div className="invite-personal-avatar">
@@ -199,17 +199,18 @@ export default function InvitePage() {
               </span>
             )}
             <span className="invite-personal-code">
-              Codigo {profile.codigoPersonal ?? code}
+              Código {profile.codigoPersonal ?? code}
             </span>
           </div>
         </div>
       )}
 
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="auth-form" onSubmit={handleSubmit} noValidate>
         <label className="auth-field">
           <span>Nome completo</span>
           <input
             type="text"
+            required
             autoComplete="name"
             placeholder="Seu nome"
             value={name}
@@ -221,6 +222,7 @@ export default function InvitePage() {
           <span>Email</span>
           <input
             type="email"
+            required
             autoComplete="email"
             placeholder="seu@email.com"
             value={email}
@@ -232,6 +234,7 @@ export default function InvitePage() {
           <span>Senha</span>
           <input
             type="password"
+            required
             autoComplete="new-password"
             placeholder="********"
             value={password}
@@ -243,6 +246,7 @@ export default function InvitePage() {
           <span>Confirmar senha</span>
           <input
             type="password"
+            required
             autoComplete="new-password"
             placeholder="********"
             value={confirmPassword}
@@ -250,7 +254,7 @@ export default function InvitePage() {
             className="auth-input"
           />
         </label>
-        {error && <p className="auth-error">{error}</p>}
+        {error && <p className="auth-error" role="alert">{error}</p>}
         {success ? (
           <button type="button" className="auth-submit" onClick={() => router.replace('/app')}>
             Entrar agora
@@ -263,7 +267,7 @@ export default function InvitePage() {
       </form>
 
       <div className="auth-links">
-        <span className="subtle">Ja tem conta?</span>
+        <span className="subtle">Já tem conta?</span>
         <Link href="/login-aluno" className="auth-link">
           Entrar
         </Link>

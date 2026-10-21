@@ -30,15 +30,15 @@ export default function RegisterAcademyPage() {
 
   const validate = () => {
     if (!name) {
-      setError('Nome da academia obrigatorio.');
+      setError('Nome da academia obrigatório.');
       return false;
     }
     if (!email) {
-      setError('Email obrigatorio.');
+      setError('E-mail obrigatório.');
       return false;
     }
     if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Email invalido.');
+      setError('E-mail inválido.');
       return false;
     }
     if (!password) {
@@ -50,7 +50,7 @@ export default function RegisterAcademyPage() {
       return false;
     }
     if (password !== confirmPassword) {
-      setError('Senhas nao coincidem.');
+      setError('As senhas não coincidem.');
       return false;
     }
     setError('');
@@ -88,15 +88,16 @@ export default function RegisterAcademyPage() {
       </div>
       {academyCode && (
         <div className="auth-code">
-          <span>Codigo da academia</span>
+          <span>Código da academia</span>
           <strong>{academyCode}</strong>
         </div>
       )}
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="auth-form" onSubmit={handleSubmit} noValidate>
         <label className="auth-field">
           <span>Nome da academia</span>
           <input
             type="text"
+            required
             autoComplete="organization"
             placeholder="Nome da sua academia"
             value={name}
@@ -108,6 +109,7 @@ export default function RegisterAcademyPage() {
           <span>Email</span>
           <input
             type="email"
+            required
             autoComplete="email"
             placeholder="contato@email.com"
             value={email}
@@ -119,6 +121,7 @@ export default function RegisterAcademyPage() {
           <span>Senha</span>
           <input
             type="password"
+            required
             autoComplete="new-password"
             placeholder="********"
             value={password}
@@ -130,6 +133,7 @@ export default function RegisterAcademyPage() {
           <span>Confirmar senha</span>
           <input
             type="password"
+            required
             autoComplete="new-password"
             placeholder="********"
             value={confirmPassword}
@@ -137,7 +141,7 @@ export default function RegisterAcademyPage() {
             className="auth-input"
           />
         </label>
-        {error && <p className="auth-error">{error}</p>}
+        {error && <p className="auth-error" role="alert">{error}</p>}
         {success ? (
           <button type="button" className="auth-submit" onClick={() => router.replace(redirectTo)}>
             Ir para o painel
@@ -149,7 +153,7 @@ export default function RegisterAcademyPage() {
         )}
       </form>
       <div className="auth-links">
-        <span className="subtle">Ja tem conta?</span>
+        <span className="subtle">Já tem conta?</span>
         <Link href="/academy-login" className="auth-link">
           Entrar no painel
         </Link>

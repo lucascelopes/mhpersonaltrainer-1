@@ -18,7 +18,7 @@ export default function ForgotPasswordPage() {
       return;
     }
     if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Email invalido.');
+      setError('E-mail inválido.');
       return;
     }
     setError('');
@@ -37,13 +37,14 @@ export default function ForgotPasswordPage() {
       <div className="auth-card-header">
         <p className="auth-kicker">Recuperar acesso</p>
         <h1>Recuperar senha</h1>
-        <p className="subtle">Enviaremos um link de recuperacao para seu email.</p>
+        <p className="subtle">Enviaremos um link de recuperação para seu e-mail.</p>
       </div>
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="auth-form" onSubmit={handleSubmit} noValidate>
         <label className="auth-field">
           <span>Email</span>
           <input
             type="email"
+            required
             autoComplete="email"
             placeholder="seu@email.com"
             value={email}
@@ -51,8 +52,8 @@ export default function ForgotPasswordPage() {
             className="auth-input"
           />
         </label>
-        {message && <p className="auth-success">{message}</p>}
-        {error && <p className="auth-error">{error}</p>}
+        {message && <p className="auth-success" role="status">{message}</p>}
+        {error && <p className="auth-error" role="alert">{error}</p>}
         <button type="submit" className="auth-submit" disabled={loading}>
           {loading ? 'Enviando...' : 'Enviar link'}
         </button>
