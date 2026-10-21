@@ -193,7 +193,7 @@ export default function LoginAlunoPage() {
       </div>
 
       <div className="auth-links">
-        <Link href="/forgot-password" className="auth-link">
+        <Link href="/forgot-password?from=student" className="auth-link">
           Esqueci a senha
         </Link>
         <Link href="/register-aluno" className="auth-link">

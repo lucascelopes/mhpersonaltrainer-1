@@ -155,7 +155,7 @@ export default function AcademyLoginPage() {
       </div>
 
       <div className="auth-links">
-        <Link href="/forgot-password" className="auth-link">
+        <Link href="/forgot-password?from=academy" className="auth-link">
           Esqueci a senha
         </Link>
         <Link href="/register-academy" className="auth-link">

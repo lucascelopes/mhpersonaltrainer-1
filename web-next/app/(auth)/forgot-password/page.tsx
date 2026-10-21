@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import Link from 'next/link';
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useAuth } from '@/lib/auth';
 
 export default function ForgotPasswordPage() {
@@ -10,6 +10,13 @@ export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [loginPath, setLoginPath] = useState('/login');
+
+  useEffect(() => {
+    const from = new URLSearchParams(window.location.search).get('from');
+    if (from === 'academy') setLoginPath('/academy-login');
+    if (from === 'student') setLoginPath('/login-aluno');
+  }, []);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -44,6 +51,7 @@ export default function ForgotPasswordPage() {
           <span>Email</span>
           <input
             type="email"
+            autoComplete="email"
             placeholder="seuemail@mhpersonal.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
@@ -58,7 +66,7 @@ export default function ForgotPasswordPage() {
       </form>
       <div className="auth-links">
         <span className="subtle">Voltar para</span>
-        <Link href="/login" className="auth-link">
+        <Link href={loginPath} className="auth-link">
           login
         </Link>
       </div>
