@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import PageShell from '@/components/PageShell';
 import AiInsightsPanel from '@/components/AiInsightsPanel';
 import UserScopePicker from '@/components/data/UserScopePicker';
@@ -11,12 +11,12 @@ import {
   formatDate,
   useCollectionData,
   useDocumentData,
-  useUserScope,
 } from '@/lib/firestoreHooks';
 import { fetchEvaluations, getEvaluationStatusLabel, getEvaluationTypeLabel } from '@/lib/services/evaluations';
 import { fetchUserWorkouts } from '@/lib/services/workouts';
 import { useAuth } from '@/lib/auth';
 import { useDashboardData } from '@/lib/hooks/useDashboardData';
+import { useStudentScopeFromQuery } from '@/lib/hooks/useStudentScopeFromQuery';
 import type { PhysicalEvaluation } from '@/lib/types/evaluation';
 import type { UserWorkout } from '@/lib/types/workout';
 import styles from './page.module.css';
@@ -207,14 +207,20 @@ interface StudentDoc {
 }
 
 function PersonalProgress() {
-  const { userId } = useUserScope();
+  const searchParams = useSearchParams();
+  const requestedStudentId = searchParams.get('studentId') || '';
+  const studentScope = useStudentScopeFromQuery(requestedStudentId);
+  const { isPersonal, userId } = studentScope;
   const router = useRouter();
   const { data: student } = useDocumentData<StudentDoc>(['users', userId]);
   const query = useMemo(
     () => (userId ? [firestoreHelpers.where('userId', '==', userId), firestoreHelpers.orderBy('date', 'desc')] : []),
     [userId]
   );
-  const { data: logs, loading: logsLoading } = useCollectionData<ProgressRow>(['workout_logs'], query);
+  const { data: logs, loading: logsLoading } = useCollectionData<ProgressRow>(
+    userId ? ['workout_logs'] : [],
+    query
+  );
   const [workouts, setWorkouts] = useState<UserWorkout[]>([]);
   const [evaluations, setEvaluations] = useState<PhysicalEvaluation[]>([]);
   const [dataLoading, setDataLoading] = useState(false);
@@ -314,6 +320,28 @@ function PersonalProgress() {
   const lastEvaluation = evaluationItems[0]?.date;
   const recentLogs = useMemo(() => logs.slice(0, 6), [logs]);
 
+  if (isPersonal && !userId) {
+    const scopeMessage = !requestedStudentId
+      ? 'Abra o perfil de um aluno para ver os treinos, avaliações e check-ins dele.'
+        : studentScope.loading
+        ? 'Conferindo o acesso ao aluno...'
+          : studentScope.error || 'Esse aluno não está vinculado à sua conta. Escolha alguém da sua lista.';
+
+    return (
+      <PageShell
+        title="Progresso"
+        description="Acompanhe os dados do aluno selecionado."
+        breadcrumbs={[{ label: 'Alunos', href: '/students' }]}
+      >
+        <section className="portal-card" aria-live="polite">
+          <h2>{studentScope.loading ? 'Carregando aluno' : 'Selecione um aluno'}</h2>
+          <p className="subtle">{scopeMessage}</p>
+          <Link href="/students" className="button">Ver alunos</Link>
+        </section>
+      </PageShell>
+    );
+  }
+
   const handleAssistantPrompt = (prompt: string) => {
     if (typeof window !== 'undefined') {
       window.sessionStorage.setItem('mh-assistant-prompt', prompt);
@@ -351,13 +379,13 @@ function PersonalProgress() {
                 </div>
               </div>
               <div className="progress-hero-actions">
-                <Link href="/workouts" className="button">
+                <Link href={isPersonal ? `/workouts?studentId=${encodeURIComponent(userId)}` : '/workouts'} className="button">
                   Ver treinos
                 </Link>
-                <Link href="/evaluations" className="button secondary">
+                <Link href={isPersonal ? `/evaluations?studentId=${encodeURIComponent(userId)}` : '/evaluations'} className="button secondary">
                   Ver avaliacoes
                 </Link>
-                <Link href="/ai/assistant" className="button secondary">
+                <Link href={isPersonal ? `/ai/assistant?studentId=${encodeURIComponent(userId)}` : '/ai/assistant'} className="button secondary">
                   Abrir assistente
                 </Link>
               </div>

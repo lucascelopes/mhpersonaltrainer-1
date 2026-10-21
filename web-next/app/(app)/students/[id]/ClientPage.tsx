@@ -344,7 +344,7 @@ export default function StudentDetailPage({ params }: { params: { id: string } }
                     Treinos do aluno
                     <span>Veja rotina ativa e historico.</span>
                   </Link>
-                  <Link href="/evaluations" className="student-profile-action">
+                  <Link href={`/evaluations?studentId=${encodeURIComponent(studentId)}`} className="student-profile-action">
                     Avaliacoes
                     <span>Acesse o historico e status.</span>
                   </Link>
@@ -352,7 +352,7 @@ export default function StudentDetailPage({ params }: { params: { id: string } }
                     Documentos
                     <span>Arquivos, laudos e anexos.</span>
                   </Link>
-                  <Link href="/progress" className="student-profile-action">
+                  <Link href={`/progress?studentId=${encodeURIComponent(studentId)}`} className="student-profile-action">
                     Progresso
                     <span>Graficos de evolucao do aluno.</span>
                   </Link>

@@ -2,7 +2,9 @@
 
 import PageShell from '@/components/PageShell';
 import UserScopePicker from '@/components/data/UserScopePicker';
-import { useUserScope } from '@/lib/firestoreHooks';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { useStudentScopeFromQuery } from '@/lib/hooks/useStudentScopeFromQuery';
 import { addDoc, collection, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
 import { useState, type FormEvent } from 'react';
@@ -14,7 +16,9 @@ const COLLECTIONS: Record<string, string> = {
 };
 
 export default function EvaluationCreatePage() {
-  const { userId } = useUserScope();
+  const searchParams = useSearchParams();
+  const studentScope = useStudentScopeFromQuery(searchParams.get('studentId') || '');
+  const { userId, isPersonal, student } = studentScope;
   const [tipo, setTipo] = useState<'postural' | 'fisica' | 'personalizada'>('postural');
   const [aluno, setAluno] = useState('');
   const [observacoes, setObservacoes] = useState('');
@@ -26,7 +30,7 @@ export default function EvaluationCreatePage() {
     setSaving(true);
     try {
       await addDoc(collection(db, 'users', userId, COLLECTIONS[tipo]), {
-        aluno,
+        aluno: isPersonal ? student?.nome || '' : aluno,
         observacoes,
         status: 'pendente',
         createdAt: Timestamp.now(),
@@ -39,11 +43,33 @@ export default function EvaluationCreatePage() {
     }
   };
 
+  if (isPersonal && !userId) {
+    const requestedStudentId = searchParams.get('studentId') || '';
+    return (
+      <PageShell title="Nova avaliação" description="Escolha um aluno antes de criar uma avaliação.">
+        <section className="portal-card" aria-live="polite">
+          <h2>{studentScope.loading ? 'Carregando aluno' : 'Selecione um aluno'}</h2>
+          <p className="subtle">
+            {studentScope.loading
+              ? 'Conferindo o acesso ao aluno...'
+              : studentScope.error || (requestedStudentId
+                ? 'Esse aluno não está vinculado à sua conta.'
+                : 'Abra o perfil de um aluno da sua lista para criar uma avaliação.')}
+          </p>
+          <Link href="/students" className="button">Ver alunos</Link>
+        </section>
+      </PageShell>
+    );
+  }
+
   return (
     <PageShell
-      title="Nova avaliacao"
+      title={isPersonal && student ? `Nova avaliação para ${student.nome}` : 'Nova avaliacao'}
       description="Crie uma avaliacao fisica, postural ou personalizada."
-      breadcrumbs={[{ label: 'Avaliacoes', href: '/evaluations' }]}
+      breadcrumbs={[{
+        label: 'Avaliacoes',
+        href: isPersonal && userId ? `/evaluations?studentId=${encodeURIComponent(userId)}` : '/evaluations',
+      }]}
     >
       <div className="card">
         <UserScopePicker />
@@ -64,9 +90,10 @@ export default function EvaluationCreatePage() {
             Aluno
             <input
               type="text"
-              value={aluno}
+              value={isPersonal ? student?.nome || '' : aluno}
               onChange={(event) => setAluno(event.target.value)}
               placeholder="Nome do aluno"
+              readOnly={isPersonal}
               style={{ marginTop: 6, width: '100%', padding: 10, borderRadius: 10, border: '1px solid var(--border)' }}
             />
           </label>

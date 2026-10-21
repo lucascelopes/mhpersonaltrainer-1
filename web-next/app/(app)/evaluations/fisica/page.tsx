@@ -3,7 +3,10 @@
 import PageShell from '@/components/PageShell';
 import DataTable from '@/components/data/DataTable';
 import UserScopePicker from '@/components/data/UserScopePicker';
-import { formatDate, useCollectionData, useUserScope } from '@/lib/firestoreHooks';
+import { useSearchParams } from 'next/navigation';
+import { formatDate, useCollectionData } from '@/lib/firestoreHooks';
+import { useStudentScopeFromQuery } from '@/lib/hooks/useStudentScopeFromQuery';
+import PersonalStudentRequired from '@/components/data/PersonalStudentRequired';
 
 interface FisicaRow {
   id: string;
@@ -75,14 +78,33 @@ const testExamples = [
 ];
 
 export default function AvaliacaoFisicaPage() {
-  const { userId } = useUserScope();
+  const searchParams = useSearchParams();
+  const requestedStudentId = searchParams.get('studentId') || '';
+  const studentScope = useStudentScopeFromQuery(requestedStudentId);
+  const { userId, isPersonal, student } = studentScope;
   const { data } = useCollectionData<FisicaRow>(['users', userId, 'avaliacoesFisicas']);
+
+  if (isPersonal && !userId) {
+    return (
+      <PageShell title="Avaliação física" description="Consulte as medidas do aluno selecionado.">
+        <PersonalStudentRequired
+          loading={studentScope.loading}
+          requestedStudentId={requestedStudentId}
+          error={studentScope.error}
+          description="Abra o perfil de um aluno da sua lista para ver a avaliação física."
+        />
+      </PageShell>
+    );
+  }
 
   return (
     <PageShell
-      title="Avaliacao fisica"
+      title={isPersonal && student ? `Avaliação física · ${student.nome}` : 'Avaliacao fisica'}
       description="Registre medidas corporais e indicadores de performance."
-      breadcrumbs={[{ label: 'Avaliacoes', href: '/evaluations' }]}
+      breadcrumbs={[{
+        label: 'Avaliacoes',
+        href: isPersonal && userId ? `/evaluations?studentId=${encodeURIComponent(userId)}` : '/evaluations',
+      }]}
     >
       <UserScopePicker />
       <div className="evaluation-form-grid">

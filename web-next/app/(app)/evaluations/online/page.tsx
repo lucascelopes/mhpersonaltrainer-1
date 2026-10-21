@@ -5,8 +5,11 @@ import Link from 'next/link';
 import PageShell from '@/components/PageShell';
 import DataTable from '@/components/data/DataTable';
 import UserScopePicker from '@/components/data/UserScopePicker';
-import { formatDate, useCollectionData, useUserScope } from '@/lib/firestoreHooks';
+import { formatDate, useCollectionData } from '@/lib/firestoreHooks';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
+import { useStudentScopeFromQuery } from '@/lib/hooks/useStudentScopeFromQuery';
+import PersonalStudentRequired from '@/components/data/PersonalStudentRequired';
 import { chatWithAI } from '@/lib/services/ai';
 
 interface OnlineRow {
@@ -81,7 +84,10 @@ const formatEvaluationClipboard = (evaluation: AssistantEvaluation) => {
 };
 
 export default function AvaliacaoOnlinePage() {
-  const { userId } = useUserScope();
+  const searchParams = useSearchParams();
+  const requestedStudentId = searchParams.get('studentId') || '';
+  const studentScope = useStudentScopeFromQuery(requestedStudentId);
+  const { userId, isPersonal } = studentScope;
   const { role } = useAuth();
   const { data } = useCollectionData<OnlineRow>(['users', userId, 'avaliacaoOnline']);
   const [photos, setPhotos] = useState<Record<string, string | null>>({
@@ -193,6 +199,19 @@ export default function AvaliacaoOnlinePage() {
     event.preventDefault();
     submitAssistantPrompt(assistantPrompt);
   };
+
+  if (isPersonal && !userId) {
+    return (
+      <PageShell title="Avaliação online" description="Consulte a avaliação do aluno selecionado.">
+        <PersonalStudentRequired
+          loading={studentScope.loading}
+          requestedStudentId={requestedStudentId}
+          error={studentScope.error}
+          description="Abra o perfil de um aluno da sua lista para acessar a avaliação online."
+        />
+      </PageShell>
+    );
+  }
 
   return (
     <PageShell
@@ -315,7 +334,10 @@ export default function AvaliacaoOnlinePage() {
               <button className="button" type="submit" disabled={assistantLoading}>
                 {assistantLoading ? 'Gerando...' : 'Gerar avaliacao'}
               </button>
-              <Link href="/ai/assistant" className="button secondary">
+              <Link
+                href={isPersonal && userId ? `/ai/assistant?studentId=${encodeURIComponent(userId)}` : '/ai/assistant'}
+                className="button secondary"
+              >
                 Assistente completo
               </Link>
             </div>

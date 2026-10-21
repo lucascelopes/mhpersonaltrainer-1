@@ -5,8 +5,11 @@ import Link from 'next/link';
 import PageShell from '@/components/PageShell';
 import DataTable from '@/components/data/DataTable';
 import UserScopePicker from '@/components/data/UserScopePicker';
-import { formatDate, useCollectionData, useUserScope } from '@/lib/firestoreHooks';
+import { useSearchParams } from 'next/navigation';
+import { formatDate, useCollectionData } from '@/lib/firestoreHooks';
 import { useAuth } from '@/lib/auth';
+import { useStudentScopeFromQuery } from '@/lib/hooks/useStudentScopeFromQuery';
+import PersonalStudentRequired from '@/components/data/PersonalStudentRequired';
 import { analyzePostureImage, type AnalysisResult } from '@/lib/services/aiAnalysis';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/lib/firebaseClient';
@@ -57,7 +60,10 @@ const analysisInitialState: Record<PhotoKey, PhotoAnalysis> = {
 };
 
 export default function PosturalEvaluationPage() {
-  const { userId } = useUserScope();
+  const searchParams = useSearchParams();
+  const requestedStudentId = searchParams.get('studentId') || '';
+  const studentScope = useStudentScopeFromQuery(requestedStudentId);
+  const { userId, isPersonal } = studentScope;
   const { role } = useAuth();
   const aiAccess = useAiAccessStatus();
   const { data } = useCollectionData<PosturalRow>(['users', userId, 'avaliacaoPostural']);
@@ -121,6 +127,10 @@ export default function PosturalEvaluationPage() {
   };
 
   const analyzePhotos = async () => {
+    if (isPersonal && !userId) {
+      setAnalysisError('Abra o perfil de um aluno antes de enviar fotos.');
+      return;
+    }
     if (!photoCount) {
       setAnalysisError('Envie pelo menos uma foto para analisar.');
       return;
@@ -171,6 +181,19 @@ export default function PosturalEvaluationPage() {
     error: 'Erro',
   };
 
+  if (isPersonal && !userId) {
+    return (
+      <PageShell title="Avaliação postural" description="Consulte a avaliação do aluno selecionado.">
+        <PersonalStudentRequired
+          loading={studentScope.loading}
+          requestedStudentId={requestedStudentId}
+          error={studentScope.error}
+          description="Abra o perfil de um aluno da sua lista para iniciar uma avaliação postural."
+        />
+      </PageShell>
+    );
+  }
+
   return (
     <PageShell
       title="Avaliacao postural"
@@ -187,14 +210,25 @@ export default function PosturalEvaluationPage() {
             />
           </label>
           {assistantDate ? (
-            <Link href={`${agendaBase}?date=${assistantDate}`} className="button secondary sm">
+            <Link
+              href={`${agendaBase}?date=${assistantDate}${isPersonal && userId ? `&studentId=${encodeURIComponent(userId)}` : ''}`}
+              className="button secondary sm"
+            >
               Agenda
             </Link>
           ) : null}
         </>
       }
-      breadcrumbs={[{ label: 'Avaliacoes', href: '/evaluations' }]}
-      actions={[{ label: 'Resultado', href: '/evaluations/personalizada/resultado' }]}
+      breadcrumbs={[{
+        label: 'Avaliacoes',
+        href: isPersonal && userId ? `/evaluations?studentId=${encodeURIComponent(userId)}` : '/evaluations',
+      }]}
+      actions={[{
+        label: 'Resultado',
+        href: isPersonal && userId
+          ? `/evaluations/personalizada/resultado?studentId=${encodeURIComponent(userId)}`
+          : '/evaluations/personalizada/resultado',
+      }]}
     >
       <UserScopePicker />
       <div className="postural-layout">

@@ -5,7 +5,10 @@ import { useMemo } from 'react';
 import PageShell from '@/components/PageShell';
 import UserScopePicker from '@/components/data/UserScopePicker';
 import { useAuth } from '@/lib/auth';
-import { useCollectionData, useUserScope } from '@/lib/firestoreHooks';
+import { useCollectionData } from '@/lib/firestoreHooks';
+import { useSearchParams } from 'next/navigation';
+import { useStudentScopeFromQuery } from '@/lib/hooks/useStudentScopeFromQuery';
+import PersonalStudentRequired from '@/components/data/PersonalStudentRequired';
 import type { EvaluationStatus, EvaluationType } from '@/lib/types/evaluation';
 import mobileStyles from '../evaluationMobile.module.css';
 
@@ -94,7 +97,10 @@ function formatMetric(value: number, unit: string): string {
 }
 
 export default function UltimaAvaliacaoPage() {
-  const { userId } = useUserScope();
+  const searchParams = useSearchParams();
+  const requestedStudentId = searchParams.get('studentId') || '';
+  const studentScope = useStudentScopeFromQuery(requestedStudentId);
+  const { userId, isPersonal } = studentScope;
   const { role } = useAuth();
   const emptyConstraints = useMemo(() => [], []);
   const onlinePath = useMemo(() => ['users', userId, 'avaliacaoOnline'], [userId]);
@@ -149,11 +155,27 @@ export default function UltimaAvaliacaoPage() {
   ].filter((metric): metric is { label: string; value: number; unit: string } => metric.value !== undefined) : [];
   const recommendations = latest?.recomendacoes?.filter((item) => typeof item === 'string' && item.trim()) ?? [];
 
+  if (isPersonal && !userId) {
+    return (
+      <PageShell title="Última avaliação" description="Resumo do aluno selecionado.">
+        <PersonalStudentRequired
+          loading={studentScope.loading}
+          requestedStudentId={requestedStudentId}
+          error={studentScope.error}
+          description="Abra o perfil de um aluno da sua lista para ver a avaliação mais recente."
+        />
+      </PageShell>
+    );
+  }
+
   return (
     <PageShell
       title="Última avaliação"
       description="Resumo do registro mais recente deste perfil."
-      breadcrumbs={[{ label: 'Avaliações', href: '/evaluations' }]}
+      breadcrumbs={[{
+        label: 'Avaliações',
+        href: isPersonal && userId ? `/evaluations?studentId=${encodeURIComponent(userId)}` : '/evaluations',
+      }]}
     >
       <UserScopePicker />
       <div className={`student-evaluation-detail ${mobileStyles.evaluationContent}`}>
@@ -183,7 +205,10 @@ export default function UltimaAvaliacaoPage() {
           ) : !latest ? (
             <div className="student-empty-state">
               <p>Nenhuma avaliação foi registrada para este perfil.</p>
-              <Link href="/evaluations" className="button secondary">Ver histórico</Link>
+              <Link
+                href={isPersonal && userId ? `/evaluations?studentId=${encodeURIComponent(userId)}` : '/evaluations'}
+                className="button secondary"
+              >Ver histórico</Link>
             </div>
           ) : (
             <div className="student-eval-detail-content">
@@ -228,7 +253,10 @@ export default function UltimaAvaliacaoPage() {
                 <p className="student-eval-detail-note">Este registro ainda não contém medidas ou um resumo.</p>
               )}
 
-              <Link href={`/evaluations/${latest.id}?type=${latest.type}`} className="button secondary">
+              <Link
+                href={`/evaluations/${latest.id}?type=${latest.type}${isPersonal && userId ? `&studentId=${encodeURIComponent(userId)}` : ''}`}
+                className="button secondary"
+              >
                 Ver avaliação completa
               </Link>
             </div>

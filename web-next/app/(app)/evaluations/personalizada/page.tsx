@@ -4,7 +4,10 @@ import PageShell from '@/components/PageShell';
 import Link from 'next/link';
 import DataTable from '@/components/data/DataTable';
 import UserScopePicker from '@/components/data/UserScopePicker';
-import { formatDate, useCollectionData, useUserScope } from '@/lib/firestoreHooks';
+import { useSearchParams } from 'next/navigation';
+import { formatDate, useCollectionData } from '@/lib/firestoreHooks';
+import { useStudentScopeFromQuery } from '@/lib/hooks/useStudentScopeFromQuery';
+import PersonalStudentRequired from '@/components/data/PersonalStudentRequired';
 
 interface PersonalizadaRow {
   id: string;
@@ -31,15 +34,39 @@ const questionSamples = [
 const recommendationSamples = ['Melhorar mobilidade', 'Fortalecer core', 'Reavaliar em 30 dias'];
 
 export default function PersonalizadaPage() {
-  const { userId } = useUserScope();
+  const searchParams = useSearchParams();
+  const requestedStudentId = searchParams.get('studentId') || '';
+  const studentScope = useStudentScopeFromQuery(requestedStudentId);
+  const { userId, isPersonal, student } = studentScope;
   const { data } = useCollectionData<PersonalizadaRow>(['users', userId, 'avaliacaoPersonalizada']);
+
+  if (isPersonal && !userId) {
+    return (
+      <PageShell title="Avaliação personalizada" description="Consulte o questionário do aluno selecionado.">
+        <PersonalStudentRequired
+          loading={studentScope.loading}
+          requestedStudentId={requestedStudentId}
+          error={studentScope.error}
+          description="Abra o perfil de um aluno da sua lista para ver a avaliação personalizada."
+        />
+      </PageShell>
+    );
+  }
 
   return (
     <PageShell
-      title="Avaliacao personalizada"
+      title={isPersonal && student ? `Avaliação personalizada · ${student.nome}` : 'Avaliacao personalizada'}
       description="Questionario completo com metas e objetivos do aluno."
-      breadcrumbs={[{ label: 'Avaliacoes', href: '/evaluations' }]}
-      actions={[{ label: 'Ver resultado', href: '/evaluations/personalizada/resultado' }]}
+      breadcrumbs={[{
+        label: 'Avaliacoes',
+        href: isPersonal && userId ? `/evaluations?studentId=${encodeURIComponent(userId)}` : '/evaluations',
+      }]}
+      actions={[{
+        label: 'Ver resultado',
+        href: isPersonal && userId
+          ? `/evaluations/personalizada/resultado?studentId=${encodeURIComponent(userId)}`
+          : '/evaluations/personalizada/resultado',
+      }]}
     >
       <UserScopePicker />
       <div className="evaluation-form-grid">
@@ -90,7 +117,10 @@ export default function PersonalizadaPage() {
             <button className="button secondary" type="button">
               Adicionar pergunta
             </button>
-            <Link href="/ai/assistant" className="button">
+            <Link
+              href={isPersonal && userId ? `/ai/assistant?studentId=${encodeURIComponent(userId)}` : '/ai/assistant'}
+              className="button"
+            >
               Abrir assistente
             </Link>
           </div>

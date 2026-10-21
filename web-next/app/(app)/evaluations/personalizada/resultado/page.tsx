@@ -2,7 +2,10 @@
 
 import PageShell from '@/components/PageShell';
 import UserScopePicker from '@/components/data/UserScopePicker';
-import { firestoreHelpers, useCollectionData, useUserScope } from '@/lib/firestoreHooks';
+import { firestoreHelpers, useCollectionData } from '@/lib/firestoreHooks';
+import { useSearchParams } from 'next/navigation';
+import { useStudentScopeFromQuery } from '@/lib/hooks/useStudentScopeFromQuery';
+import PersonalStudentRequired from '@/components/data/PersonalStudentRequired';
 import { useMemo } from 'react';
 
 interface ResultadoRow {
@@ -14,16 +17,35 @@ interface ResultadoRow {
 }
 
 export default function ResultadoPersonalizadaPage() {
-  const { userId } = useUserScope();
+  const searchParams = useSearchParams();
+  const requestedStudentId = searchParams.get('studentId') || '';
+  const studentScope = useStudentScopeFromQuery(requestedStudentId);
+  const { userId, isPersonal } = studentScope;
   const query = useMemo(() => [firestoreHelpers.orderBy('createdAt', 'desc'), firestoreHelpers.limit(1)], []);
   const { data } = useCollectionData<ResultadoRow>(['users', userId, 'avaliacaoPersonalizada'], query);
   const latest = data[0];
+
+  if (isPersonal && !userId) {
+    return (
+      <PageShell title="Resultado da avaliação" description="Consulte o resultado do aluno selecionado.">
+        <PersonalStudentRequired
+          loading={studentScope.loading}
+          requestedStudentId={requestedStudentId}
+          error={studentScope.error}
+          description="Abra o perfil de um aluno da sua lista para ver o resultado."
+        />
+      </PageShell>
+    );
+  }
 
   return (
     <PageShell
       title="Resultado da avaliacao personalizada"
       description="Resumo do questionario e plano sugerido."
-      breadcrumbs={[{ label: 'Avaliacoes', href: '/evaluations' }]}
+      breadcrumbs={[{
+        label: 'Avaliacoes',
+        href: isPersonal && userId ? `/evaluations?studentId=${encodeURIComponent(userId)}` : '/evaluations',
+      }]}
     >
       <UserScopePicker />
       <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>

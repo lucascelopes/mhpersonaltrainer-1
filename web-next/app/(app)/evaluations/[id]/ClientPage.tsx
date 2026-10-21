@@ -6,6 +6,7 @@ import mobileStyles from '../evaluationMobile.module.css';
 import PageShell from '@/components/PageShell';
 import { useAuth } from '@/lib/auth';
 import { formatDate, useUserScope } from '@/lib/firestoreHooks';
+import { useStudentScopeFromQuery } from '@/lib/hooks/useStudentScopeFromQuery';
 import {
   fetchEvaluationById,
   getEvaluationStatusColor,
@@ -79,6 +80,7 @@ export default function EvaluationDetailPage({ params }: { params: { id: string 
   const { role, isLoading: authLoading } = useAuth();
   const { userId } = useUserScope();
   const isStudent = role === 'aluno';
+  const isPersonal = role === 'personal' || role === 'professor';
 
   const evaluationId = useMemo(() => {
     const parts = pathname.split('/').filter(Boolean);
@@ -89,7 +91,12 @@ export default function EvaluationDetailPage({ params }: { params: { id: string 
   const typeParam = searchParams.get('type');
   const requestedType = isEvaluationType(typeParam) ? typeParam : null;
   const requestedUserId = searchParams.get('studentId') || searchParams.get('userId');
-  const scopedUserId = role === 'admin' ? requestedUserId || userId : userId;
+  const studentScope = useStudentScopeFromQuery(requestedUserId || '');
+  const scopedUserId = isPersonal
+    ? studentScope.userId
+    : role === 'admin'
+      ? requestedUserId || userId
+      : userId;
 
   const [evaluation, setEvaluation] = useState<PhysicalEvaluation | null>(null);
   const [loading, setLoading] = useState(true);
@@ -99,6 +106,7 @@ export default function EvaluationDetailPage({ params }: { params: { id: string 
     let active = true;
     const load = async () => {
       if (authLoading) return;
+      if (isPersonal && requestedUserId && studentScope.loading) return;
       if (!scopedUserId || !evaluationId) {
         setError(scopedUserId ? 'Avaliação não encontrada.' : 'Nenhum aluno selecionado.');
         setLoading(false);
@@ -135,7 +143,7 @@ export default function EvaluationDetailPage({ params }: { params: { id: string 
     return () => {
       active = false;
     };
-  }, [authLoading, evaluationId, isStudent, requestedType, scopedUserId]);
+  }, [authLoading, evaluationId, isPersonal, isStudent, requestedType, requestedUserId, scopedUserId, studentScope.loading]);
 
   const typeLabel = evaluation ? getEvaluationTypeLabel(evaluation.type) : '';
   const statusLabel = evaluation ? getEvaluationStatusLabel(evaluation.status) : '';
@@ -173,7 +181,9 @@ export default function EvaluationDetailPage({ params }: { params: { id: string 
       router.back();
       return;
     }
-    router.push('/evaluations');
+    router.push(isPersonal && requestedUserId
+      ? `/evaluations?studentId=${encodeURIComponent(requestedUserId)}`
+      : '/evaluations');
   };
 
   const body = (

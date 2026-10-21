@@ -2,11 +2,12 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import PageShell from '@/components/PageShell';
 import UserScopePicker from '@/components/data/UserScopePicker';
-import { formatDate, useCollectionData, useUserScope } from '@/lib/firestoreHooks';
+import { formatDate, useCollectionData } from '@/lib/firestoreHooks';
 import { useAuth } from '@/lib/auth';
+import { useStudentScopeFromQuery } from '@/lib/hooks/useStudentScopeFromQuery';
 import {
   getEvaluationStatusColor,
   getEvaluationStatusLabel,
@@ -91,10 +92,13 @@ const normalizeStatus = (status?: string): EvaluationStatus => {
 };
 
 export default function EvaluationsPage() {
-  const { userId } = useUserScope();
   const router = useRouter();
   const { role } = useAuth();
   const isStudent = role === 'aluno';
+  const searchParams = useSearchParams();
+  const requestedStudentId = searchParams.get('studentId') || '';
+  const studentScope = useStudentScopeFromQuery(requestedStudentId);
+  const { isPersonal, userId } = studentScope;
   const online = useCollectionData<EvaluationRow>(['users', userId, 'avaliacaoOnline']);
   const postural = useCollectionData<EvaluationRow>(['users', userId, 'avaliacaoPostural']);
   const personalizada = useCollectionData<EvaluationRow>(['users', userId, 'avaliacaoPersonalizada']);
@@ -131,12 +135,14 @@ export default function EvaluationsPage() {
             detail,
             date: toDateValue(dateValue),
             dateLabel,
-            href: `/evaluations/${row.id}?type=${collection.type}`,
+            href: `/evaluations/${row.id}?type=${collection.type}${(isPersonal || role === 'admin') && userId
+              ? `&studentId=${encodeURIComponent(userId)}`
+              : ''}`,
           };
         })
       )
       .sort((a, b) => (b.date?.getTime?.() || 0) - (a.date?.getTime?.() || 0));
-  }, [fisica.data, online.data, personalizada.data, postural.data]);
+  }, [fisica.data, isPersonal, online.data, personalizada.data, postural.data, role, userId]);
 
   const filteredEvaluations = useMemo(() => {
     if (selectedFilter === 'all') return evaluationItems;
@@ -149,8 +155,31 @@ export default function EvaluationsPage() {
     if (typeof window !== 'undefined') {
       window.sessionStorage.setItem('mh-assistant-prompt', prompt);
     }
-    router.push('/ai/assistant');
+    router.push(isPersonal && userId ? `/ai/assistant?studentId=${encodeURIComponent(userId)}` : '/ai/assistant');
   };
+
+  const withStudentContext = (href: string) =>
+    isPersonal && userId
+      ? `${href}${href.includes('?') ? '&' : '?'}studentId=${encodeURIComponent(userId)}`
+      : href;
+
+  if (isPersonal && !userId) {
+    const scopeMessage = !requestedStudentId
+      ? 'Abra o perfil de um aluno para consultar as avaliações dele.'
+        : studentScope.loading
+        ? 'Conferindo o acesso ao aluno...'
+          : studentScope.error || 'Esse aluno não está vinculado à sua conta. Escolha alguém da sua lista.';
+
+    return (
+      <PageShell title="Avaliações" description="Consulte o histórico do aluno selecionado.">
+        <section className="portal-card" aria-live="polite">
+          <h2>{studentScope.loading ? 'Carregando aluno' : 'Selecione um aluno'}</h2>
+          <p className="subtle">{scopeMessage}</p>
+          <Link href="/students" className="button">Ver alunos</Link>
+        </section>
+      </PageShell>
+    );
+  }
 
   if (isStudent) {
     return (
@@ -235,10 +264,10 @@ export default function EvaluationsPage() {
               Centralize avaliacoes, acompanhe status e gere insights para orientar cada aluno.
             </p>
             <div className="evaluations-hero-actions">
-              <Link href="/evaluations/create" className="button">
+              <Link href={withStudentContext('/evaluations/create')} className="button">
                 Nova avaliacao
               </Link>
-              <Link href="/progress" className="button secondary">
+              <Link href={withStudentContext('/progress')} className="button secondary">
                 Abrir progresso
               </Link>
             </div>
@@ -278,7 +307,7 @@ export default function EvaluationsPage() {
                 <h3>Filtrar avaliacoes</h3>
                 <p className="subtle">Escolha o tipo para focar no que importa.</p>
               </div>
-              <Link href="/evaluations/create" className="button secondary sm">
+              <Link href={withStudentContext('/evaluations/create')} className="button secondary sm">
                 Nova
               </Link>
             </div>
@@ -305,10 +334,10 @@ export default function EvaluationsPage() {
               </p>
             </div>
             <div className="evaluations-assistant-actions">
-              <button type="button" className="button" onClick={() => router.push('/ai/assistant')}>
+              <button type="button" className="button" onClick={() => router.push(withStudentContext('/ai/assistant'))}>
                 Abrir assistente
               </button>
-              <Link href="/evaluations/create" className="button secondary">
+              <Link href={withStudentContext('/evaluations/create')} className="button secondary">
                 Criar manualmente
               </Link>
             </div>
@@ -336,7 +365,7 @@ export default function EvaluationsPage() {
           </div>
           <div className="portal-grid portal-grid--2 evaluations-areas-grid">
             {evaluationAreas.map((area) => (
-              <Link key={area.title} href={area.href} className="evaluations-area-card">
+              <Link key={area.title} href={withStudentContext(area.href)} className="evaluations-area-card">
                 <span className="portal-pill">{area.tag || getEvaluationTypeLabel(area.type)}</span>
                 <strong>{area.title}</strong>
                 <span className="evaluations-area-text">{area.text}</span>
@@ -355,15 +384,15 @@ export default function EvaluationsPage() {
                   : `Ultimas avaliacoes do tipo ${getEvaluationTypeLabel(selectedFilter)}.`}
               </p>
             </div>
-            <Link href="/evaluations/ultima" className="button secondary sm">
+            <Link href={withStudentContext('/evaluations/ultima')} className="button secondary sm">
               Ver resumo
             </Link>
           </div>
 
           {!userId ? (
             <div className="portal-empty">
-              <strong>Informe um UID para listar avaliacoes.</strong>
-              <span>Use o filtro acima para carregar as subcolecoes do aluno.</span>
+              <strong>Selecione um aluno para listar avaliações.</strong>
+              <span>Abra o perfil de alguém da sua lista para consultar as subcoleções.</span>
             </div>
           ) : filteredEvaluations.length ? (
             <ul className="portal-list evaluations-list">
