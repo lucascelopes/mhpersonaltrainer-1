@@ -30,7 +30,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <div className="auth-pill-row">
             <span className="auth-pill">Web</span>
             <span className="auth-pill">Android</span>
-            <span className="auth-pill">iOS</span>
+            <span className="auth-pill">iOS em breve</span>
           </div>
           <div className="auth-highlight-grid">
             <div className="auth-highlight-card">

@@ -24,7 +24,7 @@ const accountTypes = [
   {
     href: '/register-aluno',
     role: 'Aluno',
-    description: 'O cadastro de aluno é feito pelo app no celular.',
+    description: 'Crie sua conta para acompanhar treinos e resultados.',
     action: 'Continuar como Aluno',
   },
 ];
