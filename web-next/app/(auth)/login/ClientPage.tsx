@@ -111,7 +111,7 @@ export default function LoginPage() {
       <div className={styles.mobileIntro}>
         <div className={styles.mobileBrandRow}>
           <Link href="/" aria-label="MH Personal Trainer — início">
-            <BrandLockup width={164} height={50} surface="light" priority />
+            <BrandLockup width={164} height={50} surface="theme" priority />
           </Link>
           <span className={styles.mobileBrandWords}>
             Disciplina
