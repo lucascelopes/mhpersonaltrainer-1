@@ -445,9 +445,27 @@
     min-height: 48px;
     align-items: center;
     justify-content: center;
-    padding: 6px 9px;
-    font-size: 0.75rem;
+    padding: 0 12px;
+    border: 1px solid #c7def5;
+    border-radius: 12px;
+    background: #f7fbff;
+    color: #0b5fc1;
+    font-size: 0.76rem;
+    font-weight: 700;
+    line-height: 1.2;
     text-align: center;
+    text-decoration: none;
+    transition: background-color 160ms ease, border-color 160ms ease;
+  }
+
+  .loginPage :global(.auth-link-chip:hover) {
+    border-color: #8fbff0;
+    background: #edf6ff;
+  }
+
+  .loginPage :global(.auth-link-chip:focus-visible) {
+    outline: 3px solid rgba(8, 119, 232, 0.42);
+    outline-offset: 2px;
   }
 
   .mobileFooter {
@@ -573,6 +591,15 @@
     border-color: rgba(148, 163, 184, 0.3);
     background: rgba(26, 36, 56, 0.94);
     color: #dbe7ff;
+  }
+
+  :global(:root[data-theme='dark']) .loginPage :global(.auth-link-chip:hover) {
+    border-color: #72b2ee;
+    background: rgba(56, 182, 255, 0.16);
+  }
+
+  :global(:root[data-theme='dark']) .loginPage :global(.auth-link-chip:focus-visible) {
+    outline-color: #72b2ee;
   }
 }
 

@@ -252,7 +252,7 @@ export default function LoginPage() {
                 <p className="subtle">Conta profissional no painel web.</p>
               </div>
               <div className="auth-access-actions">
-                <Link href="/cadastro" className="auth-link auth-link-chip">
+                <Link href="/register-personal" className="auth-link auth-link-chip">
                   Criar conta de personal
                 </Link>
               </div>
