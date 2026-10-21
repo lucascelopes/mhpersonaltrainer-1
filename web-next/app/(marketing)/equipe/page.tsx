@@ -5,7 +5,7 @@ import MobileAwareLink from '@/components/MobileAwareLink';
 import styles from './page.module.css';
 
 export const metadata: Metadata = buildMarketingMetadata({
-  title: 'Equipe MH Personal Trainer',
+  title: 'Equipe',
   description: 'Conheca a equipe por tras do MH Personal Trainer e o foco em produto, suporte e resultado.',
   path: '/equipe',
   keywords: [

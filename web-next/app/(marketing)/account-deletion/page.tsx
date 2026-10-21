@@ -4,7 +4,7 @@ import { buildMarketingMetadata } from '@/lib/seo';
 import MobileAwareLink from '@/components/MobileAwareLink';
 
 export const metadata: Metadata = buildMarketingMetadata({
-  title: 'Exclusao de conta | MH Personal Trainer',
+  title: 'Exclusao de conta',
   description: 'Saiba como excluir sua conta e como tratamos os dados apos a solicitacao de exclusao.',
   path: '/account-deletion',
   keywords: [

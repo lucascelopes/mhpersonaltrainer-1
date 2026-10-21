@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { buildMarketingMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = buildMarketingMetadata({
-  title: 'Politica de privacidade | MH Personal Trainer',
+  title: 'Politica de privacidade',
   description: 'Transparencia sobre coleta, uso e protecao de dados na plataforma MH Personal Trainer.',
   path: '/privacy',
   keywords: [

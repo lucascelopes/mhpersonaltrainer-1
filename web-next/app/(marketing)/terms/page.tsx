@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { buildMarketingMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = buildMarketingMetadata({
-  title: 'Termos de uso | MH Personal Trainer',
+  title: 'Termos de uso',
   description: 'Regras de uso, responsabilidades e condicoes dos servicos da plataforma MH Personal Trainer.',
   path: '/terms',
   keywords: [
