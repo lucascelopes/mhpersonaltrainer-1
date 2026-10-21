@@ -16,23 +16,23 @@ export const metadata: Metadata = buildMarketingMetadata({
 });
 const team = [
   {
-    name: 'Marina H.',
-    role: 'Head de Produto',
+    name: 'Produto',
+    role: 'Experiencia de uso',
     bio: 'Traduz a rotina do personal em fluxos simples e claros.',
   },
   {
-    name: 'Lucas M.',
-    role: 'Tech Lead',
+    name: 'Tecnologia',
+    role: 'Web e mobile',
     bio: 'Integra web e mobile com foco em performance.',
   },
   {
-    name: 'Rafael D.',
-    role: 'Coach de Performance',
+    name: 'Treinamento',
+    role: 'Rotina de treino',
     bio: 'Ajusta treinos, metas e indicadores de resultado.',
   },
   {
-    name: 'Aline P.',
-    role: 'CX e Suporte',
+    name: 'Atendimento',
+    role: 'Suporte',
     bio: 'Onboarding, suporte humano e acompanhamento diario.',
   },
 ];
@@ -80,7 +80,7 @@ export default function EquipePage() {
             </div>
             <div className="marketing-hero-panel-card">
               <span className="marketing-panel-title">Produto evolutivo</span>
-              <p>Atualizacoes constantes em web, Android e iOS.</p>
+              <p>Melhorias continuas no web e Android. Versao para iOS em breve.</p>
             </div>
             <div className="marketing-hero-panel-card">
               <span className="marketing-panel-title">Resultados claros</span>
@@ -111,9 +111,9 @@ export default function EquipePage() {
       <section className="marketing-section marketing-surface">
         <div className="container">
           <div className="marketing-section-head">
-            <span className="marketing-eyebrow">Equipe dedicada</span>
-            <h2>Especialistas em produto, treino e experiencia digital</h2>
-            <p>Um time enxuto e focado em resultados reais para nossos clientes.</p>
+            <span className="marketing-eyebrow">Areas de atuacao</span>
+            <h2>Produto, treino e experiencia digital no mesmo fluxo</h2>
+            <p>Conheca as frentes que ajudam a evoluir a experiencia de alunos, personais e academias.</p>
           </div>
           <div className="marketing-team-grid">
             {team.map((member) => (
