@@ -1,0 +1,5 @@
+.layout :global(.marketing-eyebrow) {
+  width: fit-content;
+  max-width: 100%;
+  justify-self: start;
+}

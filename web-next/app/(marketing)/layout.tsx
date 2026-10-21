@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import MarketingNav from '@/components/MarketingNav';
 import MarketingFooter from '@/components/MarketingFooter';
 import { DEFAULT_DESCRIPTION } from '@/lib/seo';
+import styles from './layout.module.css';
 
 export const metadata: Metadata = {
   description: DEFAULT_DESCRIPTION,
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="marketing-page">
+    <div className={`marketing-page ${styles.layout}`}>
       <MarketingNav />
       {children}
       <MarketingFooter />
