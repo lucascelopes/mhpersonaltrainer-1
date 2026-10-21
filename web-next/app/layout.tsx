@@ -40,7 +40,7 @@ const merriweather = Merriweather({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'MH Personal Trainer | Web, Android e iOS',
+    default: 'MH Personal Trainer | Treinos e gestão fitness',
     template: '%s | MH Personal Trainer',
   },
   description: DEFAULT_DESCRIPTION,

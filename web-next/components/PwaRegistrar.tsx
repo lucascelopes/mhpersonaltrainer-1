@@ -21,7 +21,7 @@ export default function PwaRegistrar() {
       return;
     }
 
-    navigator.serviceWorker.register('/sw.js?v=2').catch(() => {
+    navigator.serviceWorker.register('/sw.js?v=3', { updateViaCache: 'none' }).catch(() => {
       // Falha no registro nao deve quebrar a pagina.
     });
   }, []);

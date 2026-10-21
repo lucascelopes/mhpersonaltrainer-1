@@ -1,16 +1,15 @@
-const CACHE_NAME = 'mh-pt-cache-v2';
+const CACHE_NAME = 'mh-pt-cache-v3';
+const OFFLINE_ASSETS = [
+  '/manifest.webmanifest',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/icon-192-maskable.png',
+  '/icon-512-maskable.png',
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) =>
-      cache.addAll([
-        '/manifest.webmanifest',
-        '/icon-192.png',
-        '/icon-512.png',
-        '/icon-192-maskable.png',
-        '/icon-512-maskable.png',
-      ])
-    )
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(OFFLINE_ASSETS))
   );
   self.skipWaiting();
 });
@@ -18,7 +17,9 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.map((key) => (key === CACHE_NAME ? null : caches.delete(key))))
+      Promise.all(keys.map((key) => (
+        key.startsWith('mh-pt-cache-') && key !== CACHE_NAME ? caches.delete(key) : null
+      )))
     )
   );
   self.clients.claim();
@@ -31,21 +32,20 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  const isAsset =
-    request.destination === 'image' ||
-    request.destination === 'font' ||
-    url.pathname === '/manifest.webmanifest';
-
-  if (!isAsset) return;
+  if (!OFFLINE_ASSETS.includes(url.pathname)) return;
 
   event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request).then((response) => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+    fetch(request)
+      .then((response) => {
+        if (response.ok) {
+          event.waitUntil(
+            caches.open(CACHE_NAME)
+              .then((cache) => cache.put(request, response.clone()))
+              .catch(() => {})
+          );
+        }
         return response;
-      });
-    })
+      })
+      .catch(async () => (await caches.match(request)) || Response.error())
   );
 });
