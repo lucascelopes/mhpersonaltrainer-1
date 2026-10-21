@@ -64,9 +64,9 @@ export default function EquipePage() {
               simples, previsivel e escalavel.
             </p>
             <div className="marketing-cta-row">
-              <MobileAwareLink href="/register" mobilePath="/register" className="marketing-button">
+              <Link href="/cadastro" className="marketing-button">
                 Criar conta
-              </MobileAwareLink>
+              </Link>
               <Link href="/beneficios" className="marketing-button ghost">
                 Ver beneficios
               </Link>
@@ -134,9 +134,9 @@ export default function EquipePage() {
             <p>Crie sua conta e tenha a equipe ao seu lado desde o primeiro dia.</p>
           </div>
           <div className="marketing-cta-row">
-            <MobileAwareLink href="/register" mobilePath="/register" className="marketing-button">
+            <Link href="/cadastro" className="marketing-button">
               Criar conta
-            </MobileAwareLink>
+            </Link>
             <MobileAwareLink href="/login" mobilePath="/login" className="marketing-button ghost">
               Entrar
             </MobileAwareLink>

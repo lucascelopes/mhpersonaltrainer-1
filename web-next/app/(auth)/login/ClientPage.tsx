@@ -107,7 +107,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className={styles.loginPage}>
+    <div className={styles.loginPage} data-auth-page="login">
       <div className={styles.mobileIntro}>
         <div className={styles.mobileBrandRow}>
           <Link href="/" aria-label="MH Personal Trainer — início">
@@ -252,7 +252,7 @@ export default function LoginPage() {
                 <p className="subtle">Conta profissional no painel web.</p>
               </div>
               <div className="auth-access-actions">
-                <Link href="/register" className="auth-link auth-link-chip">
+                <Link href="/cadastro" className="auth-link auth-link-chip">
                   Criar conta de personal
                 </Link>
               </div>

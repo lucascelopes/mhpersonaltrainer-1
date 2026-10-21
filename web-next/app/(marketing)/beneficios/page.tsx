@@ -78,9 +78,9 @@ export default function BeneficiosPage() {
               escalar.
             </p>
             <div className="marketing-cta-row">
-              <MobileAwareLink href="/register" mobilePath="/register" className="marketing-button">
+              <Link href="/cadastro" className="marketing-button">
                 Criar conta
-              </MobileAwareLink>
+              </Link>
               <MobileAwareLink href="/login" mobilePath="/login" className="marketing-button ghost">
                 Entrar
               </MobileAwareLink>
@@ -170,9 +170,9 @@ export default function BeneficiosPage() {
             <p>Crie sua conta e organize alunos, treinos e agenda em minutos.</p>
           </div>
           <div className="marketing-cta-row">
-            <MobileAwareLink href="/register" mobilePath="/register" className="marketing-button">
+            <Link href="/cadastro" className="marketing-button">
               Criar conta
-            </MobileAwareLink>
+            </Link>
             <Link href="/beneficios" className="marketing-button ghost">
               Voltar ao topo
             </Link>

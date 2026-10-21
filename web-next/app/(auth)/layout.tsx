@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import BrandLockup from '@/components/BrandLockup';
+import styles from './auth-layout.module.css';
 
 export const metadata: Metadata = {
   robots: {
@@ -48,6 +49,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </aside>
 
         <div className="auth-panel">
+          <Link href="/" className={styles.mobileBrand} aria-label="MH Personal Trainer — início">
+            <BrandLockup width={150} height={48} surface="theme" priority />
+          </Link>
           {children}
           <p className="auth-note">Seus dados ficam protegidos e sincronizados em todos os dispositivos.</p>
         </div>

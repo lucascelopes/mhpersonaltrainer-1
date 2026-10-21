@@ -1,7 +1,6 @@
 ﻿import type { Metadata } from 'next';
 import Link from 'next/link';
 import { buildMarketingMetadata } from '@/lib/seo';
-import MobileAwareLink from '@/components/MobileAwareLink';
 
 export const metadata: Metadata = buildMarketingMetadata({
   title: 'Politica de privacidade | MH Personal Trainer',
@@ -89,9 +88,9 @@ export default function PrivacyPage() {
               Transparencia total sobre o que coletamos, como usamos e quais sao seus direitos.
             </p>
             <div className="legal-hero-actions">
-              <MobileAwareLink href="/register" mobilePath="/register" className="marketing-button">
+              <Link href="/cadastro" className="marketing-button">
                 Criar conta
-              </MobileAwareLink>
+              </Link>
               <Link href="/help" className="marketing-button ghost">
                 Central de ajuda
               </Link>

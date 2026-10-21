@@ -38,7 +38,7 @@ export default function MarketingNav() {
             <MobileAwareLink href="/login" mobilePath="/login" className={styles.loginBtn}>
               Entrar
             </MobileAwareLink>
-            <MobileAwareLink href="/register" mobilePath="/register" className={styles.ctaBtn}>
+            <MobileAwareLink href="/cadastro" className={styles.ctaBtn}>
               Criar conta
             </MobileAwareLink>
           </div>

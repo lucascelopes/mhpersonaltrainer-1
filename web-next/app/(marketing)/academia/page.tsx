@@ -22,7 +22,7 @@ export const metadata: Metadata = buildMarketingMetadata({
   ],
 });
 const kpis = [
-  { value: '360deg', label: 'Visao da operacao' },
+  { value: '360°', label: 'Visao da operacao' },
   { value: 'Tempo real', label: 'Presenca, equipe e caixa' },
   { value: '1 ecossistema', label: 'Academia, personal e aluno' },
 ];

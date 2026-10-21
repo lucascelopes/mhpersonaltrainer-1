@@ -1,0 +1,17 @@
+.mobileBrand {
+  display: none;
+  width: fit-content;
+  min-height: 48px;
+  margin-bottom: 4px;
+  align-items: center;
+}
+
+@media (max-width: 767px) {
+  .mobileBrand {
+    display: inline-flex;
+  }
+
+  :global(.auth-panel:has([data-auth-page="login"])) .mobileBrand {
+    display: none;
+  }
+}
