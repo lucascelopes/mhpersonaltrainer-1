@@ -30,6 +30,7 @@ import { auth, db } from './firebaseClient';
 import type { AuthState, User, UserRole } from './types/user';
 import { firestoreService } from './services/firestoreService';
 import { notifyUserLoginSecurityAlert } from './services/notificationCenter';
+import { inviteErrorMessage, registerStudentWithInvite } from './services/personalInvite';
 
 interface AuthContextValue extends AuthState {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
@@ -193,7 +194,7 @@ const mapUserData = (uid: string, data: Record<string, any>): User => ({
   acessoSuspenso: toBool(data.acessoSuspenso),
   codigoPersonal: data.codigoPersonal,
   codigoAcademia: data.codigoAcademia,
-  personalAccountId: data.personalAccount?.id,
+  personalAccountId: data.personalAccountId || data.personalAccount?.id,
   nameDoSeuPersonal: data.nameDoSeuPersonal,
   objetivoNoApp: data.objetivoNoApp,
   experiencia: data.expericencia,
@@ -514,20 +515,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           ? normalizePersonalCodeValue(payloadAdditional.codigoPersonal)
           : null;
         if (personalCodeCandidate !== null) {
-          const capacity = await firestoreService.getPersonalStudentCapacityByCode(personalCodeCandidate);
-          if (!capacity.allowed) {
-            const message =
-              capacity.reason === 'personal_not_found'
-                ? 'Codigo do personal nao encontrado.'
-                : 'Esse personal ja atingiu o limite de 4 alunos no plano gratuito. Peca para ele assinar o Premium para liberar alunos ilimitados.';
-            return {
-              success: false,
-              error: message,
-            };
+          try {
+            await registerStudentWithInvite({
+              code: String(personalCodeCandidate),
+              name: displayName,
+              email,
+              password,
+            });
+          } catch (inviteError) {
+            return { success: false, error: inviteErrorMessage(inviteError) };
           }
-          if (!payloadAdditional.nameDoSeuPersonal && capacity.personalName) {
-            payloadAdditional.nameDoSeuPersonal = capacity.personalName;
-          }
+          await signInWithEmailAndPassword(auth, email, password);
+          await refreshUser();
+          return { success: true };
         }
 
         const result = await createUserWithEmailAndPassword(auth, email, password);

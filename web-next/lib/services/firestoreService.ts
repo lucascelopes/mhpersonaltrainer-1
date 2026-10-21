@@ -357,25 +357,6 @@ async function getCodigoPersonal(uid: string): Promise<string | null> {
 async function getAlunosDoPersonal(uid: string): Promise<Aluno[]> {
   try {
     const db = getFirebaseDb();
-    
-    const codigoPersonal = await getCodigoPersonal(uid);
-    
-    if (!codigoPersonal) {
-      return [];
-    }
-
-    const { numeric, string } = normalizePersonalCode(codigoPersonal);
-    if ((numeric === null || numeric <= 0) && (!string || string === '0')) {
-      return [];
-    }
-    const codeVariants = new Set<number | string>();
-    if (numeric !== null) {
-      codeVariants.add(numeric);
-    }
-    if (string) {
-      codeVariants.add(string);
-    }
-
     const usersRef = collection(db, 'users');
 
     const alunosMap = new Map<string, Aluno>();
@@ -399,16 +380,10 @@ async function getAlunosDoPersonal(uid: string): Promise<Aluno[]> {
     });
   };
 
-    if (codeVariants.size > 0) {
-      const snapshots = await Promise.all(
-        Array.from(codeVariants).map((value) =>
-          getDocs(query(usersRef, where('codigoPersonal', '==', value), limit(50)))
-        )
-      );
-      snapshots.forEach((snap) => {
-        snap.forEach(addAluno);
-      });
-    }
+    const linkedStudents = await getDocs(
+      query(usersRef, where('personalAccountId', '==', uid), limit(200))
+    );
+    linkedStudents.forEach(addAluno);
 
     const userDoc = await getDoc(doc(db, 'users', uid));
     const refIds: string[] = [];
@@ -474,31 +449,6 @@ async function listenToAlunosDoPersonal(
   onError?: (error: unknown) => void
 ): Promise<() => void> {
   const db = getFirebaseDb();
-  const codigoPersonal = await getCodigoPersonal(uid);
-
-  if (!codigoPersonal) {
-    callback([]);
-    return () => {};
-  }
-
-  const { numeric, string } = normalizePersonalCode(codigoPersonal);
-  if ((numeric === null || numeric <= 0) && (!string || string === '0')) {
-    callback([]);
-    return () => {};
-  }
-
-  const codeVariants = new Set<number | string>();
-  if (numeric !== null) {
-    codeVariants.add(numeric);
-  }
-  if (string) {
-    codeVariants.add(string);
-  }
-
-  if (!codeVariants.size) {
-    callback([]);
-    return () => {};
-  }
 
   let isReloading = false;
   let needsReload = false;
@@ -537,18 +487,13 @@ async function listenToAlunosDoPersonal(
   const unsubscribers: Array<() => void> = [];
   const usersRef = collection(db, 'users');
 
-  codeVariants.forEach((value) => {
-    try {
-      const q = query(usersRef, where('codigoPersonal', '==', value), limit(50));
-      unsubscribers.push(
-        onSnapshot(q, triggerReload, (err) => {
-          console.warn('Aviso: listener de alunos por código:', err);
-        })
-      );
-    } catch (e) {
-      console.warn('Falha ao registrar listener por código:', e);
-    }
-  });
+  unsubscribers.push(
+    onSnapshot(
+      query(usersRef, where('personalAccountId', '==', uid), limit(200)),
+      triggerReload,
+      handleError
+    )
+  );
 
   try {
     unsubscribers.push(
