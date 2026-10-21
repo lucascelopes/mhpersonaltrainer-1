@@ -15,6 +15,8 @@ import {
   type StripeConnectStatus,
 } from '@/lib/services/payments';
 import type { PaymentRecord } from '@/lib/types/finance';
+import { parseBrazilianMoneyInput } from '@/lib/financeAmount';
+import styles from './page.module.css';
 
 const STRIPE_FEE_RATE = 0.1;
 
@@ -60,12 +62,6 @@ const normalizePayment = (row: PaymentRow): PaymentRecord => {
   };
 };
 
-const parseAmount = (value: string) => {
-  const cleaned = value.replace(/[^\d,.-]/g, '').replace(',', '.');
-  const parsed = Number(cleaned);
-  return Number.isFinite(parsed) ? parsed : 0;
-};
-
 export default function FinanceiroPersonalPage() {
   const { userId } = useUserScope();
   const { role, user } = useAuth();
@@ -99,7 +95,7 @@ export default function FinanceiroPersonalPage() {
       setSelectedStudentId('');
       return;
     }
-    if (!selectedStudentId) {
+    if (!dashboard.alunos.some((aluno) => aluno.id === selectedStudentId)) {
       setSelectedStudentId(dashboard.alunos[0].id);
     }
   }, [dashboard.alunos, isPersonal, selectedStudentId]);
@@ -179,23 +175,23 @@ export default function FinanceiroPersonalPage() {
     }
   }, [stripeConnected]);
 
-  const amountPreview = parseAmount(invoiceAmount);
+  const amountPreview = parseBrazilianMoneyInput(invoiceAmount);
 
   const handleCreateInvoice = async () => {
     setInvoiceError('');
     setInvoiceMessage('');
-    if (!selectedStudentId) {
+    if (!selectedStudentId || !selectedStudent) {
       setInvoiceError('Selecione um aluno para enviar a fatura.');
       return;
     }
-    const amount = parseAmount(invoiceAmount);
+    const amount = parseBrazilianMoneyInput(invoiceAmount);
     if (!amount || amount <= 0) {
       setInvoiceError('Informe um valor valido.');
       return;
     }
     const description = invoiceDescription.trim() || 'Fatura do personal';
     const dueDay = invoiceDueDay ? Number(invoiceDueDay) : undefined;
-    if (dueDay && (Number.isNaN(dueDay) || dueDay < 1 || dueDay > 31)) {
+    if (dueDay !== undefined && (!Number.isInteger(dueDay) || dueDay < 1 || dueDay > 31)) {
       setInvoiceError('Dia de vencimento invalido.');
       return;
     }
@@ -213,51 +209,69 @@ export default function FinanceiroPersonalPage() {
       personalCode: user?.codigoPersonal,
     };
 
-    const result = await createPaymentForUser(selectedStudentId, payload);
-    if (result.error || !result.data) {
-      setInvoiceError(result.error || 'Nao foi possivel criar a fatura.');
-      setInvoiceLoading(false);
-      return;
-    }
-
-    let checkoutUrl = invoiceCheckoutUrl.trim();
-    if (invoiceAutoStripe && stripeConnected && stripeReady && !checkoutUrl && user?.uid) {
-      const stripeAmount = Math.round(amount * 100);
-      const feeAmount = Math.round(stripeAmount * STRIPE_FEE_RATE);
-      const checkout = await createStripeCheckoutSession({
-        amount: stripeAmount,
-        currency: 'brl',
-        studentId: selectedStudentId,
-        personalId: user.uid,
-        paymentId: result.data.id,
-        destinationAccountId: user?.stripeAccountId,
-        applicationFeeAmount: feeAmount,
-        description,
-      });
-      if (checkout.data?.checkoutUrl) {
-        checkoutUrl = checkout.data.checkoutUrl;
-        await updatePaymentForUser(selectedStudentId, result.data.id, {
-          checkoutUrl,
-          stripeSessionId: checkout.data.sessionId,
-          stripePaymentIntentId: checkout.data.paymentIntentId,
-          stripeStatus: checkout.data.status,
-        });
-      } else if (checkout.error) {
-        setInvoiceMessage('Fatura criada, mas o link do Stripe nao foi gerado.');
+    let invoiceCreated = false;
+    try {
+      const result = await createPaymentForUser(selectedStudentId, payload);
+      if (result.error || !result.data) {
+        setInvoiceError(result.error || 'Nao foi possivel criar a fatura.');
+        return;
       }
-    }
+      invoiceCreated = true;
 
-    setInvoiceMessage(
-      checkoutUrl
-        ? 'Fatura criada e pronta para pagamento.'
-        : 'Fatura criada. O aluno vera no app.'
-    );
-    setInvoiceAmount('');
-    setInvoiceDescription('');
-    setInvoiceDueDay('');
-    setInvoiceRecurring('1');
-    setInvoiceCheckoutUrl('');
-    setInvoiceLoading(false);
+      let checkoutUrl = invoiceCheckoutUrl.trim();
+      let checkoutFailed = false;
+      if (invoiceAutoStripe && stripeConnected && stripeReady && !checkoutUrl && user?.uid) {
+        const stripeAmount = Math.round(amount * 100);
+        const feeAmount = Math.round(stripeAmount * STRIPE_FEE_RATE);
+        try {
+          const checkout = await createStripeCheckoutSession({
+            amount: stripeAmount,
+            currency: 'brl',
+            studentId: selectedStudentId,
+            personalId: user.uid,
+            paymentId: result.data.id,
+            destinationAccountId: user?.stripeAccountId,
+            applicationFeeAmount: feeAmount,
+            description,
+          });
+          if (checkout.data?.checkoutUrl) {
+            checkoutUrl = checkout.data.checkoutUrl;
+            const updateResult = await updatePaymentForUser(selectedStudentId, result.data.id, {
+              checkoutUrl,
+              stripeSessionId: checkout.data.sessionId,
+              stripePaymentIntentId: checkout.data.paymentIntentId,
+              stripeStatus: checkout.data.status,
+            });
+            if (updateResult.error) checkoutFailed = true;
+          } else {
+            checkoutFailed = true;
+          }
+        } catch {
+          checkoutFailed = true;
+        }
+      }
+
+      setInvoiceMessage(
+        checkoutFailed
+          ? 'Fatura criada, mas o link do Stripe nao foi salvo. Confira a cobranca antes de reenviar.'
+          : checkoutUrl
+          ? 'Fatura criada e pronta para pagamento.'
+          : 'Fatura criada. O aluno vera no app.'
+      );
+      setInvoiceAmount('');
+      setInvoiceDescription('');
+      setInvoiceDueDay('');
+      setInvoiceRecurring('1');
+      setInvoiceCheckoutUrl('');
+    } catch {
+      setInvoiceError(
+        invoiceCreated
+          ? 'Fatura criada, mas ocorreu um erro depois. Confira a lista antes de tentar novamente.'
+          : 'Nao foi possivel criar a fatura. Tente novamente.'
+      );
+    } finally {
+      setInvoiceLoading(false);
+    }
   };
 
   return (
@@ -267,28 +281,10 @@ export default function FinanceiroPersonalPage() {
       breadcrumbs={[{ label: 'Financeiro', href: '/financeiro' }]}
     >
       <UserScopePicker />
-      <div className="finance-personal finance-personal-layout">
-        <section className="portal-card portal-card--highlight finance-hero">
-          <div className="finance-hero-main">
-            <div className="finance-hero-copy">
-              <p className="portal-pill">Financeiro</p>
-              <h2>Envie faturas completas e acompanhe o caixa.</h2>
-              <p className="subtle">
-                Gere cobrancas para seus alunos e acompanhe tudo em um painel unico.
-              </p>
-              <div className="finance-hero-actions">
-                <Link href="/financeiro/subscription" className="button secondary">
-                  Assinatura
-                </Link>
-                <Link href="/financeiro/plans" className="button secondary">
-                  Ver planos
-                </Link>
-                <Link href="/students" className="button">
-                  Ver alunos
-                </Link>
-              </div>
-            </div>
-            <div className="finance-summary-grid finance-summary-grid--hero">
+      <div className={`finance-personal finance-personal-layout ${styles.page}`}>
+        {selectedStudent && <section className="finance-hero" aria-label={`Resumo financeiro de ${selectedStudent.nome}`}>
+          <p className="subtle">Resumo de {selectedStudent.nome}</p>
+          <div className="finance-summary-grid finance-summary-grid--hero">
               <div className="finance-summary-card">
                 <span>Total pendente</span>
                 <strong>{formatCurrency(totalPendente)}</strong>
@@ -305,12 +301,11 @@ export default function FinanceiroPersonalPage() {
                 <span>Liquido estimado</span>
                 <strong>{formatCurrency(liquidoEstimado)}</strong>
               </div>
-            </div>
           </div>
-        </section>
+        </section>}
 
         <div className="finance-personal-grid">
-          <div className="finance-personal-main">
+          {selectedStudent && <div className="finance-personal-main">
             <div className="portal-card finance-card finance-invoice-card" id="nova-fatura">
               <div className="finance-card-header">
                 <div>
@@ -324,6 +319,7 @@ export default function FinanceiroPersonalPage() {
                 )}
               </div>
 
+              {selectedStudent ? <>
               <div className="finance-invoice-form">
                 <label className="finance-field">
                   <span>Descricao</span>
@@ -339,6 +335,7 @@ export default function FinanceiroPersonalPage() {
                   <input
                     className="finance-input"
                     placeholder="R$ 120,00"
+                    inputMode="decimal"
                     value={invoiceAmount}
                     onChange={(event) => setInvoiceAmount(event.target.value)}
                   />
@@ -409,8 +406,19 @@ export default function FinanceiroPersonalPage() {
                   {invoiceLoading ? 'Enviando...' : 'Enviar fatura'}
                 </button>
               </div>
-              {invoiceError && <p className="finance-feedback is-error">{invoiceError}</p>}
-              {invoiceMessage && <p className="finance-feedback">{invoiceMessage}</p>}
+              {invoiceError && (
+                <p className="finance-feedback is-error" role="alert">
+                  {invoiceError}
+                </p>
+              )}
+              {invoiceMessage && (
+                <p className="finance-feedback" role="status">
+                  {invoiceMessage}
+                </p>
+              )}
+              </> : (
+                <p className="subtle">Vincule ou selecione um aluno para criar uma fatura.</p>
+              )}
             </div>
 
             <div className="portal-card finance-card finance-section">
@@ -463,7 +471,7 @@ export default function FinanceiroPersonalPage() {
                 </div>
               )}
             </div>
-          </div>
+          </div>}
 
           <div className="finance-personal-side">
             <div className="portal-card finance-card finance-student-card">

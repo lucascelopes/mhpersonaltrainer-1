@@ -1,0 +1,252 @@
+.page {
+  min-width: 0;
+}
+
+.page :global(.finance-personal-grid),
+.page :global(.finance-personal-main),
+.page :global(.finance-personal-side),
+.page :global(.finance-card),
+.page :global(.finance-payment-card),
+.page :global(.finance-payment-title),
+.page :global(.finance-student-mini) {
+  min-width: 0;
+}
+
+.page :global(.finance-payment-title strong),
+.page :global(.finance-student-mini strong),
+.page :global(.finance-payment-meta),
+.page :global(.finance-feedback) {
+  overflow-wrap: anywhere;
+}
+
+.page :global(.finance-input) {
+  min-width: 0;
+}
+
+/* The personal workspace follows the wide, calm layout of Home and Agenda. */
+.page :global(.finance-hero) {
+  padding: 0 0 22px;
+  border: 0;
+  border-bottom: 1px solid var(--portal-border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.page :global(.finance-hero-main) {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+
+.page :global(.finance-hero-copy) {
+  max-width: 760px;
+}
+
+.page :global(.finance-hero-copy h2) {
+  font-size: clamp(1.5rem, 2vw, 2rem);
+  line-height: 1.18;
+}
+
+.page :global(.finance-summary-grid--hero) {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  border: 1px solid var(--portal-border);
+  border-radius: 14px;
+  background: var(--portal-surface);
+  overflow: hidden;
+}
+
+.page :global(.finance-summary-card) {
+  border: 0;
+  border-right: 1px solid var(--portal-border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 15px 18px;
+}
+
+.page :global(.finance-summary-card:last-child) {
+  border-right: 0;
+}
+
+.page :global(.finance-personal-grid) {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.page :global(.finance-personal-side) {
+  order: -1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 16px;
+}
+
+.page :global(.finance-personal-main) {
+  gap: 16px;
+}
+
+.page :global(.finance-card) {
+  box-shadow: none;
+}
+
+.page :global(.finance-payments-grid) {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--portal-border);
+}
+
+.page :global(.finance-payment-card) {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px 20px;
+  padding: 13px 0;
+  border: 0;
+  border-bottom: 1px solid var(--portal-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.page :global(.finance-payment-header) {
+  min-width: 0;
+  grid-column: 1;
+}
+
+.page :global(.finance-payment-title) {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.page :global(.finance-payment-meta) {
+  white-space: nowrap;
+}
+
+:global(:root[data-theme='dark']) .page :global(.finance-stripe-card) {
+  background: linear-gradient(135deg, rgba(42, 92, 142, 0.22), var(--portal-surface));
+  border-color: var(--portal-border);
+}
+
+:global(:root[data-theme='dark']) .page :global(.finance-input),
+:global(:root[data-theme='dark']) .page :global(.finance-payment-card) {
+  background: var(--portal-surface-alt);
+  color: var(--portal-ink);
+  border-color: var(--portal-border);
+}
+
+:global(:root[data-theme='dark']) .page :global(.finance-payment-card) {
+  background: transparent;
+}
+
+@media (max-width: 900px) {
+  .page :global(.finance-personal-side) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page :global(.finance-summary-grid--hero) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .page :global(.finance-summary-card:nth-child(2)) {
+    border-right: 0;
+  }
+
+  .page :global(.finance-summary-card:nth-child(-n + 2)) {
+    border-bottom: 1px solid var(--portal-border);
+  }
+}
+
+@media (max-width: 640px) {
+  .page :global(.finance-hero) {
+    padding: 0 0 16px;
+  }
+
+  .page :global(.finance-hero-actions),
+  .page :global(.finance-actions) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+  }
+
+  .page :global(.finance-hero-actions .button),
+  .page :global(.finance-actions .button),
+  .page :global(.finance-invoice-actions > .button) {
+    width: 100%;
+    min-height: 48px;
+    justify-content: center;
+  }
+
+  .page :global(.finance-summary-grid--hero) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .page :global(.finance-summary-card) {
+    min-width: 0;
+    padding: 12px;
+  }
+
+  .page :global(.finance-summary-card strong) {
+    overflow-wrap: anywhere;
+  }
+
+  .page :global(.finance-input) {
+    width: 100%;
+    min-height: 48px;
+    height: auto;
+    font-size: 16px;
+  }
+
+  .page :global(.finance-inline) {
+    min-width: 0;
+  }
+
+  .page :global(.finance-toggle) {
+    min-height: 44px;
+    align-items: flex-start;
+  }
+
+  .page :global(.finance-invoice-actions) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page :global(.finance-invoice-preview) {
+    min-width: 0;
+  }
+
+  .page :global(.finance-student-chip) {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .page :global(.finance-payment-header) {
+    align-items: flex-start;
+  }
+
+  .page :global(.finance-payment-card) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+
+  .page :global(.finance-payment-meta) {
+    white-space: normal;
+  }
+
+  .page :global(.finance-empty) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page :global(.finance-empty .students-action) {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 360px) {
+  .page :global(.finance-summary-grid--hero) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,10 +1,12 @@
 ﻿'use client';
 
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import PageShell from '@/components/PageShell';
 import UserScopePicker from '@/components/data/UserScopePicker';
 import { formatDate, useCollectionData, useUserScope } from '@/lib/firestoreHooks';
+import { useAuth } from '@/lib/auth';
 import { formatCurrency } from '@/lib/services/payments';
 import type { PaymentRecord } from '@/lib/types/finance';
 
@@ -52,7 +54,16 @@ const normalizePayment = (row: PaymentRow): PaymentRecord => {
 
 export default function FinanceiroPage() {
   const { userId } = useUserScope();
+  const { role, isLoading: authLoading } = useAuth();
+  const router = useRouter();
   const { data } = useCollectionData<PaymentRow>(['users', userId, 'pagamentos']);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (role === 'aluno') router.replace('/financeiro/aluno');
+    if (role === 'academy') router.replace('/academy/billing');
+    if (role === 'personal' || role === 'professor') router.replace('/financeiro/personal');
+  }, [authLoading, role, router]);
 
   const payments = useMemo(() => data.map(normalizePayment), [data]);
   const orderedPayments = useMemo(() => {
@@ -79,6 +90,14 @@ export default function FinanceiroPage() {
     return dias.length ? dias[0] : null;
   }, [payments]);
 
+  if (authLoading || role === 'aluno' || role === 'academy' || role === 'personal' || role === 'professor') {
+    return (
+      <PageShell title="Financeiro">
+        <p className="subtle" role="status">Abrindo o financeiro do seu perfil...</p>
+      </PageShell>
+    );
+  }
+
   return (
     <PageShell
       title="Financeiro"
@@ -90,9 +109,9 @@ export default function FinanceiroPage() {
           <div className="finance-hero-main">
             <div className="finance-hero-copy">
               <p className="portal-pill">Resumo</p>
-              <h2>Centralize cobrancas e assinaturas em um painel moderno.</h2>
+              <h2>Centralize cobranças e assinaturas em um só lugar.</h2>
               <p className="subtle">
-                Envie faturas para seus alunos, acompanhe pagamentos e gerencie sua assinatura do assistente.
+                Envie faturas para seus alunos, acompanhe os pagamentos e gerencie sua assinatura do assistente.
               </p>
               <div className="finance-hero-actions">
                 <Link href="/financeiro/personal#nova-fatura" className="button">
@@ -116,7 +135,7 @@ export default function FinanceiroPage() {
                 <strong>{formatCurrency(totalRecebido)}</strong>
               </div>
               <div className="finance-summary-card">
-                <span>Proximo vencimento</span>
+                <span>Próximo vencimento</span>
                 <strong>{proximoVencimento ? `Dia ${proximoVencimento}` : '-'}</strong>
               </div>
             </div>
@@ -126,7 +145,7 @@ export default function FinanceiroPage() {
         <div className="finance-overview-grid">
           <Link href="/financeiro/personal" className="portal-card finance-overview-card">
             <strong>Faturas do personal</strong>
-            <span>Crie cobrancas e acompanhe pagamentos dos alunos.</span>
+            <span>Crie cobranças e acompanhe os pagamentos dos alunos.</span>
             <em>Enviar agora</em>
           </Link>
           <Link href="/financeiro/aluno" className="portal-card finance-overview-card">
@@ -136,7 +155,7 @@ export default function FinanceiroPage() {
           </Link>
           <Link href="/financeiro/subscription" className="portal-card finance-overview-card">
             <strong>Assinatura do assistente</strong>
-            <span>Controle o plano ativo e renovacoes no Stripe.</span>
+            <span>Controle o plano ativo e as renovações no Stripe.</span>
             <em>Gerenciar</em>
           </Link>
         </div>
@@ -146,7 +165,7 @@ export default function FinanceiroPage() {
         <div className="finance-card-header">
           <div>
             <h3>Pagamentos recentes</h3>
-            <p className="subtle">Resumo rapido das ultimas cobrancas registradas.</p>
+            <p className="subtle">Resumo rápido das últimas cobranças registradas.</p>
           </div>
           <Link href="/financeiro/aluno" className="students-action">
             Ver detalhes
@@ -163,7 +182,7 @@ export default function FinanceiroPage() {
                     <span className={`finance-payment-tag ${payment.pago ? 'is-paid' : 'is-pending'}`}>
                       {payment.pago ? 'Pago' : 'Pendente'}
                     </span>
-                    <strong>{payment.descricao || 'Cobranca'}</strong>
+                    <strong>{payment.descricao || 'Cobrança'}</strong>
                   </div>
                   <span className="finance-payment-value">
                     {formatCurrency(payment.valorDaCombranca || 0)}
