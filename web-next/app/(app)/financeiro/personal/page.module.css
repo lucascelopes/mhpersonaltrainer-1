@@ -145,6 +145,16 @@
   background: transparent;
 }
 
+:global(:root[data-theme='dark']) .page :global(.finance-payment-tag.is-paid),
+:global(:root[data-theme='dark']) .page :global(.finance-status-pill.is-success) {
+  color: #86efac;
+}
+
+:global(:root[data-theme='dark']) .page :global(.finance-payment-tag.is-pending),
+:global(:root[data-theme='dark']) .page :global(.finance-status-pill.is-warning) {
+  color: #fcd34d;
+}
+
 @media (max-width: 900px) {
   .page :global(.finance-personal-side) {
     grid-template-columns: minmax(0, 1fr);
@@ -164,6 +174,15 @@
 }
 
 @media (max-width: 640px) {
+  .page :global(.finance-section .finance-card-header) {
+    flex-wrap: wrap;
+  }
+
+  .page :global(.finance-section .students-action) {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
   .page :global(.finance-hero) {
     padding: 0 0 16px;
   }
