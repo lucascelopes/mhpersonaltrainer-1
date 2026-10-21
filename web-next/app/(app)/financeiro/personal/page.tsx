@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import PageShell from '@/components/PageShell';
 import UserScopePicker from '@/components/data/UserScopePicker';
 import { useAuth } from '@/lib/auth';
@@ -64,9 +65,16 @@ const normalizePayment = (row: PaymentRow): PaymentRecord => {
 
 export default function FinanceiroPersonalPage() {
   const { userId } = useUserScope();
-  const { role, user } = useAuth();
+  const { role, user, isLoading: authLoading } = useAuth();
+  const router = useRouter();
   const dashboard = useDashboardData();
   const isPersonal = role === 'personal' || role === 'professor';
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (role === 'aluno') router.replace('/financeiro/aluno');
+    if (role === 'academy') router.replace('/academy/billing');
+  }, [authLoading, role, router]);
   const [selectedStudentId, setSelectedStudentId] = useState('');
   const [stripeStatus, setStripeStatus] = useState<StripeConnectStatus | null>(null);
   const [stripeLoading, setStripeLoading] = useState(false);
@@ -273,6 +281,14 @@ export default function FinanceiroPersonalPage() {
       setInvoiceLoading(false);
     }
   };
+
+  if (authLoading || role === 'aluno' || role === 'academy') {
+    return (
+      <PageShell title="Financeiro">
+        <p className="subtle" role="status">Abrindo o financeiro do seu perfil...</p>
+      </PageShell>
+    );
+  }
 
   return (
     <PageShell
