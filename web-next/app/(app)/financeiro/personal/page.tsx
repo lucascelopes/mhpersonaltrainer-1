@@ -16,6 +16,7 @@ import {
   type StripeConnectStatus,
 } from '@/lib/services/payments';
 import type { PaymentRecord } from '@/lib/types/finance';
+import { isPaymentPaid } from '@/lib/paymentStatus';
 import { parseBrazilianMoneyInput } from '@/lib/financeAmount';
 import styles from './page.module.css';
 
@@ -41,8 +42,6 @@ interface PaymentRow {
 }
 
 const normalizePayment = (row: PaymentRow): PaymentRecord => {
-  const rawStatus = String(row.status ?? row.stripeStatus ?? '').toLowerCase();
-  const paidByStatus = rawStatus === 'paid' || rawStatus === 'pago' || rawStatus === 'succeeded';
   const dates = Array.isArray(row.datas)
     ? row.datas
         .map((item) => (item?.toDate ? item.toDate() : item ? new Date(item) : null))
@@ -54,7 +53,7 @@ const normalizePayment = (row: PaymentRow): PaymentRecord => {
     valorDaCombranca: row.valorDaCombranca ?? row.valor ?? 0,
     todoDiaDoMes: row.todoDiaDoMes ?? row.diaDoPagamento ?? undefined,
     descricao: row.descricao ?? 'Cobranca',
-    pago: row.Pago ?? row.pago ?? paidByStatus,
+    pago: isPaymentPaid(row),
     repetirPMes: row.repetirPMes,
     diaDoPagamento: row.diaDoPagamento,
     datas: dates as Date[],

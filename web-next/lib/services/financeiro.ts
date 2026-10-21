@@ -8,6 +8,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { PaymentRecord } from '../types/finance';
+import { isPaymentPaid } from '../paymentStatus';
 
 interface QueryResult<T> {
   data: T | null;
@@ -19,7 +20,7 @@ const mapPayment = (id: string, data: any): PaymentRecord => ({
   valorDaCombranca: data.valorDaCombranca,
   todoDiaDoMes: data.todoDiaDoMes,
   descricao: data.descricao,
-  pago: data.Pago ?? false,
+  pago: isPaymentPaid(data),
   repetirPMes: data.repetirPMes,
   diaDoPagamento: data.diaDoPagamento,
   datas: (data.datas || []).map((item: any) =>

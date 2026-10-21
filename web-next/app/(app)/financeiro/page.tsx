@@ -9,6 +9,7 @@ import { formatDate, useCollectionData, useUserScope } from '@/lib/firestoreHook
 import { useAuth } from '@/lib/auth';
 import { formatCurrency } from '@/lib/services/payments';
 import type { PaymentRecord } from '@/lib/types/finance';
+import { isPaymentPaid } from '@/lib/paymentStatus';
 
 interface PaymentRow {
   id: string;
@@ -30,8 +31,6 @@ interface PaymentRow {
 }
 
 const normalizePayment = (row: PaymentRow): PaymentRecord => {
-  const rawStatus = String(row.status ?? row.stripeStatus ?? '').toLowerCase();
-  const paidByStatus = rawStatus === 'paid' || rawStatus === 'pago' || rawStatus === 'succeeded';
   const dates = Array.isArray(row.datas)
     ? row.datas
         .map((item) => (item?.toDate ? item.toDate() : item ? new Date(item) : null))
@@ -43,7 +42,7 @@ const normalizePayment = (row: PaymentRow): PaymentRecord => {
     valorDaCombranca: row.valorDaCombranca ?? row.valor ?? 0,
     todoDiaDoMes: row.todoDiaDoMes ?? row.diaDoPagamento ?? undefined,
     descricao: row.descricao ?? 'Cobranca',
-    pago: row.Pago ?? row.pago ?? paidByStatus,
+    pago: isPaymentPaid(row),
     repetirPMes: row.repetirPMes,
     diaDoPagamento: row.diaDoPagamento,
     datas: dates as Date[],
