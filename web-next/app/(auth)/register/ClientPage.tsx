@@ -151,7 +151,7 @@ export default function RegisterPage() {
           </button>
         )}
       </form>
-      <div className="auth-links">
+      <div className="auth-links auth-links--account">
         <span className="subtle">Ja tem conta?</span>
         <Link href="/login" className="auth-link">
           Entrar

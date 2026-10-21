@@ -144,7 +144,7 @@ export default function RegisterAcademyPage() {
           </button>
         )}
       </form>
-      <div className="auth-links">
+      <div className="auth-links auth-links--account">
         <span className="subtle">Ja tem conta?</span>
         <Link href="/academy-login" className="auth-link">
           Entrar no painel

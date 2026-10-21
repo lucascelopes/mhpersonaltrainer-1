@@ -271,6 +271,13 @@
     font-weight: 600;
   }
 
+  .auth-links--account {
+    align-items: center;
+    justify-content: center;
+    column-gap: 6px;
+    row-gap: 0;
+  }
+
   .auth-link {
     color: var(--brand-deep);
   }
