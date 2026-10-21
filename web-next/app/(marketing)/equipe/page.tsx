@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { buildMarketingMetadata } from '@/lib/seo';
 import MobileAwareLink from '@/components/MobileAwareLink';
+import styles from './page.module.css';
 
 export const metadata: Metadata = buildMarketingMetadata({
   title: 'Equipe MH Personal Trainer',
@@ -53,15 +54,15 @@ const values = [
 
 export default function EquipePage() {
   return (
-    <div className="marketing-page">
+    <div className={`marketing-page ${styles.page}`}>
       <section className="marketing-hero marketing-hero--compact">
         <div className="container marketing-hero-grid">
           <div className="marketing-hero-copy">
             <span className="marketing-eyebrow">Nossa equipe</span>
-            <h1>Gente que entende a rotina de alunos, personais e academias.</h1>
+            <h1>Gente que entende sua rotina.</h1>
             <p className="marketing-lead">
-              Time multidisciplinar focado em produto, tecnologia e suporte. Nosso objetivo e tornar o treino mais
-              simples, previsivel e escalavel.
+              Produto, tecnologia e suporte para tornar o trabalho de personais e academias mais simples e o treino
+              dos alunos mais consistente.
             </p>
             <div className="marketing-cta-row">
               <Link href="/cadastro" className="marketing-button">
