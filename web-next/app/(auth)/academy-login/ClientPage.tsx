@@ -100,7 +100,8 @@ export default function AcademyLoginPage() {
           <span>Email</span>
           <input
             type="email"
-            placeholder="seuemail@mhpersonal.com"
+            autoComplete="email"
+            placeholder="seu@email.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             className="auth-input"
@@ -111,6 +112,7 @@ export default function AcademyLoginPage() {
           <div className="auth-password">
             <input
               type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
               placeholder="********"
               value={password}
               onChange={(event) => setPassword(event.target.value)}

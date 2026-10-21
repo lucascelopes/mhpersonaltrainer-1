@@ -89,6 +89,7 @@ export default function RegisterPersonalPage() {
           <span>Nome completo</span>
           <input
             type="text"
+            autoComplete="name"
             placeholder="Seu nome"
             value={name}
             onChange={(event) => setName(event.target.value)}
@@ -99,7 +100,8 @@ export default function RegisterPersonalPage() {
           <span>Email</span>
           <input
             type="email"
-            placeholder="seuemail@mhpersonal.com"
+            autoComplete="email"
+            placeholder="seu@email.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             className="auth-input"
@@ -109,6 +111,7 @@ export default function RegisterPersonalPage() {
           <span>Senha</span>
           <input
             type="password"
+            autoComplete="new-password"
             placeholder="********"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
@@ -119,6 +122,7 @@ export default function RegisterPersonalPage() {
           <span>Confirmar senha</span>
           <input
             type="password"
+            autoComplete="new-password"
             placeholder="********"
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
