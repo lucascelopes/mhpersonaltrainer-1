@@ -253,7 +253,7 @@ const ensureUserDocument = async (
       created_time: serverTimestamp(),
       last_active_time: serverTimestamp(),
       professorAccount: false,
-      admin: isAdminEmail(email),
+      admin: false,
       academyAccount: false,
       assinatura: false,
       planoChatGPT: false,
@@ -267,9 +267,6 @@ const ensureUserDocument = async (
   if (!data?.display_name && displayName) updates.display_name = displayName;
   if (!data?.photo_url && photoUrl) updates.photo_url = photoUrl;
   if (!data?.email && email) updates.email = email;
-  const shouldBeAdmin = isAdminEmail(email);
-  if (shouldBeAdmin && !toBool(data?.admin)) updates.admin = true;
-  if (!shouldBeAdmin && toBool(data?.admin)) updates.admin = false;
   if (Object.keys(updates).length > 0) {
     await updateDoc(userRef, updates);
   }
@@ -350,7 +347,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const userData = await fetchUserDoc(firebaseUser.uid);
         if (!mounted) return;
         if (userData) {
-          const shouldBeAdmin = isAdminEmail(userData.email);
           const updates: Record<string, any> = {
             last_active_time: serverTimestamp(),
           };
@@ -368,13 +364,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             nextUser = { ...nextUser, codigoPersonal: personalCode };
           }
 
-          if (shouldBeAdmin && !userData.admin) {
-            updates.admin = true;
-            nextUser = { ...nextUser, admin: true };
-          } else if (!shouldBeAdmin && userData.admin) {
-            updates.admin = false;
-            nextUser = { ...nextUser, admin: false };
-          }
           setUserState(nextUser);
           await updateDoc(doc(db, 'users', firebaseUser.uid), updates);
         } else {
@@ -549,11 +538,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           created_time: serverTimestamp(),
           last_active_time: serverTimestamp(),
           professorAccount: false,
-          admin: isAdminEmail(email),
           assinatura: false,
           planoChatGPT: false,
           acessoSuspenso: false,
           ...payloadAdditional,
+          admin: false,
         });
         await refreshUser();
         return { success: true };
