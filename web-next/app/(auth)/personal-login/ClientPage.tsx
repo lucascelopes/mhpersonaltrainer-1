@@ -63,6 +63,7 @@ export default function PersonalLoginPage() {
           <span>Email</span>
           <input
             type="email"
+            autoComplete="email"
             placeholder="personal@mhpersonal.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
@@ -74,6 +75,7 @@ export default function PersonalLoginPage() {
           <div className="auth-password">
             <input
               type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
               placeholder="********"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
