@@ -1,0 +1,918 @@
+:root[data-theme='dark'] .app-shell-personal-portal {
+  background: #0b1423 !important;
+  color: #e5edf8;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal {
+  background: #0b1423 !important;
+  color: #e5edf8;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .page-header {
+  border-color: #27394f;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .page-header h1,
+:root[data-theme='dark'] .app-content-personal-portal :where(h1, h2, h3, h4) {
+  color: #edf4ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .page-header .subtle,
+:root[data-theme='dark'] .app-content-personal-portal .subtle {
+  color: #aab8ca;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .card,
+:root[data-theme='dark'] .app-content-personal-portal .portal-card {
+  border-color: #2b4058;
+  background: #142338;
+  color: #e5edf8;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .portal-card--highlight {
+  background: linear-gradient(135deg, rgba(16, 24, 40, 0.98), rgba(25, 36, 56, 0.96));
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .student-profile-hero::before {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(58, 136, 212, 0.2), transparent 45%),
+    radial-gradient(circle at 88% 12%, rgba(148, 163, 184, 0.16), transparent 48%);
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .student-profile-identity h2,
+:root[data-theme='dark'] .app-content-personal-portal .student-profile-metric,
+:root[data-theme='dark'] .app-content-personal-portal .student-profile-metric strong {
+  color: #e5edf8;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .student-profile-title-row .pill {
+  border-color: rgba(114, 178, 238, 0.32);
+  background: rgba(58, 136, 212, 0.22);
+  color: #dbe8ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .student-profile-avatar-legend,
+:root[data-theme='dark'] .app-content-personal-portal .student-profile-metric span,
+:root[data-theme='dark'] .app-content-personal-portal .student-profile-action span {
+  color: #b8c6dd;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal :where(label) {
+  color: #d4e0ef;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal :where(input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']), select, textarea) {
+  border-color: #405570 !important;
+  background-color: #0d192a !important;
+  color: #e8f0fb !important;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal :where(input, textarea)::placeholder {
+  color: #aab8ca;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .button.secondary,
+:root[data-theme='dark'] .app-content-personal-portal .button.ghost,
+:root[data-theme='dark'] .app-content-personal-portal .button.outline {
+  border-color: #354a63;
+  background: #1a2b41;
+  color: #dbe8f8;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .student-profile-action {
+  border-color: #2b4058;
+  background: #0c1422;
+  color: #e8eef9;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .student-profile-action:hover {
+  border-color: rgba(114, 178, 238, 0.46);
+}
+
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-header {
+  border-bottom-color: #2b4058;
+  background: rgba(12, 20, 34, 0.97);
+  color: #e5edf8;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.24);
+}
+
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-brand img {
+  filter: brightness(0) invert(1) !important;
+}
+
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-primary-nav a,
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-icon-button,
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-more summary,
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-account summary {
+  color: #b8c6dd;
+}
+
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-primary-nav a:hover,
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-primary-nav a.is-active {
+  color: #edf4ff;
+}
+
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-search {
+  border-color: #354a63;
+  background: #0d192a;
+}
+
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-search button,
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-search input {
+  color: #e8f0fb;
+}
+
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-theme.theme-toggle-button {
+  border-color: #354a63;
+  background: #1a2b41;
+  color: #dbe8f8;
+}
+
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-menu-button {
+  border-color: #354a63;
+  background: #1a2b41;
+  color: #dbe8f8;
+}
+
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-account-copy strong {
+  color: #edf4ff;
+}
+
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-account-copy small {
+  color: #aab8ca;
+}
+
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-avatar {
+  background: #203b5c;
+  color: #edf4ff;
+}
+
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-popover {
+  border-color: #354a63;
+  background: #111f32;
+  color: #e5edf8;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.42);
+}
+
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-popover p {
+  color: #aab8ca;
+}
+
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-popover a,
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-popover button {
+  color: #dbe8f8;
+}
+
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-popover a:hover,
+:root[data-theme='dark'] .app-shell-personal-portal .personal-portal-popover button:hover {
+  background: #203b5c;
+  color: #ffffff;
+}
+
+@media (max-width: 640px) {
+  :root[data-theme='dark'] .app-shell-personal-portal .personal-bottom-nav {
+    border-top-color: #2b4058;
+    background: rgba(17, 31, 50, 0.98);
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.34);
+  }
+
+  :root[data-theme='dark'] .app-shell-personal-portal .personal-nav-link {
+    color: #b7c6d9;
+  }
+
+  :root[data-theme='dark'] .app-shell-personal-portal .personal-nav-link.active {
+    color: #9bc8ff;
+  }
+}
+
+@media (max-width: 380px) {
+  .app-content-personal-portal .student-profile-file {
+    box-sizing: border-box;
+    min-width: 0;
+    padding-inline: 6px;
+    font-size: 12px;
+  }
+
+  .app-content-personal-portal .student-profile-file::file-selector-button,
+  .app-content-personal-portal .student-profile-file::-webkit-file-upload-button {
+    margin-right: 6px;
+    padding-inline: 7px;
+    font-size: 12px;
+  }
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students {
+  background: #0b1423;
+  color: #e5edf8;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-heading {
+  border-bottom-color: #27394f;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-heading > div:first-child > p,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-metrics span,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-table-header,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-code span,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-invite > label > span {
+  color: #aab8ca;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-metrics small {
+  color: #86efac;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-heading h1,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-metrics strong,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-section-head h2,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-invite h2,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-insights h2,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-person strong,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-plan strong,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-activity strong,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-tip strong,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-empty strong {
+  color: #edf4ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-heading > div:first-child > span,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-section-head p,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-invite > p,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-insights p,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-person small,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-plan small,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-activity small,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-tip span,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-code small,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-chart span {
+  color: #b8c6dd;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-metrics,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-metrics div,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-main-grid,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-invite,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-table,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-row,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-tip,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-chart,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-observations {
+  border-color: #2b4058;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-roster,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-invite {
+  background: #111f32;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-invite {
+  border-left-color: #2b4058;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-filters button {
+  background: #1a2b41;
+  color: #c7d4e6;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-filters button span {
+  background: rgba(148, 163, 184, 0.2);
+  color: #e5edf8;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-filters button.is-active {
+  background: #0874ed;
+  color: #fff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-filters button.is-active span {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-row:hover {
+  background: rgba(58, 136, 212, 0.12);
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-person i {
+  background: #203b5c;
+  color: #edf4ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-status {
+  background: rgba(22, 101, 52, 0.3);
+  color: #86efac;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-status.is-attention {
+  background: rgba(127, 29, 29, 0.32);
+  color: #fecaca;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-status.is-new {
+  background: rgba(30, 64, 175, 0.3);
+  color: #bfdbfe;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-loading,
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-empty {
+  border-color: #354a63;
+  background: #0d192a;
+  color: #b8c6dd;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-code {
+  background: #0d192a;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-invite > label input {
+  border-color: #405570;
+  background: #0d192a;
+  color: #e8f0fb;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-copy.secondary {
+  border-color: #3989ed;
+  color: #9bc8ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-feedback {
+  color: #86efac;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard {
+  background: #0b1423 !important;
+  color: #e5edf8;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-content {
+  color: #e5edf8;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-intro,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-primary-grid,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-secondary-grid {
+  border-color: #27394f;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-primary-grid > article + article,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-secondary-grid > article + article {
+  border-color: #2b4058;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-eyebrow,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-lead,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-profile-copy small,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-metrics span,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-section-heading p,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-timeline time,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-session small,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-student-copy small,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-feedback-row small,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-chart-legend,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-chart small {
+  color: #aab8ca;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard h1,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard h2,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard h3,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard h4,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-metrics strong,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-session strong,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-student-copy strong,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-feedback-row strong,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-empty-block strong {
+  color: #edf4ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-metrics small {
+  color: #86efac;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-metrics > div,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-session,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-student-row,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-feedback-row {
+  border-color: #2b4058;
+  background: #111f32;
+  color: #e5edf8;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-portrait,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-student-avatar {
+  border-color: #354a63;
+  background: #203b5c;
+  color: #edf4ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-empty-block,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-chart-empty {
+  border-color: #354a63;
+  background: #0d192a;
+  color: #b8c6dd;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-empty-block a,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-inline-link,
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-outline-button {
+  color: #9bc8ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-outline-button {
+  border-color: #3989ed;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-student-row em.is-muted {
+  background: #1a2b41;
+  color: #c7d4e6;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-student-row em.is-success {
+  background: rgba(22, 101, 52, 0.3);
+  color: #86efac;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-chart {
+  border-color: #2b4058;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-chart-value {
+  color: #dbe8f8;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-dashboard-chart-columns b {
+  background: #354a63;
+}
+
+@media (max-width: 640px) {
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_dashboard__'] {
+    color: #e5edf8;
+  }
+
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_eyebrow__'],
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_intro__'] > p:last-child,
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_sectionHeading__'] p,
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_agendaCard__'] > p,
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_sessionList__'] time,
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_sessionList__'] a span,
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_action__'] small {
+    color: #b8c6dd;
+  }
+
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_intro__'] h1,
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_sectionHeading__'] h2,
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_metric__'] strong,
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_agendaCard__'] > strong,
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_action__'] {
+    color: #edf4ff;
+  }
+
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_metric__'],
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_action__'],
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_sessionList__'] a {
+    border-color: #2b4058;
+    background: #142338;
+    color: #e5edf8;
+  }
+
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_metric__'] > span:last-child {
+    color: #b8c6dd;
+  }
+
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_metricIcon__'],
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_agendaIcon__'],
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_actionIcon__'] {
+    background: #203b5c;
+    color: #9bc8ff;
+  }
+
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_agendaCard__'] {
+    border-color: #354a63;
+    background: #111f32;
+    color: #edf4ff;
+  }
+
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_weekLink__'],
+  :root[data-theme='dark'] .app-content-personal-dashboard [class*='PersonalDashboardMobile_agendaTextLink__'] {
+    color: #9bc8ff;
+  }
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-page {
+  background: #0b1423 !important;
+  color: #e5edf8;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-kicker,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-hero p:not(.personal-workouts-kicker),
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-student-copy span,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-week-head p,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-week-empty span,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-day span,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-day footer,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-assistant > p:not(.personal-workouts-assistant-label),
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-assistant-note span,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-recent-item > span,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-recent-item small,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-footer-strip p:not(.personal-workouts-kicker),
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-bars i span,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-feedback span {
+  color: #b8c6dd;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-hero h1,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-week-head h2,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-week-empty strong,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-day > small,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-day a,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-day > div,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-assistant h2,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-assistant-note strong,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-section-heading h2,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-footer-strip h2,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-feedback strong,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-student-copy strong {
+  color: #edf4ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-focus,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-recent,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-footer-strip {
+  border-color: #27394f;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-week-card,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-recent-list,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-recent-item {
+  border-color: #2b4058;
+  background: #111f32;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-week-head,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-day,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-assistant,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-feedback {
+  border-color: #2b4058;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-day a,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-assistant-note {
+  background: #1a2b41;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-day > small em {
+  color: #aab8ca;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-day footer b,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-recent-item small.is-completed,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-week-head > span {
+  color: #86efac;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-week-empty,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-empty,
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-bars-empty {
+  border-color: #354a63;
+  color: #b8c6dd;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-assistant-label {
+  background: rgba(58, 136, 212, 0.24);
+  color: #9bc8ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-assistant > a {
+  color: #9bc8ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-workouts-bars {
+  border-color: #2b4058;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-page {
+  background: #0b1423 !important;
+  color: #e5edf8;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-heading p,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-heading span,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-student p,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-profile-detail span,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-section-head p,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-chart-legend,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-visuals p,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-photo-cards span,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-table-row,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-summary-head span,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-metric-grid span,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-metric-grid small,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-next-step p,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-recent > a em {
+  color: #b8c6dd;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-heading h1,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-student h2,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-profile-detail strong,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-section-head h2,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-summary h2,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-visuals h3,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-timeline h3,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-recent h3,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-metric-grid strong,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-photo-cards strong,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-recent > a {
+  color: #edf4ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-profile,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-evolution,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-summary {
+  border-color: #2b4058;
+  background: #111f32;
+  color: #e5edf8;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-profile-detail,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-timeline,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-recent,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-recent > a {
+  border-color: #2b4058;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-student-avatar {
+  background: #203b5c;
+  color: #edf4ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-name-line b {
+  background: rgba(22, 101, 52, 0.3);
+  color: #86efac;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-tabs {
+  border-color: #354a63;
+  background: #0d192a;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-tabs button {
+  color: #b8c6dd;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-tabs button.is-active {
+  background: #0874ed;
+  color: #fff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-photo-stage,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-photo-cards > div,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-silhouette,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-metric-grid > div {
+  border-color: #354a63;
+  background: #0d192a;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-table {
+  border-color: #354a63;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-table-head {
+  background: #1a2b41;
+  color: #b8c6dd;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-table-row:hover {
+  background: #203b5c;
+  color: #edf4ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-next-step {
+  background: #1a2b41;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-next-step span,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-visuals button,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-timeline-head a,
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-recent > div a {
+  color: #9bc8ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-actions button {
+  border-color: #3989ed;
+  background: #1a2b41;
+  color: #9bc8ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-actions button:hover {
+  background: #203b5c;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal .personal-evaluations-empty {
+  border-color: #354a63;
+  background: #0d192a;
+  color: #b8c6dd;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_page__'] {
+  color: #e5edf8;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_overview__'] {
+  border-color: #27394f;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_overview__'] p,
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_headStats__'] small {
+  color: #b8c6dd;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_headStats__'] {
+  border-color: #2b4058;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_headStats__'] > div {
+  border-color: #2b4058;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_headStats__'] strong {
+  color: #edf4ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_headStats__'] span {
+  color: #aab8ca;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_periodButton__'],
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_calendarCard__'],
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_dayPanel__'],
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_weekSummary__'] {
+  border-color: #2b4058;
+  background: #111f32;
+  color: #e5edf8;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_periodButton__'] small,
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_summaryIntro__'] p,
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_weekSummary__'] span {
+  color: #b8c6dd;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_calendarToolbar__'],
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_calendarTitle__'],
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_weekHeader__'],
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_dayHeader__'],
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_timeGutter__'],
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_dayColumn__'],
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_hourCell__'] {
+  border-color: #2b4058;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_iconButton__'],
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_filterButton__'],
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_todayButton__'] {
+  border-color: #354a63;
+  background: #1a2b41;
+  color: #dbe8f8;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_filters__'] {
+  border-color: #354a63;
+  background: #111f32;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.4);
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_filter__'] {
+  border-color: #354a63;
+  background: #1a2b41;
+  color: #c7d4e6;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_filterActive__'] {
+  border-color: #3989ed;
+  background: #203b5c;
+  color: #dbe8ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_dayHeader__'] {
+  background: #111f32;
+  color: #dbe8f8;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_selectedDay__'] {
+  background: #203b5c;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_selectedDay__'] strong,
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_selectedDay__'] span {
+  color: #9bc8ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_timeGutter__'] span,
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_dayHeader__'] span,
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_panelHeading__'] p,
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_agendaHeading__'] span,
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_dayTime__'],
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_dayItemCopy__'] small,
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_message__'],
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_unscheduledNote__'] {
+  color: #b8c6dd;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_selectedColumn__'] {
+  background: rgba(58, 136, 212, 0.12);
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_training__'] {
+  background: rgba(30, 64, 175, 0.34);
+  color: #bfdbfe;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_evaluation__'] {
+  background: rgba(22, 101, 52, 0.34);
+  color: #bbf7d0;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_consultation__'] {
+  background: rgba(127, 29, 29, 0.34);
+  color: #fecaca;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_panelHeading__'] h3,
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_agendaHeading__'] h4,
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_summaryIntro__'] h3,
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_weekSummary__'] strong {
+  color: #edf4ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_nextCard__'] {
+  background: #1a2b41;
+  color: #dbe8f8;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_nextCard__'] > div {
+  color: #9bc8ff;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_nextCard__'] > small {
+  background: #203b5c;
+  color: #bfdbfe;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_nextRelative__'] {
+  color: #aab8ca;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_nextEmpty__'] {
+  background: #1a2b41;
+  color: #b8c6dd;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_agendaHeading__'],
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_dayItem__'] {
+  border-color: #2b4058;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_dayItem__'] {
+  color: #dbe8f8;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_dayItem__']:hover {
+  background: #1a2b41;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_panelHint__'] {
+  background: #2a2417;
+  color: #f3d18b;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_panelHint__'] p {
+  color: #d7c9a5;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_monthWeekday__'] {
+  border-color: #2b4058;
+  color: #b8c6dd;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_monthBlank__'],
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_monthDay__'] {
+  border-color: #2b4058;
+  background: #111f32;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_monthDay__'] {
+  color: #dbe8f8;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_monthDay__']:hover,
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_monthSelected__'] {
+  background: #203b5c;
+}
+
+:root[data-theme='dark'] .app-content-personal-portal [class*='schedule_monthDay__'] small {
+  color: #b8c6dd;
+}
