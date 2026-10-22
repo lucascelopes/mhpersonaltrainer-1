@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
-import { internalAuthRedirect } from '@/lib/authRedirect';
+import { generateAvailablePersonalCode } from '@/lib/services/personalCode';
 
-const generatePersonalCode = () => Math.floor(1000 + Math.random() * 9000);
+import { internalAuthRedirect } from '@/lib/authRedirect';
 
 export default function RegisterPersonalPage() {
   const { register, isAuthenticated } = useAuth();
@@ -62,7 +62,14 @@ export default function RegisterPersonalPage() {
     event.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    const code = generatePersonalCode();
+    let code: number;
+    try {
+      code = await generateAvailablePersonalCode();
+    } catch {
+      setLoading(false);
+      setError('Não foi possível verificar um código de personal. Tente novamente.');
+      return;
+    }
     const result = await register(email, password, name, {
       professorAccount: true,
       codigoPersonal: code,
