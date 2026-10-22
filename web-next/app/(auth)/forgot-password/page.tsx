@@ -20,20 +20,20 @@ export default function ForgotPasswordPage() {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!email) {
-      setError('Informe seu email.');
+    if (!email.trim()) {
+      setError('Informe seu e-mail.');
       return;
     }
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Email invalido.');
+    if (!/\S+@\S+\.\S+/.test(email.trim())) {
+      setError('E-mail inválido.');
       return;
     }
     setError('');
     setLoading(true);
-    const result = await resetPassword(email);
+    const result = await resetPassword(email.trim());
     setLoading(false);
     if (result.success) {
-      setMessage('Link enviado para seu email.');
+      setMessage('Link enviado para seu e-mail.');
     } else {
       setError(result.error || 'Erro ao enviar link.');
     }
@@ -44,30 +44,30 @@ export default function ForgotPasswordPage() {
       <div className="auth-card-header">
         <p className="auth-kicker">Recuperar acesso</p>
         <h1>Recuperar senha</h1>
-        <p className="subtle">Enviaremos um link de recuperacao para seu email.</p>
+        <p className="subtle">Enviaremos um link de recuperação para seu e-mail.</p>
       </div>
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="auth-form" onSubmit={handleSubmit} noValidate>
         <label className="auth-field">
-          <span>Email</span>
+          <span>E-mail</span>
           <input
             type="email"
             autoComplete="email"
+            autoCapitalize="none"
             placeholder="seuemail@mhpersonal.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             className="auth-input"
           />
         </label>
-        {message && <p className="auth-success">{message}</p>}
-        {error && <p className="auth-error">{error}</p>}
+        {message && <p className="auth-success" role="status">{message}</p>}
+        {error && <p className="auth-error" role="alert">{error}</p>}
         <button type="submit" className="auth-submit" disabled={loading}>
           {loading ? 'Enviando...' : 'Enviar link'}
         </button>
       </form>
-      <div className="auth-links">
-        <span className="subtle">Voltar para</span>
+      <div className="auth-links auth-links--account">
         <Link href={loginPath} className="auth-link">
-          login
+          Voltar para o login
         </Link>
       </div>
     </div>
