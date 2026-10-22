@@ -5,7 +5,6 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { generateAvailablePersonalCode } from '@/lib/services/personalCode';
-
 import { internalAuthRedirect } from '@/lib/authRedirect';
 
 export default function RegisterPersonalPage() {
@@ -30,28 +29,28 @@ export default function RegisterPersonalPage() {
   }, [isAuthenticated, redirectTo, router]);
 
   const validate = () => {
-    if (!name) {
-      setError('Nome obrigatorio.');
+    if (!name.trim()) {
+      setError('Nome obrigatório.');
       return false;
     }
-    if (!email) {
-      setError('Email obrigatorio.');
+    if (!email.trim()) {
+      setError('E-mail obrigatório.');
       return false;
     }
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Email invalido.');
+    if (!/\S+@\S+\.\S+/.test(email.trim())) {
+      setError('E-mail inválido.');
       return false;
     }
     if (!password) {
-      setError('Senha obrigatoria.');
+      setError('Senha obrigatória.');
       return false;
     }
     if (password.length < 6) {
-      setError('Senha deve ter pelo menos 6 caracteres.');
+      setError('A senha deve ter pelo menos 6 caracteres.');
       return false;
     }
     if (password !== confirmPassword) {
-      setError('Senhas nao coincidem.');
+      setError('As senhas não coincidem.');
       return false;
     }
     setError('');
@@ -70,7 +69,7 @@ export default function RegisterPersonalPage() {
       setError('Não foi possível verificar um código de personal. Tente novamente.');
       return;
     }
-    const result = await register(email, password, name, {
+    const result = await register(email.trim(), password, name.trim(), {
       professorAccount: true,
       codigoPersonal: code,
     });
@@ -89,10 +88,10 @@ export default function RegisterPersonalPage() {
         <p className="auth-kicker">Cadastro profissional</p>
         <h1>Crie sua conta de personal</h1>
         <p className="subtle">
-          Tenha um painel completo para treinos, avaliacoes, agenda e comunicacao.
+          Tenha um painel completo para treinos, avaliações, agenda e comunicação.
         </p>
       </div>
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="auth-form" onSubmit={handleSubmit} noValidate>
         <label className="auth-field">
           <span>Nome completo</span>
           <input
@@ -105,10 +104,11 @@ export default function RegisterPersonalPage() {
           />
         </label>
         <label className="auth-field">
-          <span>Email</span>
+          <span>E-mail</span>
           <input
             type="email"
             autoComplete="email"
+            autoCapitalize="none"
             placeholder="seuemail@mhpersonal.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
@@ -137,10 +137,10 @@ export default function RegisterPersonalPage() {
             className="auth-input"
           />
         </label>
-        {error && <p className="auth-error">{error}</p>}
+        {error && <p className="auth-error" role="alert">{error}</p>}
         {personalCode && (
           <div className="auth-code">
-            <span>Seu codigo de personal</span>
+            <span>Seu código de personal</span>
             <strong>{personalCode}</strong>
           </div>
         )}
@@ -159,7 +159,7 @@ export default function RegisterPersonalPage() {
         )}
       </form>
       <div className="auth-links auth-links--account">
-        <span className="subtle">Ja tem conta?</span>
+        <span className="subtle">Já tem conta?</span>
         <Link href="/personal-login" className="auth-link">
           Entrar
         </Link>
