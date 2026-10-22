@@ -4,13 +4,14 @@ import Link from 'next/link';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
+import { internalAuthRedirect } from '@/lib/authRedirect';
 
 const resolveRedirect = (redirectParam: string | null) => {
-  if (!redirectParam) return '/app';
-  if (redirectParam.startsWith('/admin') || redirectParam.startsWith('/academy')) {
+  const destination = internalAuthRedirect(redirectParam, '/app');
+  if (destination.startsWith('/admin') || destination.startsWith('/academy')) {
     return '/app';
   }
-  return redirectParam;
+  return destination;
 };
 
 export default function LoginAlunoPage() {

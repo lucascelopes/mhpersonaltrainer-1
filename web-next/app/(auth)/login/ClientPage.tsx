@@ -18,6 +18,7 @@ import {
 } from '@phosphor-icons/react';
 import BrandLockup from '@/components/BrandLockup';
 import { useAuth } from '@/lib/auth';
+import { internalAuthRedirect } from '@/lib/authRedirect';
 import { isMobileOrTablet } from '@/lib/device';
 import { getMobileAppUrl } from '@/lib/mobileApp';
 import styles from './login.module.css';
@@ -33,14 +34,14 @@ export default function LoginPage() {
     return '/app';
   };
   const resolveRedirect = (currentRole: typeof role) => {
-    if (!redirectParam) return getDefaultRedirect(currentRole);
-    if (redirectParam.startsWith('/academy') && currentRole !== 'academy') {
+    const destination = internalAuthRedirect(redirectParam, getDefaultRedirect(currentRole));
+    if (destination.startsWith('/academy') && currentRole !== 'academy') {
       return getDefaultRedirect(currentRole);
     }
-    if (redirectParam.startsWith('/admin') && currentRole !== 'admin') {
+    if (destination.startsWith('/admin') && currentRole !== 'admin') {
       return getDefaultRedirect(currentRole);
     }
-    return redirectParam;
+    return destination;
   };
   const redirectTo = resolveRedirect(role);
 

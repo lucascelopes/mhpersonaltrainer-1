@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
+import { internalAuthRedirect } from '@/lib/authRedirect';
 import { isMobileOrTablet } from '@/lib/device';
 import { getMobileAppUrl } from '@/lib/mobileApp';
 
@@ -13,7 +14,7 @@ export default function RegisterPage() {
   const { register, isAuthenticated } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/app';
+  const redirectTo = internalAuthRedirect(searchParams.get('redirect'), '/app');
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');

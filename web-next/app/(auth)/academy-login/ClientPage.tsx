@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
+import { internalAuthRedirect } from '@/lib/authRedirect';
 
 export default function AcademyLoginPage() {
   const { login, loginWithGoogle, loginWithApple, logout, isAuthenticated, role } = useAuth();
@@ -16,14 +17,14 @@ export default function AcademyLoginPage() {
     return '/app';
   };
   const resolveRedirect = (currentRole: typeof role) => {
-    if (!redirectParam) return getDefaultRedirect(currentRole);
-    if (redirectParam.startsWith('/academy') && currentRole !== 'academy') {
+    const destination = internalAuthRedirect(redirectParam, getDefaultRedirect(currentRole));
+    if (destination.startsWith('/academy') && currentRole !== 'academy') {
       return getDefaultRedirect(currentRole);
     }
-    if (redirectParam.startsWith('/admin') && currentRole !== 'admin') {
+    if (destination.startsWith('/admin') && currentRole !== 'admin') {
       return getDefaultRedirect(currentRole);
     }
-    return redirectParam;
+    return destination;
   };
 
   const [email, setEmail] = useState('');

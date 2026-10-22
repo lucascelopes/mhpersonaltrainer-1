@@ -4,12 +4,13 @@ import Link from 'next/link';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
+import { internalAuthRedirect } from '@/lib/authRedirect';
 
 export default function PersonalLoginPage() {
   const { loginAsPersonal, isAuthenticated } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/app';
+  const redirectTo = internalAuthRedirect(searchParams.get('redirect'), '/app');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
