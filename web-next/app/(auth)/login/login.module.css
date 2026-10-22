@@ -418,9 +418,9 @@
 
   .loginPage :global(.auth-access-item),
   :global(:root[data-theme='dark']) .loginPage :global(.auth-access-item) {
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 8px;
-    padding: 10px 12px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding: 14px;
     border: 1px solid #d6e4f2;
     border-radius: 12px;
     background: rgba(255, 255, 255, 0.82);
@@ -432,16 +432,23 @@
 
   .loginPage :global(.auth-access-title) {
     color: #193455;
-    font-size: 0.8rem;
+    font-size: 0.875rem;
   }
 
   .loginPage :global(.auth-access-actions) {
-    justify-content: flex-end;
-    gap: 5px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+  }
+
+  .loginPage :global(.auth-access-item:first-child .auth-access-actions) {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .loginPage :global(.auth-link-chip) {
     display: inline-flex;
+    min-width: 0;
     min-height: 48px;
     align-items: center;
     justify-content: center;
@@ -450,7 +457,7 @@
     border-radius: 12px;
     background: #f7fbff;
     color: #0b5fc1;
-    font-size: 0.76rem;
+    font-size: 0.875rem;
     font-weight: 700;
     line-height: 1.2;
     text-align: center;
