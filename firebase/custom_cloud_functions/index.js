@@ -66,3 +66,6 @@ exports.notifyPersonalOnStudentMessage =
 const notificationAiDispatcher = require("./notification_ai_dispatcher.js");
 exports.runNotificationAssistantAutoDispatch =
   notificationAiDispatcher.runNotificationAssistantAutoDispatch;
+
+const academyRegistration = require('./academy_registration.js');
+exports.registerAcademyWithCode = academyRegistration.registerAcademyWithCode;

@@ -31,6 +31,7 @@ import type { AuthState, User, UserRole } from './types/user';
 import { firestoreService } from './services/firestoreService';
 import { notifyUserLoginSecurityAlert } from './services/notificationCenter';
 import { inviteErrorMessage, registerStudentWithInvite } from './services/personalInvite';
+import { academyRegistrationErrorMessage, registerAcademyWithCode } from './services/academyRegistration';
 
 interface AuthContextValue extends AuthState {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
@@ -42,7 +43,7 @@ interface AuthContextValue extends AuthState {
     password: string,
     displayName: string,
     additionalData?: Partial<User>
-  ) => Promise<{ success: boolean; error?: string }>;
+  ) => Promise<{ success: boolean; error?: string; academyCode?: number }>;
   logout: () => Promise<{ success: boolean; error?: string }>;
   resetPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
   refreshUser: () => Promise<void>;
@@ -510,6 +511,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     ) => {
       try {
         const payloadAdditional: Partial<User> = { ...(additionalData || {}) };
+        if (toBool(payloadAdditional.academyAccount)) {
+          let academyCode: number;
+          try {
+            academyCode = await registerAcademyWithCode({ name: displayName, email, password });
+          } catch (academyError) {
+            return { success: false, error: academyRegistrationErrorMessage(academyError) };
+          }
+          try {
+            await signInWithEmailAndPassword(auth, email, password);
+            await refreshUser();
+            return { success: true, academyCode };
+          } catch {
+            return {
+              success: false,
+              academyCode,
+              error: 'Conta criada. Entre com seu e-mail e senha para continuar.',
+            };
+          }
+        }
         const shouldCheckStudentCapacity = !toBool(payloadAdditional.professorAccount);
         const personalCodeCandidate = shouldCheckStudentCapacity
           ? normalizePersonalCodeValue(payloadAdditional.codigoPersonal)

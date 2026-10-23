@@ -6,8 +6,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { internalAuthRedirect } from '@/lib/authRedirect';
 
-const generateAcademyCode = () => Math.floor(10000 + Math.random() * 90000);
-
 export default function RegisterAcademyPage() {
   const { register, isAuthenticated } = useAuth();
   const router = useRouter();
@@ -62,17 +60,15 @@ export default function RegisterAcademyPage() {
     event.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    const code = generateAcademyCode();
     const result = await register(email, password, name, {
       academyAccount: true,
       admin: false,
       professorAccount: false,
-      codigoAcademia: code,
     });
     setLoading(false);
-    if (result.success) {
+    if (result.success && result.academyCode) {
       setSuccess(true);
-      setAcademyCode(code);
+      setAcademyCode(result.academyCode);
     } else {
       setError(result.error || 'Erro ao cadastrar.');
     }
