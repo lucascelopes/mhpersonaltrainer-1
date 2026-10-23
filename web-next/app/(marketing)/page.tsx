@@ -57,7 +57,7 @@ export default function MarketingHome() {
             <p>A MH transforma rotina em acompanhamento de verdade — com treino, conversa, avaliação e IA no mesmo fluxo.</p>
             <div className={styles.actions}>
               <MobileAwareLink href="/register-personal" mobilePath="/register-personal" className={styles.primaryBtn}>Criar minha conta <span>→</span></MobileAwareLink>
-              <a href="#produto" className={styles.secondaryBtn}>Assistir ao demo</a>
+              <a href="#produto" className={styles.secondaryBtn}>Ver o produto</a>
             </div>
             <small>Comece agora e leve um acompanhamento mais completo para seus alunos.</small>
           </div>
