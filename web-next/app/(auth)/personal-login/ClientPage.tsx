@@ -92,7 +92,7 @@ export default function PersonalLoginPage() {
             </button>
           </div>
         </label>
-        {error && <p className="auth-error">{error}</p>}
+        {error && <p className="auth-error" role="alert">{error}</p>}
         <button type="submit" className="auth-submit" disabled={loading}>
           {loading ? 'Entrando...' : 'Entrar no painel'}
         </button>

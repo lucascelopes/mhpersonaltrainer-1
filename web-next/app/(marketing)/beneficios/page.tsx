@@ -67,7 +67,7 @@ const features = [
 
 export default function BeneficiosPage() {
   return (
-    <div className="marketing-page">
+    <main className="marketing-page">
       <section className="marketing-hero marketing-hero--compact">
         <div className="container marketing-hero-grid">
           <div className="marketing-hero-copy">
@@ -179,7 +179,7 @@ export default function BeneficiosPage() {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }
 

@@ -139,7 +139,7 @@ export default function RegisterAcademyPage() {
             className="auth-input"
           />
         </label>
-        {error && <p className="auth-error">{error}</p>}
+        {error && <p className="auth-error" role="alert">{error}</p>}
         {success ? (
           <button type="button" className="auth-submit" onClick={() => router.replace(redirectTo)}>
             Ir para o painel

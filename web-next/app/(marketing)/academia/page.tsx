@@ -99,7 +99,7 @@ const showcases = [
 
 export default function AcademiaPage() {
   return (
-    <div className={styles.page}>
+    <main className={styles.page}>
       <section className={styles.hero}>
         <div className={`container ${styles.heroGrid}`}>
           <div className={styles.heroCopy}>
@@ -219,7 +219,7 @@ export default function AcademiaPage() {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }
 

@@ -54,7 +54,7 @@ const values = [
 
 export default function EquipePage() {
   return (
-    <div className={`marketing-page ${styles.page}`}>
+    <main className={`marketing-page ${styles.page}`}>
       <section className="marketing-hero marketing-hero--compact">
         <div className="container marketing-hero-grid">
           <div className="marketing-hero-copy">
@@ -144,7 +144,7 @@ export default function EquipePage() {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }
 

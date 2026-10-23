@@ -16,13 +16,13 @@ export const metadata: Metadata = {
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="auth-shell">
-      <div className="container auth-grid">
+      <main className="container auth-grid">
         <aside className="auth-hero">
           <Link href="/" className="auth-brand" aria-label="MH Personal Trainer — início">
             <BrandLockup width={164} height={52} priority />
           </Link>
           <span className="auth-eyebrow">Plataforma completa</span>
-          <h1 className="auth-title">Treinos, avaliações e agenda no mesmo lugar.</h1>
+          <p className="auth-title">Treinos, avaliações e agenda no mesmo lugar.</p>
           <p className="auth-lead">
             Tudo o que aluno, personal e academia precisam para evoluir: IA para treinos,
             avaliação completa, chat direto e relatórios de progresso.
@@ -55,7 +55,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           {children}
           <p className="auth-note">Seus dados ficam protegidos e sincronizados em todos os dispositivos.</p>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

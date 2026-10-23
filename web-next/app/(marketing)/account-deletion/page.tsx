@@ -94,7 +94,7 @@ const deletionTimeline = [
 
 export default function AccountDeletionPage() {
   return (
-    <div className="marketing-page legal-page">
+    <main className="marketing-page legal-page">
       <section className="legal-hero">
         <div className="container legal-hero-grid">
           <div className="legal-hero-copy">
@@ -230,7 +230,7 @@ export default function AccountDeletionPage() {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }
 

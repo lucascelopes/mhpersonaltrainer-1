@@ -104,7 +104,7 @@ const termsUpdates = [
 
 export default function TermsPage() {
   return (
-    <div className="marketing-page legal-page">
+    <main className="marketing-page legal-page">
       <section className="legal-hero">
         <div className="container legal-hero-grid">
           <div className="legal-hero-copy">
@@ -240,7 +240,7 @@ export default function TermsPage() {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }
 
