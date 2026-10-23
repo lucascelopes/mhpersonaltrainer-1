@@ -270,6 +270,10 @@
   border-left-color: #2b4058;
 }
 
+:root[data-theme='dark'] .app-content-personal-portal .personal-students-row {
+  background: #172940;
+}
+
 :root[data-theme='dark'] .app-content-personal-portal .personal-students-filters button {
   background: #1a2b41;
   color: #c7d4e6;
@@ -291,7 +295,7 @@
 }
 
 :root[data-theme='dark'] .app-content-personal-portal .personal-students-row:hover {
-  background: rgba(58, 136, 212, 0.12);
+  background: #1e3755;
 }
 
 :root[data-theme='dark'] .app-content-personal-portal .personal-students-person i {
