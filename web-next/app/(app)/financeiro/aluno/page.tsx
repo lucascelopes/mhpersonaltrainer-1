@@ -157,15 +157,15 @@ export default function FinanceiroAlunoPage() {
                   )}
                   {!payment.pago && (
                     <div className="finance-payment-actions">
-                      <button
-                        type="button"
-                        className="button secondary sm"
-                        onClick={() => handleOpenPayment(payment.checkoutUrl)}
-                        disabled={!payment.checkoutUrl}
-                      >
-                        Pagar com Stripe
-                      </button>
-                      {!payment.checkoutUrl && (
+                      {payment.checkoutUrl ? (
+                        <button
+                          type="button"
+                          className="button secondary sm"
+                          onClick={() => handleOpenPayment(payment.checkoutUrl)}
+                        >
+                          Pagar com Stripe
+                        </button>
+                      ) : (
                         <span className="finance-payment-hint">Aguardando link do personal</span>
                       )}
                     </div>
