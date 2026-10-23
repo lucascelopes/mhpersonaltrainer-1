@@ -2,6 +2,10 @@
   min-width: 0;
 }
 
+.page :global(#nova-fatura) {
+  scroll-margin-top: 88px;
+}
+
 .page :global(.finance-personal-grid),
 .page :global(.finance-personal-main),
 .page :global(.finance-personal-side),
