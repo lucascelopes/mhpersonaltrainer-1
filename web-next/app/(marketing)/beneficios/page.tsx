@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { buildMarketingMetadata } from '@/lib/seo';
 import MobileAwareLink from '@/components/MobileAwareLink';
 
-import heroPhotoTwo from '@/assets/3[1].jpg';
-import heroPhotoThree from '@/assets/4[1].jpg';
-import appPreviewAlt from '@/assets/Design-sem-nome-49-scaled.webp';
+import personalPhoto from '@/assets/landing-comparison-v2.png';
+import studentPhoto from '@/assets/landing-hero-gym-v2.png';
+import academyPhoto from '@/assets/landing-audience-trainer-v2.png';
 
 export const metadata: Metadata = buildMarketingMetadata({
   title: 'Beneficios do MH Personal Trainer para aluno, personal e academia',
@@ -90,8 +90,8 @@ export default function BeneficiosPage() {
             <div className="device-stack device-stack--compact">
               <div className="device-card device-card--tall">
                 <Image
-                  src={heroPhotoThree}
-                  alt="Tela do aluno com treinos e progresso"
+                  src={studentPhoto}
+                  alt="Personal acompanha uma aluna durante o treino"
                   fill
                   priority
                   sizes="(max-width: 900px) 90vw, 520px"
@@ -100,8 +100,8 @@ export default function BeneficiosPage() {
               </div>
               <div className="device-card">
                 <Image
-                  src={heroPhotoTwo}
-                  alt="Tela do personal criando treinos"
+                  src={personalPhoto}
+                  alt="Personal e aluna conferem o aplicativo juntos"
                   fill
                   sizes="(max-width: 900px) 90vw, 240px"
                 />
@@ -109,8 +109,8 @@ export default function BeneficiosPage() {
               </div>
               <div className="device-card">
                 <Image
-                  src={appPreviewAlt}
-                  alt="Painel web da academia"
+                  src={academyPhoto}
+                  alt="Profissional da equipe em uma academia"
                   fill
                   sizes="(max-width: 900px) 90vw, 240px"
                 />

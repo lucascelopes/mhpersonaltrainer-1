@@ -125,6 +125,7 @@
 
 .mainShot img {
   object-fit: cover;
+  object-position: center top;
 }
 
 .mainShot > span,
@@ -161,6 +162,11 @@
 
 .sideShot img {
   object-fit: cover;
+  object-position: center top;
+}
+
+.sideShot:last-child img {
+  object-position: center 30%;
 }
 
 .section,

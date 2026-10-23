@@ -3,9 +3,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { buildMarketingMetadata } from '@/lib/seo';
 
-import appPreviewAlt from '@/assets/Design-sem-nome-49-scaled.webp';
-import personalPreview from '@/assets/3[1].jpg';
-import studentPreview from '@/assets/4[1].jpg';
+import heroTeamPhoto from '@/assets/landing-comparison-v2.png';
+import personalPreview from '@/assets/Design-sem-nome-50.webp';
+import studentPreview from '@/assets/landing-audience-trainer-v2.png';
+import appPreview from '@/assets/Design-sem-nome-49-scaled.webp';
 
 import styles from './page.module.css';
 
@@ -74,25 +75,25 @@ const operations = [
 
 const showcases = [
   {
-    title: 'Painel de comando da academia',
-    text: 'Visao executiva para operar a unidade com controle diario.',
-    image: appPreviewAlt,
-    alt: 'Painel de gestao da academia',
-    tag: 'Academia',
+    title: 'Acompanhamento na pratica',
+    text: 'Mantenha a equipe alinhada e acompanhe a evolucao dos alunos de perto.',
+    image: appPreview,
+    alt: 'Personal acompanha uma aluna durante um exercicio',
+    tag: 'Treino',
   },
   {
-    title: 'Rotina integrada do personal',
-    text: 'A equipe trabalha no mesmo fluxo e voce acompanha tudo no painel.',
+    title: 'Equipe alinhada na academia',
+    text: 'Personais e equipe consultam as informacoes de treino no mesmo ambiente.',
     image: personalPreview,
-    alt: 'Tela operacional para personal',
+    alt: 'Duas pessoas da equipe consultam um celular na academia',
     tag: 'Equipe',
   },
   {
-    title: 'Jornada conectada do aluno',
-    text: 'Aluno acompanha treino e progresso enquanto a academia mede adesao.',
+    title: 'Identidade presente na rotina da academia',
+    text: 'A marca da academia acompanha a experiencia de quem treina.',
     image: studentPreview,
-    alt: 'Tela do app do aluno',
-    tag: 'Aluno',
+    alt: 'Profissional em uma academia com camiseta da MH Personal',
+    tag: 'Academia',
   },
 ];
 
@@ -128,17 +129,17 @@ export default function AcademiaPage() {
 
           <div className={styles.heroMedia}>
             <div className={styles.mainShot}>
-              <Image src={appPreviewAlt} alt="Painel principal da academia" fill priority sizes="(max-width: 980px) 92vw, 520px" />
-              <span>Comando da academia</span>
+              <Image src={heroTeamPhoto} alt="Personal e aluna consultam o aplicativo durante o acompanhamento" fill priority sizes="(max-width: 980px) 92vw, 520px" />
+              <span>Equipe em acompanhamento</span>
             </div>
             <div className={styles.sideShots}>
               <div className={styles.sideShot}>
-                <Image src={personalPreview} alt="Fluxo do personal integrado" fill sizes="(max-width: 980px) 92vw, 240px" />
-                <span>Equipe</span>
+                <Image src={personalPreview} alt="Personal apresenta o aplicativo de treino" fill sizes="(max-width: 980px) 92vw, 240px" />
+                <span>Tecnologia</span>
               </div>
               <div className={styles.sideShot}>
-                <Image src={studentPreview} alt="Aplicativo do aluno" fill sizes="(max-width: 980px) 92vw, 240px" />
-                <span>Aluno</span>
+                <Image src={studentPreview} alt="Treino em academia com camiseta MH Personal" fill sizes="(max-width: 980px) 92vw, 240px" />
+                <span>Academia</span>
               </div>
             </div>
           </div>
