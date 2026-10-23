@@ -5,7 +5,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { internalAuthRedirect } from '@/lib/authRedirect';
-import styles from '../responsive-login.module.css';
+import styles from '../responsive-auth.module.css';
 
 export default function AcademyLoginPage() {
   const { login, loginWithGoogle, loginWithApple, logout, isAuthenticated, role } = useAuth();
@@ -89,7 +89,7 @@ export default function AcademyLoginPage() {
   };
 
   return (
-    <div className={`auth-card ${styles.responsiveLogin}`}>
+    <div className={`auth-card ${styles.responsiveAuthCard}`}>
       <div className="auth-card-header">
         <p className="auth-kicker">Portal da academia</p>
         <h1>Entrar no painel da academia</h1>

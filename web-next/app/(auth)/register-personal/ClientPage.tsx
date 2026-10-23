@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { generateAvailablePersonalCode } from '@/lib/services/personalCode';
 import { internalAuthRedirect } from '@/lib/authRedirect';
+import styles from '../responsive-auth.module.css';
 
 export default function RegisterPersonalPage() {
   const { register, isAuthenticated } = useAuth();
@@ -85,7 +86,7 @@ export default function RegisterPersonalPage() {
   };
 
   return (
-    <div className="auth-card">
+    <div className={`auth-card ${styles.responsiveAuthCard}`}>
       <div className="auth-card-header">
         <p className="auth-kicker">Cadastro profissional</p>
         <h1>Crie sua conta de personal</h1>

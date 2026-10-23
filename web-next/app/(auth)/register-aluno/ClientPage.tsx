@@ -5,6 +5,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import type { User } from '@/lib/types/user';
+import styles from '../responsive-auth.module.css';
 
 const parsePersonalCode = (value: string) => {
   const trimmed = value.trim();
@@ -88,7 +89,7 @@ export default function RegisterAlunoPage() {
   };
 
   return (
-    <div className="auth-card auth-card--student">
+    <div className={`auth-card auth-card--student ${styles.responsiveAuthCard}`}>
       <div className="auth-card-header">
         <p className="auth-kicker">Aluno</p>
         <h1>Crie sua conta de aluno</h1>

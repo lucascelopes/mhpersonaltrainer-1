@@ -5,7 +5,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { internalAuthRedirect } from '@/lib/authRedirect';
-import styles from '../responsive-login.module.css';
+import styles from '../responsive-auth.module.css';
 
 const resolveRedirect = (redirectParam: string | null) => {
   const destination = internalAuthRedirect(redirectParam, '/app');
@@ -96,7 +96,7 @@ export default function LoginAlunoPage() {
 
   if (mobileAllowed === null) {
     return (
-      <div className={`auth-card auth-card--student ${styles.responsiveLogin}`}>
+      <div className={`auth-card auth-card--student ${styles.responsiveAuthCard}`}>
         <div className="auth-card-header">
           <p className="auth-kicker">Aluno</p>
           <h1>Verificando dispositivo</h1>
@@ -108,7 +108,7 @@ export default function LoginAlunoPage() {
 
   if (!mobileAllowed) {
     return (
-      <div className={`auth-card auth-card--student ${styles.responsiveLogin}`}>
+      <div className={`auth-card auth-card--student ${styles.responsiveAuthCard}`}>
         <div className="auth-card-header">
           <p className="auth-kicker">Aluno</p>
           <h1>Acesso apenas no celular</h1>
@@ -129,7 +129,7 @@ export default function LoginAlunoPage() {
   }
 
   return (
-    <div className={`auth-card auth-card--student ${styles.responsiveLogin}`}>
+    <div className={`auth-card auth-card--student ${styles.responsiveAuthCard}`}>
       <div className="auth-card-header">
         <p className="auth-kicker">Aluno</p>
         <h1>Entrar no painel do aluno</h1>

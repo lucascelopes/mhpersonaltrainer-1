@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { internalAuthRedirect } from '@/lib/authRedirect';
+import styles from '../responsive-auth.module.css';
 
 export default function RegisterAcademyPage() {
   const { register, isAuthenticated } = useAuth();
@@ -30,19 +31,19 @@ export default function RegisterAcademyPage() {
 
   const validate = () => {
     if (!name) {
-      setError('Nome da academia obrigatorio.');
+      setError('Nome da academia obrigatório.');
       return false;
     }
     if (!email) {
-      setError('Email obrigatorio.');
+      setError('E-mail obrigatório.');
       return false;
     }
     if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Email invalido.');
+      setError('E-mail inválido.');
       return false;
     }
     if (!password) {
-      setError('Senha obrigatoria.');
+      setError('Senha obrigatória.');
       return false;
     }
     if (password.length < 6) {
@@ -50,7 +51,7 @@ export default function RegisterAcademyPage() {
       return false;
     }
     if (password !== confirmPassword) {
-      setError('Senhas nao coincidem.');
+      setError('As senhas não coincidem.');
       return false;
     }
     setError('');
@@ -79,7 +80,7 @@ export default function RegisterAcademyPage() {
   };
 
   return (
-    <div className="auth-card">
+    <div className={`auth-card ${styles.responsiveAuthCard}`}>
       <div className="auth-card-header">
         <p className="auth-kicker">Cadastro da academia</p>
         <h1>Crie o acesso ao painel da academia</h1>
@@ -89,7 +90,7 @@ export default function RegisterAcademyPage() {
       </div>
       {academyCode && (
         <div className="auth-code">
-          <span>Codigo da academia</span>
+          <span>Código da academia</span>
           <strong>{academyCode}</strong>
         </div>
       )}
@@ -98,6 +99,7 @@ export default function RegisterAcademyPage() {
           <span>Nome da academia</span>
           <input
             type="text"
+            autoComplete="organization"
             placeholder="Nome da sua academia"
             value={name}
             onChange={(event) => setName(event.target.value)}
@@ -108,6 +110,7 @@ export default function RegisterAcademyPage() {
           <span>Email</span>
           <input
             type="email"
+            autoComplete="email"
             placeholder="seu@email.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
@@ -118,6 +121,7 @@ export default function RegisterAcademyPage() {
           <span>Senha</span>
           <input
             type="password"
+            autoComplete="new-password"
             placeholder="********"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
@@ -128,6 +132,7 @@ export default function RegisterAcademyPage() {
           <span>Confirmar senha</span>
           <input
             type="password"
+            autoComplete="new-password"
             placeholder="********"
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}

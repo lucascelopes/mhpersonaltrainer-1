@@ -5,7 +5,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { internalAuthRedirect } from '@/lib/authRedirect';
-import styles from '../responsive-login.module.css';
+import styles from '../responsive-auth.module.css';
 
 export default function PersonalLoginPage() {
   const { loginAsPersonal, isAuthenticated } = useAuth();
@@ -52,7 +52,7 @@ export default function PersonalLoginPage() {
   };
 
   return (
-    <div className={`auth-card ${styles.responsiveLogin}`}>
+    <div className={`auth-card ${styles.responsiveAuthCard}`}>
       <div className="auth-card-header">
         <p className="auth-kicker">Área do personal</p>
         <h1>Entrar no painel profissional</h1>
