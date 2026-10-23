@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { internalAuthRedirect } from '@/lib/authRedirect';
@@ -20,9 +20,10 @@ export default function RegisterAcademyPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [academyCode, setAcademyCode] = useState<number | null>(null);
+  const registrationStarted = useRef(false);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !registrationStarted.current) {
       router.replace(redirectTo);
     }
   }, [isAuthenticated, redirectTo, router]);
@@ -59,6 +60,7 @@ export default function RegisterAcademyPage() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!validate()) return;
+    registrationStarted.current = true;
     setLoading(true);
     const result = await register(email, password, name, {
       academyAccount: true,
@@ -66,9 +68,11 @@ export default function RegisterAcademyPage() {
       professorAccount: false,
     });
     setLoading(false);
+    if (result.academyCode) {
+      setAcademyCode(result.academyCode);
+    }
     if (result.success && result.academyCode) {
       setSuccess(true);
-      setAcademyCode(result.academyCode);
     } else {
       setError(result.error || 'Erro ao cadastrar.');
     }

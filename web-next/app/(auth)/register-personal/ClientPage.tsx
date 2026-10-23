@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { generateAvailablePersonalCode } from '@/lib/services/personalCode';
@@ -21,9 +21,10 @@ export default function RegisterPersonalPage() {
   const [error, setError] = useState('');
   const [personalCode, setPersonalCode] = useState<number | null>(null);
   const [success, setSuccess] = useState(false);
+  const registrationStarted = useRef(false);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !registrationStarted.current) {
       router.replace(redirectTo);
     }
   }, [isAuthenticated, redirectTo, router]);
@@ -60,6 +61,7 @@ export default function RegisterPersonalPage() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!validate()) return;
+    registrationStarted.current = true;
     setLoading(true);
     let code: number;
     try {
