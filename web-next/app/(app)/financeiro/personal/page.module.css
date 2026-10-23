@@ -174,8 +174,14 @@
 }
 
 @media (max-width: 640px) {
-  .page :global(.finance-section .finance-card-header) {
+  .page :global(.finance-section .finance-card-header),
+  .page :global(.finance-invoice-card .finance-card-header) {
     flex-wrap: wrap;
+  }
+
+  .page :global(.finance-invoice-card .finance-card-header > div) {
+    flex: 1 1 180px;
+    min-width: 0;
   }
 
   .page :global(.finance-section .students-action) {
@@ -241,9 +247,9 @@
   }
 
   .page :global(.finance-student-chip) {
+    flex: 0 0 auto;
     max-width: 100%;
-    white-space: normal;
-    overflow-wrap: anywhere;
+    white-space: nowrap;
   }
 
   .page :global(.finance-payment-header) {
