@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { collection, doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import PageShell from '@/components/PageShell';
 import AcademyGate from '@/components/AcademyGate';
@@ -605,7 +605,9 @@ export default function AcademyDashboardPage() {
         }
       }
 
-      await addDoc(collection(db, 'academyCheckins'), {
+      const checkinRef = doc(collection(db, 'academyCheckins'));
+      const batch = writeBatch(db);
+      batch.set(checkinRef, {
         academyId: user?.uid || null,
         academyCode: academyCodeRaw,
         studentId: checkinStudentId,
@@ -635,7 +637,8 @@ export default function AcademyDashboardPage() {
       if (checkinMethod === 'nfc' && checkinEnroll && token) {
         updates.nfcTagId = token;
       }
-      await updateDoc(doc(db, 'users', checkinStudentId), updates);
+      batch.update(doc(db, 'users', checkinStudentId), updates);
+      await batch.commit();
       setCheckinMessage('Entrada registrada com sucesso.');
       setCheckinStudentId('');
       setCheckinNotes('');

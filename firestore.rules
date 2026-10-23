@@ -99,15 +99,19 @@ service cloud.firestore {
     }
 
     // Backfill academyCodes for legacy academies before deploying these rules.
-    function linkedToCurrentAcademy(data) {
+    function currentAcademyOwnsCode(code) {
       return signedIn() &&
         userExists(request.auth.uid) &&
         isTruthy(userData(request.auth.uid).academyAccount) &&
         hasField(userData(request.auth.uid), 'codigoAcademia') &&
-        hasField(data, 'codigoAcademia') &&
         exists(/databases/$(database)/documents/academyCodes/$(string(userData(request.auth.uid).codigoAcademia))) &&
         get(/databases/$(database)/documents/academyCodes/$(string(userData(request.auth.uid).codigoAcademia))).data.uid == request.auth.uid &&
-        string(data.codigoAcademia) == string(userData(request.auth.uid).codigoAcademia);
+        string(code) == string(userData(request.auth.uid).codigoAcademia);
+    }
+
+    function linkedToCurrentAcademy(data) {
+      return hasField(data, 'codigoAcademia') &&
+        currentAcademyOwnsCode(data.codigoAcademia);
     }
 
     function isExplicitPersonal(uid) {
@@ -257,18 +261,48 @@ service cloud.firestore {
       ]);
     }
 
+    function safeAcademyManagedUserUpdate() {
+      return linkedToCurrentAcademy(resource.data) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'codigoPersonal', 'vinculadoPorAcademia', 'personalVinculadoEm',
+          'nameDoSeuPersonal', 'academyLinkedAt',
+          'last_active_time', 'last_checkin_time', 'last_checkin_method',
+          'last_checkin_academy', 'biometricId', 'nfcTagId',
+          'checkinMethods', 'checkin_enabled_methods', 'checkinConfig',
+          'checkin_method_updated_at', 'checkin_credentials_updated_at',
+          'checkinPhotoUrl', 'checkin_photo_url', 'fotoEntradaUrl',
+          'checkin_photo_updated_at'
+        ]) &&
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['last_checkin_academy']) ||
+          string(request.resource.data.last_checkin_academy) == string(userData(request.auth.uid).codigoAcademia));
+    }
+
     match /users/{userId} {
       allow get: if canGetUser(userId);
       allow list: if canListUser(resource.data);
       allow create: if safeOwnUserCreate(userId) || isAdmin();
       allow update: if isAdmin() ||
         safeOwnUserUpdate(userId) ||
+        safeAcademyManagedUserUpdate() ||
         (linkedToCurrentPersonal(resource.data) && safeManagedUserUpdate());
       allow delete: if isAdmin();
     }
 
     match /users/{userId}/{collectionId}/{document=**} {
       allow read, write: if canAccessUser(userId);
+    }
+
+    match /academyCheckins/{checkinId} {
+      allow get, list: if hasField(resource.data, 'academyCode') &&
+        currentAcademyOwnsCode(resource.data.academyCode);
+      allow create: if request.resource.data.academyId == request.auth.uid &&
+        hasString(request.resource.data, 'studentId') &&
+        currentAcademyOwnsCode(request.resource.data.academyCode) &&
+        userExists(request.resource.data.studentId) &&
+        linkedToCurrentAcademy(userData(request.resource.data.studentId)) &&
+        request.resource.data.method in ['biometria', 'foto', 'nfc'] &&
+        request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
     }
 
     match /personalCodes/{code} {
