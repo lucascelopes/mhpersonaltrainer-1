@@ -200,7 +200,7 @@ export default function AppSidebar() {
       <div className="sidebar-top">
         <div className="sidebar-brand-row">
           <Link href={isAcademy ? '/academy' : isAdmin ? '/admin' : '/app'} className="sidebar-brand" aria-label="MH Personal Trainer, início">
-            <BrandLockup width={184} height={52} surface="theme" priority />
+            <BrandLockup width={184} height={52} surface="dark" priority />
           </Link>
           {showMiniAiStatus ? (
             <Link

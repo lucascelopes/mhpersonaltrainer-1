@@ -1,14 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import PageShell from '@/components/PageShell';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import UserScopePicker from '@/components/data/UserScopePicker';
-import { useUserScope, formatDate } from '@/lib/firestoreHooks';
-import {
-  fetchAppointments,
-  getAppointmentStatusColor,
-  getAppointmentTypeColor,
-} from '@/lib/services/scheduling';
+import { useUserScope } from '@/lib/firestoreHooks';
+import { fetchAppointments } from '@/lib/services/scheduling';
 import { fetchUserWorkouts } from '@/lib/services/workouts';
 import { fetchEvaluations, fetchEvaluationsForStudents, getEvaluationTypeLabel } from '@/lib/services/evaluations';
 import { firestoreService, type Aluno } from '@/lib/services/firestoreService';
@@ -18,19 +13,21 @@ import { useSearchParams } from 'next/navigation';
 import type { Appointment, AppointmentStatus, AppointmentType } from '@/lib/types/scheduling';
 import type { PhysicalEvaluation } from '@/lib/types/evaluation';
 import type { UserWorkout } from '@/lib/types/workout';
+import { CalendarBlank, CaretLeft, CaretRight, Clock, FunnelSimple, Plus, TrendUp } from '@phosphor-icons/react';
+import styles from './schedule.module.css';
 
 const FILTER_OPTIONS: { id: AppointmentType | null; label: string }[] = [
   { id: null, label: 'Todos' },
   { id: 'treino', label: 'Treino' },
-  { id: 'avaliacao', label: 'Avaliacao' },
+  { id: 'avaliacao', label: 'Avaliação' },
   { id: 'consulta', label: 'Consulta' },
 ];
 
-const DAY_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+const DAY_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
 const TYPE_LABELS: Record<AppointmentType, string> = {
   treino: 'Treino',
-  avaliacao: 'Avaliacao',
+  avaliacao: 'Avaliação',
   consulta: 'Consulta',
   acompanhamento: 'Acompanhamento',
   online: 'Online',
@@ -41,10 +38,10 @@ const STATUS_LABELS: Record<string, string> = {
   agendado: 'Agendado',
   confirmado: 'Confirmado',
   em_andamento: 'Em andamento',
-  concluido: 'Concluido',
+  concluido: 'Concluído',
   cancelado: 'Cancelado',
   reagendado: 'Reagendado',
-  nao_compareceu: 'Nao compareceu',
+  nao_compareceu: 'Não compareceu',
 };
 
 type AgendaSource = 'appointment' | 'workout' | 'evaluation';
@@ -168,18 +165,86 @@ const formatMonthYear = (date: Date) =>
 const formatSelectedDate = (date: Date) =>
   date.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
 
+const formatShortDate = (date: Date) =>
+  date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
+
+const getWeekStart = (date: Date) => {
+  const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+  return start;
+};
+
+const getMinutes = (time: string) => {
+  const match = /^(\d{1,2}):(\d{2})/.exec(time.trim());
+  if (!match) return null;
+  const hour = Number(match[1]);
+  const minute = Number(match[2]);
+  return hour < 24 && minute < 60 ? hour * 60 + minute : null;
+};
+
+const HOUR_HEIGHT = 38;
+
+const layoutDayEvents = (items: AgendaItem[]) => {
+  type Positioned = { item: AgendaItem; lane: number; lanes: number };
+  const sorted = [...items].sort(
+    (a, b) => (getMinutes(a.horaInicio || '') ?? 0) - (getMinutes(b.horaInicio || '') ?? 0)
+  );
+  const result: Positioned[] = [];
+  let group: Positioned[] = [];
+  let laneEnds: number[] = [];
+  let groupEnd = -1;
+
+  const flush = () => {
+    group.forEach((entry) => { entry.lanes = laneEnds.length; });
+    result.push(...group);
+    group = [];
+    laneEnds = [];
+    groupEnd = -1;
+  };
+
+  sorted.forEach((item) => {
+    const start = getMinutes(item.horaInicio || '') ?? 0;
+    const end = Math.max(start + 30, getMinutes(item.horaFim || '') ?? start + 60);
+    if (group.length && start >= groupEnd) flush();
+    let lane = laneEnds.findIndex((laneEnd) => laneEnd <= start);
+    if (lane < 0) lane = laneEnds.length;
+    laneEnds[lane] = end;
+    groupEnd = Math.max(groupEnd, end);
+    group.push({ item, lane, lanes: 1 });
+  });
+  if (group.length) flush();
+  return result;
+};
+
+const getItemTone = (type: AppointmentType) => {
+  if (type === 'avaliacao') return styles.evaluation;
+  if (type === 'consulta') return styles.consultation;
+  return styles.training;
+};
+
+const getItemContext = (item: AgendaItem, isStudent: boolean) => {
+  const parts = isStudent
+    ? [item.servico, item.personalNome]
+    : [item.alunoNome, item.servico];
+  const uniqueParts = [...new Set(parts.map((part) => part?.trim()).filter(Boolean))];
+  return uniqueParts.join(' · ') || TYPE_LABELS[item.tipo] || 'Compromisso';
+};
+
 type ViewMode = 'week' | 'month';
 
 export default function SchedulePage() {
   const { userId } = useUserScope();
   const { user, role } = useAuth();
+  const isStudent = role === 'aluno';
   const searchParams = useSearchParams();
   const dateParam = searchParams.get('date');
   const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<AppointmentType | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const weekHeaderScrollRef = useRef<HTMLDivElement>(null);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [viewMode, setViewMode] = useState<ViewMode>('week');
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [hydrating, setHydrating] = useState(false);
   const [error, setError] = useState('');
@@ -303,21 +368,77 @@ export default function SchedulePage() {
     return sortAgendaItems(items);
   }, [agendaItems, selectedDate, selectedFilter]);
 
-  const selectedLabel = isSameDay(selectedDate, new Date()) ? 'Hoje' : 'Selecionado';
+  const weekDays = useMemo(() => {
+    const start = getWeekStart(selectedDate);
+    return Array.from({ length: 7 }, (_, index) => {
+      const day = new Date(start);
+      day.setDate(start.getDate() + index);
+      return day;
+    });
+  }, [selectedDate]);
+
+  const weekStart = weekDays[0];
+  const weekEnd = weekDays[6];
+
+  useEffect(() => {
+    if (viewMode !== 'week') return;
+    const container = weekHeaderScrollRef.current;
+    const selected = container?.querySelector<HTMLButtonElement>('button[aria-pressed="true"]');
+    if (!container || !selected) return;
+    const containerRect = container.getBoundingClientRect();
+    const selectedRect = selected.getBoundingClientRect();
+    if (selectedRect.left < containerRect.left) {
+      container.scrollLeft += selectedRect.left - containerRect.left;
+    } else if (selectedRect.right > containerRect.right) {
+      container.scrollLeft += selectedRect.right - containerRect.right;
+    }
+  }, [selectedDate, viewMode]);
+  const weekItems = useMemo(() => {
+    const startKey = getDateKey(weekStart);
+    const endKey = getDateKey(weekEnd);
+    return agendaItems.filter((item) => {
+      const key = getDateKey(item.data);
+      return key >= startKey && key <= endKey;
+    });
+  }, [agendaItems, weekStart, weekEnd]);
+
+  const timedWeekItems = useMemo(
+    () => weekItems.filter((item) =>
+      getMinutes(item.horaInicio || '') !== null && (!selectedFilter || item.tipo === selectedFilter)
+    ),
+    [weekItems, selectedFilter]
+  );
+  const unscheduledDayItems = filteredAppointments.filter(
+    (item) => getMinutes(item.horaInicio || '') === null
+  );
+  const nextAppointment = filteredAppointments.find((item) => {
+    const minutes = getMinutes(item.horaInicio || '');
+    if (minutes === null) return false;
+    if (!isSameDay(selectedDate, new Date())) return true;
+    const now = new Date();
+    return minutes >= now.getHours() * 60 + now.getMinutes();
+  });
+  const weekCount = (type: AppointmentType) => weekItems.filter((item) => item.tipo === type).length;
+  const weekRange = `${formatShortDate(weekStart)} – ${formatShortDate(weekEnd)} ${weekEnd.getFullYear()}`;
+  const selectedWeekday = selectedDate.toLocaleDateString('pt-BR', { weekday: 'long' });
+  const dayTitle = isSameDay(selectedDate, new Date())
+    ? 'Hoje, ' + selectedWeekday
+    : selectedWeekday;
+  const nextRelativeLabel = (() => {
+    if (!nextAppointment || !isSameDay(selectedDate, new Date())) return '';
+    const startMinutes = getMinutes(nextAppointment.horaInicio || '');
+    if (startMinutes === null) return '';
+    const now = new Date();
+    const minutes = Math.max(0, startMinutes - now.getHours() * 60 - now.getMinutes());
+    if (minutes < 60) return 'Em ' + minutes + ' min';
+    const hours = Math.floor(minutes / 60);
+    const remainder = minutes % 60;
+    return 'Em ' + hours + ' h' + (remainder ? ' e ' + remainder + ' min' : '');
+  })();
 
   const getDayCount = (date: Date) => {
     const key = getDateKey(date);
     return appointmentCounts[key] || 0;
-  };
-
-  const getWeekDays = (date: Date) => {
-    const start = new Date(date);
-    start.setDate(start.getDate() - start.getDay());
-    return Array.from({ length: 7 }, (_, index) => {
-      const next = new Date(start);
-      next.setDate(start.getDate() + index);
-      return next;
-    });
   };
 
   const getMonthDays = (date: Date) => {
@@ -363,212 +484,148 @@ export default function SchedulePage() {
     setSelectedDate(next);
   };
 
+  const renderMonth = () => (
+    <div className={styles.monthScroll}>
+      <div className={styles.monthGrid}>
+      {DAY_LABELS.slice(1).concat(DAY_LABELS[0]).map((label) => (
+        <span key={label} className={styles.monthWeekday}>{label}</span>
+      ))}
+      {Array.from({ length: (new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay() + 6) % 7 }, (_, index) => (
+        <span key={`blank-${index}`} className={styles.monthBlank} />
+      ))}
+      {getMonthDays(currentMonth).filter((day): day is Date => day !== null).map((day) => (
+        <button
+          key={getDateKey(day)}
+          type="button"
+          className={`${styles.monthDay} ${isSameDay(day, selectedDate) ? styles.monthSelected : ''}`}
+          onClick={() => { setSelectedDate(day); setViewMode('week'); }}
+        >
+          <strong>{day.getDate()}</strong>
+          {getDayCount(day) > 0 && <small>{getDayCount(day)} compromisso{getDayCount(day) === 1 ? '' : 's'}</small>}
+        </button>
+      ))}
+      </div>
+    </div>
+  );
+
   return (
-    <PageShell
-      title="Agenda"
-      description="Controle aulas, horarios e lembretes automatizados."
-    >
-      <UserScopePicker />
-      <div className="schedule-revamp">
-        <div className="schedule-toolbar">
-          <div className="schedule-toolbar-meta">
-            <span>{selectedLabel}</span>
-            <strong>{formatSelectedDate(selectedDate)}</strong>
-            <span className="schedule-toolbar-count">
-              {filteredAppointments.length} compromissos
-            </span>
+    <section aria-label={isStudent ? 'Minha agenda' : 'Agenda'}>
+      <div className={styles.page}>
+        <div className={styles.scope}><UserScopePicker /></div>
+        <header className={styles.overview}>
+          <div className={styles.intro}>
+            <h2>{isStudent ? 'Minha agenda' : 'Agenda'}</h2>
+            <p>{isStudent ? 'Acompanhe seus treinos, avaliações e horários combinados com seu personal.' : 'Organize seus compromissos, otimize seu tempo e continue fazendo a diferença na vida dos seus alunos.'}</p>
           </div>
-          <div className="schedule-view-toggle">
-            <button
-              type="button"
-              className={`schedule-view-button ${viewMode === 'week' ? 'active' : ''}`}
-              onClick={() => setViewMode('week')}
-            >
-              Semana
-            </button>
-            <button
-              type="button"
-              className={`schedule-view-button ${viewMode === 'month' ? 'active' : ''}`}
-              onClick={() => setViewMode('month')}
-            >
-              Mes
-            </button>
+          <div className={styles.headStats} aria-label="Resumo da semana">
+            <div><strong>{weekItems.length}</strong><span>COMPROMISSOS</span><small>nesta semana</small></div>
+            <div><strong>{weekCount('treino')}</strong><span>TREINOS</span><small>{isStudent ? 'na sua rotina' : 'com alunos'}</small></div>
+            <div><strong>{weekCount('avaliacao')}</strong><span>AVALIAÇÕES</span><small>nesta semana</small></div>
           </div>
-        </div>
-
-        <div className="schedule-filters">
-          {FILTER_OPTIONS.map((option) => (
-            <button
-              key={option.id ?? 'all'}
-              type="button"
-              className={`schedule-filter-chip ${selectedFilter === option.id ? 'active' : ''}`}
-              onClick={() => setSelectedFilter(option.id)}
-            >
-              {option.label}
+          <div className={styles.headActions}>
+            <button className={styles.periodButton} type="button" onClick={() => setViewMode(viewMode === 'week' ? 'month' : 'week')} aria-label={viewMode === 'week' ? 'Ver mês' : 'Ver semana'}>
+              <CalendarBlank size={22} />
+              <span><strong>{viewMode === 'week' ? 'Semana' : 'Mês'}</strong><small>{viewMode === 'week' ? weekRange : formatMonthYear(currentMonth)}</small></span>
             </button>
-          ))}
-        </div>
-
-        <div className="schedule-layout">
-          <section className="portal-card schedule-calendar">
-            <div className="schedule-month-nav">
-              <button
-                type="button"
-                className="schedule-nav-button"
-                onClick={viewMode === 'month' ? handlePreviousMonth : handlePreviousWeek}
-              >
-                {'<'}
-              </button>
-              <span className="schedule-month-label">
-                {formatMonthYear(viewMode === 'month' ? currentMonth : selectedDate)}
-              </span>
-              <button
-                type="button"
-                className="schedule-nav-button"
-                onClick={viewMode === 'month' ? handleNextMonth : handleNextWeek}
-              >
-                {'>'}
-              </button>
-            </div>
-
-            {viewMode === 'week' ? (
-              <div className="calendar-week">
-                {getWeekDays(selectedDate).map((day) => {
-                  const count = getDayCount(day);
-                  return (
-                    <button
-                      key={getDateKey(day)}
-                      type="button"
-                      className={`calendar-day ${isSameDay(day, selectedDate) ? 'is-selected' : ''} ${
-                        isSameDay(day, new Date()) ? 'is-today' : ''
-                      }`}
-                      onClick={() => setSelectedDate(day)}
-                    >
-                      <span className="calendar-day-label">{DAY_LABELS[day.getDay()]}</span>
-                      <span className="calendar-day-number">{day.getDate()}</span>
-                      {count > 0 && (
-                        <span className="calendar-dots">
-                          {count <= 3
-                            ? Array.from({ length: count }).map((_, index) => (
-                                <span key={index} className="calendar-dot" />
-                              ))
-                            : <span className="calendar-count">{count}</span>}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
+            {!isStudent && <Link href="/schedule/create" className={styles.createButton}>Novo compromisso <Plus size={19} weight="bold" /></Link>}
+          </div>
+        </header>
+        <div className={styles.mainGrid}>
+          <section className={styles.calendarCard} aria-label="Calendário de compromissos">
+            <div className={styles.calendarToolbar}>
+              <div className={styles.calendarTitle}>
+                <button type="button" className={styles.iconButton} onClick={viewMode === 'month' ? handlePreviousMonth : handlePreviousWeek} aria-label={viewMode === 'month' ? 'Mês anterior' : 'Semana anterior'}><CaretLeft size={19} /></button>
+                <strong>{viewMode === 'month' ? formatMonthYear(currentMonth) : formatShortDate(weekStart) + ' – ' + formatShortDate(weekEnd) + ' ' + weekEnd.getFullYear()}</strong>
               </div>
-            ) : (
-              <div className="calendar-month">
-                <div className="calendar-weekdays">
-                  {DAY_LABELS.map((label) => (
-                    <span key={label}>{label}</span>
+              <div className={styles.calendarActions}>
+                <button type="button" className={styles.filterButton} onClick={() => setFiltersOpen((open) => !open)} aria-expanded={filtersOpen} aria-controls="agenda-filters"><FunnelSimple size={16} /> <span>{selectedFilter ? TYPE_LABELS[selectedFilter] : 'Filtrar'}</span></button>
+                <button type="button" className={styles.todayButton} onClick={() => { setSelectedDate(new Date()); setCurrentMonth(new Date()); }}>Hoje</button>
+                <button type="button" className={styles.iconButton} onClick={viewMode === 'month' ? handlePreviousMonth : handlePreviousWeek} aria-label="Anterior"><CaretLeft size={17} /></button>
+                <button type="button" className={styles.iconButton} onClick={viewMode === 'month' ? handleNextMonth : handleNextWeek} aria-label="Próximo"><CaretRight size={17} /></button>
+              </div>
+            </div>
+            {filtersOpen && <div id="agenda-filters" className={styles.filters} aria-label="Filtrar compromissos">
+              {FILTER_OPTIONS.map((option) => (
+                <button key={option.id ?? 'all'} type="button" className={[styles.filter, selectedFilter === option.id ? styles.filterActive : ''].join(' ')} onClick={() => { setSelectedFilter(option.id); setFiltersOpen(false); }} aria-pressed={selectedFilter === option.id}>{option.label}</button>
+              ))}
+            </div>}
+            {viewMode === 'month' ? renderMonth() : (
+              <div className={styles.weekScroll}>
+                <div className={styles.weekHeaderScroll} ref={weekHeaderScrollRef}>
+                  <div className={styles.weekHeader}>
+                    <span aria-hidden="true" />
+                    {weekDays.map((day) => (
+                      <button key={getDateKey(day)} type="button" className={[styles.dayHeader, isSameDay(day, selectedDate) ? styles.selectedDay : ''].join(' ')} onClick={() => setSelectedDate(day)} aria-pressed={isSameDay(day, selectedDate)}>
+                        <strong>{DAY_LABELS[day.getDay()]}</strong><span>{day.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className={styles.weekBody}>
+                  <div className={styles.timeGutter}>{Array.from({ length: 14 }, (_, hour) => <span key={hour}>{String(hour + 7).padStart(2, '0')}:00</span>)}</div>
+                  {weekDays.map((day) => (
+                    <div key={getDateKey(day)} className={[styles.dayColumn, isSameDay(day, selectedDate) ? styles.selectedColumn : ''].join(' ')}>
+                      {Array.from({ length: 14 }, (_, hour) => <span key={hour} className={styles.hourCell} />)}
+                      {layoutDayEvents(timedWeekItems.filter((item) => isSameDay(item.data, day))).map(({ item, lane, lanes }) => {
+                        const start = getMinutes(item.horaInicio || '') ?? 420;
+                        const end = getMinutes(item.horaFim || '') ?? start + 60;
+                        if (start >= 1260 || end <= 420) return null;
+                        const top = Math.max(0, (start - 420) / 60 * HOUR_HEIGHT);
+                        const height = Math.max(30, (Math.min(1260, Math.max(start + 30, end)) - Math.max(420, start)) / 60 * HOUR_HEIGHT - 3);
+                        return (
+                          <Link key={item.id} href={item.route || '/schedule/' + item.id} className={[styles.event, getItemTone(item.tipo)].join(' ')} style={{ top, height, left: 'calc(' + (lane / lanes * 100) + '% + 3px)', right: 'calc(' + ((lanes - lane - 1) / lanes * 100) + '% + 3px)' }} title={item.horaInicio + ' ' + getItemContext(item, isStudent)}>
+                            <small>{item.horaInicio}{item.horaFim ? ' – ' + item.horaFim : ''}</small>
+                            <strong>{TYPE_LABELS[item.tipo] || item.tipo}</strong>
+                            <span>{getItemContext(item, isStudent)}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
                   ))}
                 </div>
-                <div className="calendar-month-grid">
-                  {getMonthDays(currentMonth).map((day, index) => {
-                    if (!day) {
-                      return <div key={`empty-${index}`} className="calendar-empty" />;
-                    }
-                    const count = getDayCount(day);
-                    return (
-                      <div key={getDateKey(day)} className="calendar-cell">
-                        <button
-                          type="button"
-                          className={`calendar-day ${isSameDay(day, selectedDate) ? 'is-selected' : ''} ${
-                            isSameDay(day, new Date()) ? 'is-today' : ''
-                          }`}
-                          onClick={() => setSelectedDate(day)}
-                        >
-                          <span className="calendar-day-label">{DAY_LABELS[day.getDay()]}</span>
-                          <span className="calendar-day-number">{day.getDate()}</span>
-                          {count > 0 && (
-                            <span className="calendar-dots">
-                              {count <= 3
-                                ? Array.from({ length: count }).map((_, indexDot) => (
-                                    <span key={indexDot} className="calendar-dot" />
-                                  ))
-                                : <span className="calendar-count">{count}</span>}
-                            </span>
-                          )}
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
               </div>
             )}
           </section>
-
-          <section className="portal-card schedule-panel">
-            <div className="schedule-section-title">
-              <div>
-                <h3>Agenda do dia</h3>
-                <p className="subtle">{formatSelectedDate(selectedDate)}</p>
-              </div>
-              <span>{filteredAppointments.length} itens</span>
-            </div>
-            {loading && <p className="subtle">Carregando agenda...</p>}
-            {!loading && hydrating && <p className="subtle">Atualizando compromissos...</p>}
-            {error && <p style={{ color: '#c0392b' }}>{error}</p>}
-            {!loading && !hydrating && filteredAppointments.length === 0 && (
-              <div className="schedule-empty">
-                <p>Nenhum compromisso para esta data.</p>
-                <span className="subtle">
-                  Selecione outra data no calendario ou ajuste os filtros.
-                </span>
-              </div>
-            )}
+          <aside className={styles.dayPanel} aria-label="Compromissos do dia selecionado">
+            <div className={styles.panelHeading}><h3>{dayTitle.charAt(0).toUpperCase() + dayTitle.slice(1)}</h3><p>{selectedDate.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })}</p></div>
+            {nextAppointment ? (
+              <Link href={nextAppointment.route || '/schedule/' + nextAppointment.id} className={styles.nextCard}>
+                <div><Clock size={19} /><strong>Próximo compromisso</strong></div>
+                <strong className={styles.nextTime}>{nextAppointment.horaInicio}{nextAppointment.horaFim ? ' – ' + nextAppointment.horaFim : ''}</strong>
+                <span>{getItemContext(nextAppointment, isStudent)}</span>
+                {nextRelativeLabel && <em className={styles.nextRelative}>{nextRelativeLabel}</em>}
+                <small>{TYPE_LABELS[nextAppointment.tipo]}</small>
+              </Link>
+            ) : <div className={styles.nextEmpty}><Clock size={20} /><span>Nenhum próximo horário marcado neste dia.</span></div>}
+            <div className={styles.agendaHeading}><h4>Agenda do dia</h4><span>{filteredAppointments.length} compromisso{filteredAppointments.length === 1 ? '' : 's'}</span></div>
+            {loading && <p className={styles.message}>Carregando agenda...</p>}
+            {!loading && hydrating && <p className={styles.message}>Atualizando compromissos...</p>}
+            {error && <p className={styles.error} role="alert">{error}</p>}
+            {!loading && !hydrating && filteredAppointments.length === 0 && <p className={styles.message}>{isStudent ? 'Sem compromissos para esta data. Seus próximos treinos e avaliações aparecerão aqui.' : 'Nenhum compromisso nesta data. Escolha outro dia ou crie um novo compromisso.'}</p>}
             {!loading && filteredAppointments.length > 0 && (
-              <div className="schedule-list">
-                {filteredAppointments.map((item) => {
-                  const typeLabel = TYPE_LABELS[item.tipo] ?? item.tipo;
-                  const statusLabel = STATUS_LABELS[item.status] ?? item.status;
-                  const typeColor = getAppointmentTypeColor(item.tipo);
-                  const statusColor = getAppointmentStatusColor(item.status);
-                  const name = item.alunoNome || item.personalNome || '';
-                  const timeLabel =
-                    item.horaInicio || item.horaFim
-                      ? `${item.horaInicio || '--'} - ${item.horaFim || '--'}`
-                      : '';
-                  const title = item.servico || typeLabel;
-                  return (
-                    <Link
-                      key={item.id}
-                      href={item.route || `/schedule/${item.id}`}
-                      className="schedule-item"
-                    >
-                      <div>
-                        <div className="schedule-item-title">{title}</div>
-                        <div className="schedule-item-meta">
-                          <span>{formatDate(item.data)}</span>
-                          {timeLabel ? <span>{timeLabel}</span> : null}
-                          {name ? <span>{name}</span> : null}
-                        </div>
-                      </div>
-                      <div className="schedule-badges">
-                        <span
-                          className="schedule-badge"
-                          style={{ background: `${typeColor}22`, color: typeColor }}
-                        >
-                          {typeLabel}
-                        </span>
-                        <span
-                          className="schedule-badge"
-                          style={{ background: `${statusColor}22`, color: statusColor }}
-                        >
-                          {statusLabel}
-                        </span>
-                      </div>
-                    </Link>
-                  );
-                })}
+              <div className={styles.dayList}>
+                {filteredAppointments.map((item) => (
+                  <Link key={item.id} href={item.route || '/schedule/' + item.id} className={styles.dayItem}>
+                    <span className={[styles.dayDot, getItemTone(item.tipo)].join(' ')} />
+                    <span className={styles.dayTime}>{item.horaInicio || '—'}</span>
+                    <span className={styles.dayItemCopy}><strong>{TYPE_LABELS[item.tipo] || item.tipo}</strong><small>{getItemContext(item, isStudent) || STATUS_LABELS[item.status]}</small></span>
+                    <CaretRight size={17} />
+                  </Link>
+                ))}
               </div>
             )}
-          </section>
+            {unscheduledDayItems.length > 0 && <p className={styles.unscheduledNote}>“—” indica item sem horário definido.</p>}
+            <div className={styles.panelHint}><TrendUp size={21} /><div><strong>Lembrete do dia</strong><p>{filteredAppointments.length ? (isStudent ? 'Confira o horário e deixe tudo pronto para o próximo encontro.' : 'Confira os horários e prepare os próximos atendimentos dos seus alunos.') : (isStudent ? 'Quando seu personal marcar um horário, ele aparecerá aqui.' : 'Selecione outro dia da semana para conferir os próximos atendimentos.')}</p></div></div>
+          </aside>
         </div>
+        <section className={styles.weekSummary} aria-label="Resumo da semana">
+          <div className={styles.summaryIntro}><h3>Resumo da semana</h3><p>Visão geral dos seus compromissos.</p></div>
+          <div><CalendarBlank size={27} /><strong>{weekItems.length}</strong><span>COMPROMISSOS</span></div>
+          <div><Clock size={27} /><strong>{weekCount('treino')}</strong><span>TREINOS</span></div>
+          <div><TrendUp size={27} /><strong>{weekCount('avaliacao')}</strong><span>AVALIAÇÕES</span></div>
+          <div><Clock size={27} /><strong>{weekCount('consulta')}</strong><span>CONSULTAS</span></div>
+        </section>
       </div>
-    </PageShell>
+    </section>
   );
 }
