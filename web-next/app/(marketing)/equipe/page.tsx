@@ -6,7 +6,7 @@ import styles from './page.module.css';
 
 export const metadata: Metadata = buildMarketingMetadata({
   title: 'Equipe',
-  description: 'Conheca a equipe por tras do MH Personal Trainer e o foco em produto, suporte e resultado.',
+  description: 'Conheça a equipe por trás do MH Personal Trainer e o foco em produto, suporte e resultado.',
   path: '/equipe',
   keywords: [
     'equipe mh personal trainer',
@@ -17,7 +17,7 @@ export const metadata: Metadata = buildMarketingMetadata({
 const team = [
   {
     name: 'Produto',
-    role: 'Experiencia de uso',
+    role: 'Experiência de uso',
     bio: 'Traduz a rotina do personal em fluxos simples e claros.',
   },
   {
@@ -33,7 +33,7 @@ const team = [
   {
     name: 'Atendimento',
     role: 'Suporte',
-    bio: 'Onboarding, suporte humano e acompanhamento diario.',
+    bio: 'Onboarding, suporte humano e acompanhamento diário.',
   },
 ];
 
@@ -44,11 +44,11 @@ const values = [
   },
   {
     title: 'Resultado',
-    text: 'Tudo o que medimos vira decisao para o personal e para a academia.',
+    text: 'Tudo o que medimos vira decisão para o personal e para a academia.',
   },
   {
     title: 'Parceria',
-    text: 'Acompanhamos cada etapa da implantacao e evolucao do sistema.',
+    text: 'Acompanhamos cada etapa da implantação e evolução do sistema.',
   },
 ];
 
@@ -69,18 +69,18 @@ export default function EquipePage() {
                 Criar conta
               </Link>
               <Link href="/beneficios" className="marketing-button ghost">
-                Ver beneficios
+                Ver benefícios
               </Link>
             </div>
           </div>
           <div className="marketing-hero-panel">
             <div className="marketing-hero-panel-card">
               <span className="marketing-panel-title">Suporte humano</span>
-              <p>Onboarding guiado, respostas rapidas e acompanhamento continuo.</p>
+              <p>Onboarding guiado, respostas rápidas e acompanhamento contínuo.</p>
             </div>
             <div className="marketing-hero-panel-card">
               <span className="marketing-panel-title">Produto evolutivo</span>
-              <p>Melhorias continuas no web e Android. Versao para iOS em breve.</p>
+              <p>Melhorias contínuas na web e no Android. Versão para iOS em breve.</p>
             </div>
             <div className="marketing-hero-panel-card">
               <span className="marketing-panel-title">Resultados claros</span>
@@ -95,7 +95,7 @@ export default function EquipePage() {
           <div className="marketing-section-head">
             <span className="marketing-eyebrow">Nosso jeito de trabalhar</span>
             <h2>Valores que orientam cada entrega</h2>
-            <p>O que fazemos e sempre pensado para reduzir atrito na operacao.</p>
+            <p>O que fazemos é sempre pensado para reduzir atrito na operação.</p>
           </div>
           <div className="marketing-feature-grid">
             {values.map((value) => (
@@ -111,9 +111,9 @@ export default function EquipePage() {
       <section className="marketing-section marketing-surface">
         <div className="container">
           <div className="marketing-section-head">
-            <span className="marketing-eyebrow">Areas de atuacao</span>
-            <h2>Produto, treino e experiencia digital no mesmo fluxo</h2>
-            <p>Conheca as frentes que ajudam a evoluir a experiencia de alunos, personais e academias.</p>
+            <span className="marketing-eyebrow">Áreas de atuação</span>
+            <h2>Produto, treino e experiência digital no mesmo fluxo</h2>
+            <p>Conheça as frentes que ajudam a evoluir a experiência de alunos, personais e academias.</p>
           </div>
           <div className="marketing-team-grid">
             {team.map((member) => (
@@ -131,7 +131,7 @@ export default function EquipePage() {
         <div className="container marketing-cta-inner">
           <div>
             <span className="marketing-eyebrow">Vamos conversar</span>
-            <h2>Pronto para levar o MH para sua operacao?</h2>
+            <h2>Pronto para levar o MH para sua operação?</h2>
             <p>Crie sua conta e tenha a equipe ao seu lado desde o primeiro dia.</p>
           </div>
           <div className="marketing-cta-row">
