@@ -12,6 +12,46 @@
   min-height: 48px;
 }
 
+.loginPage :global(.auth-access-actions .auth-link-chip) {
+  min-height: 48px;
+  padding-inline: 14px;
+  border: 1px solid #c7def5;
+  border-radius: 12px;
+  background: #f7fbff;
+  color: #0b5fc1;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+
+.loginPage :global(.auth-access-actions .auth-link-chip:hover) {
+  border-color: #8fbff0;
+  background: #edf6ff;
+}
+
+.loginPage :global(.auth-access-actions .auth-link-chip:focus-visible) {
+  outline: 3px solid rgba(8, 119, 232, 0.42);
+  outline-offset: 2px;
+}
+
+:global(:root[data-theme='dark']) .loginPage :global(.auth-access-actions .auth-link-chip) {
+  border-color: rgba(148, 163, 184, 0.3);
+  background: rgba(26, 36, 56, 0.94);
+  color: #e8eef9;
+}
+
+:global(:root[data-theme='dark']) .loginPage :global(.auth-access-actions .auth-link-chip:hover) {
+  border-color: #72b2ee;
+  background: rgba(56, 182, 255, 0.16);
+}
+
+:global(:root[data-theme='dark']) .loginPage :global(.auth-access-actions .auth-link-chip:focus-visible) {
+  outline-color: #72b2ee;
+}
+
 .loginCard {
   display: contents;
 }
@@ -449,30 +489,7 @@
   .loginPage :global(.auth-link-chip) {
     display: inline-flex;
     min-width: 0;
-    min-height: 48px;
-    align-items: center;
-    justify-content: center;
-    padding: 0 12px;
-    border: 1px solid #c7def5;
-    border-radius: 12px;
-    background: #f7fbff;
-    color: #0b5fc1;
-    font-size: 0.875rem;
-    font-weight: 700;
-    line-height: 1.2;
-    text-align: center;
-    text-decoration: none;
-    transition: border-color 160ms ease;
-  }
-
-  .loginPage :global(.auth-link-chip:hover) {
-    border-color: #8fbff0;
-    background: #edf6ff;
-  }
-
-  .loginPage :global(.auth-link-chip:focus-visible) {
-    outline: 3px solid rgba(8, 119, 232, 0.42);
-    outline-offset: 2px;
+    width: 100%;
   }
 
   .mobileFooter {
@@ -594,20 +611,6 @@
     color: #e8eef9;
   }
 
-  :global(:root[data-theme='dark']) .loginPage :global(.auth-link-chip) {
-    border-color: rgba(148, 163, 184, 0.3);
-    background: rgba(26, 36, 56, 0.94);
-    color: #dbe7ff;
-  }
-
-  :global(:root[data-theme='dark']) .loginPage :global(.auth-link-chip:hover) {
-    border-color: #72b2ee;
-    background: rgba(56, 182, 255, 0.16);
-  }
-
-  :global(:root[data-theme='dark']) .loginPage :global(.auth-link-chip:focus-visible) {
-    outline-color: #72b2ee;
-  }
 }
 
 @media (max-width: 360px) {
