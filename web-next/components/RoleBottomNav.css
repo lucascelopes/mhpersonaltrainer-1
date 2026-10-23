@@ -345,6 +345,7 @@
     width: 128px;
     height: 41px;
     object-fit: contain;
+    filter: none !important;
   }
 
   .app-shell-student .sidebar-nav,
@@ -385,6 +386,10 @@
   :root[data-theme='dark'] .app-shell-student .sidebar {
     border-color: #26384e;
     background: #142338;
+  }
+
+  :root[data-theme='dark'] .app-shell-student .sidebar-brand img {
+    filter: brightness(0) invert(1) !important;
   }
 
   :root[data-theme='dark'] .app-shell-student .sidebar-logout,
