@@ -321,7 +321,7 @@
 
 @media (max-width: 760px) {
   .hero {
-    padding-top: 92px;
+    padding-top: clamp(52px, 14vw, 68px);
   }
 
   .actions {
@@ -349,4 +349,30 @@
     radial-gradient(circle at 14% 8%, rgba(56, 182, 255, 0.2), transparent 48%),
     radial-gradient(circle at 86% 6%, rgba(238, 139, 96, 0.2), transparent 48%),
     linear-gradient(180deg, #09101d 0%, #0d1525 42%, #101a2c 100%);
+}
+
+:global(:root[data-theme='dark']) .secondaryBtn,
+:global(:root[data-theme='dark']) .kpiCard,
+:global(:root[data-theme='dark']) .featureCard,
+:global(:root[data-theme='dark']) .showcaseCard {
+  color: var(--academy-ink);
+  background: rgba(12, 20, 34, 0.94);
+  border-color: rgba(148, 163, 184, 0.24);
+  box-shadow: 0 16px 34px rgba(2, 6, 23, 0.36);
+}
+
+:global(:root[data-theme='dark']) .secondaryBtn {
+  color: var(--academy-ink);
+}
+
+:global(:root[data-theme='dark']) .stepCard {
+  color: var(--academy-ink);
+  background: linear-gradient(145deg, rgba(20, 39, 65, 0.94), rgba(12, 20, 34, 0.96));
+  border-color: rgba(148, 163, 184, 0.24);
+}
+
+:global(:root[data-theme='dark']) .ctaInner {
+  color: var(--academy-ink);
+  background: linear-gradient(130deg, rgba(20, 54, 91, 0.82), rgba(12, 20, 34, 0.96));
+  border-color: rgba(148, 163, 184, 0.24);
 }
