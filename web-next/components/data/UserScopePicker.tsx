@@ -20,16 +20,16 @@ export default function UserScopePicker() {
 
   return (
     <div className="card" style={{ marginBottom: 20 }}>
-      <p className="pill">Filtro por usuário</p>
+      <p className="pill">Perfil em foco</p>
       <p className="subtle" style={{ marginTop: 8 }}>
-        Informe o UID do usuário para carregar subcoleções (avaliações, pagamentos, documentos etc.).
+        Escolha o perfil cujos dados deseja consultar em pagamentos, avaliações e documentos.
       </p>
       <div className={styles.controls}>
         <input
           value={value}
           onChange={(event) => setValue(event.target.value)}
-          placeholder="UID do usuário"
-          aria-label="UID do usuário"
+          placeholder="Identificador da conta"
+          aria-label="Identificador da conta"
         />
         <button
           className="button"
@@ -51,7 +51,7 @@ export default function UserScopePicker() {
       </div>
       {userId && (
         <p className="subtle" style={{ marginTop: 10 }}>
-          Usuário atual: {userId}
+          Perfil selecionado para consulta.
         </p>
       )}
     </div>

@@ -458,7 +458,7 @@ export default function FinanceiroPersonalPage() {
                 <p className="subtle">Selecione um aluno para ver cobranças.</p>
               )}
               {!isPersonal && !targetUserId && (
-                <p className="subtle">Informe um UID para listar pagamentos.</p>
+                <p className="subtle">Selecione um perfil para ver os pagamentos recentes.</p>
               )}
               {targetUserId && orderedPayments.length === 0 && (
                 <p className="subtle">Nenhuma cobrança encontrada.</p>

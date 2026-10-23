@@ -170,7 +170,7 @@ export default function FinanceiroPage() {
             Ver detalhes
           </Link>
         </div>
-        {!userId && <p className="subtle">Informe um UID para listar pagamentos.</p>}
+        {!userId && <p className="subtle">Selecione um perfil para ver os pagamentos recentes.</p>}
         {userId && orderedPayments.length === 0 && <p className="subtle">Nenhum pagamento encontrado.</p>}
         {userId && orderedPayments.length > 0 && (
           <div className="finance-payments-grid">
