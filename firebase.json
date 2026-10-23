@@ -15,6 +15,11 @@
       "**/node_modules/**"
     ],
     "cleanUrls": true,
+    "redirects": [
+      { "source": "/funcionalidades", "destination": "/beneficios", "type": 301 },
+      { "source": "/planos", "destination": "/#planos", "type": 301 },
+      { "source": "/sobre", "destination": "/equipe", "type": 301 }
+    ],
     "headers": [
       {
         "source": "**",
