@@ -291,6 +291,12 @@ export default function LoginPage() {
           </div>
         </section>
       </div>
+      <section className={styles.mobileRegister} aria-label="Criar uma conta">
+        <p>Ainda não tem conta?</p>
+        <Link href="/cadastro" className="auth-link auth-link-chip">
+          Criar conta
+        </Link>
+      </section>
       <p className={styles.mobileFooter}>
         Pessoas mais fortes
         <br />

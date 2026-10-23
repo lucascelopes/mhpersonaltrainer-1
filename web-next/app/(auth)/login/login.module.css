@@ -56,6 +56,10 @@
   display: contents;
 }
 
+.mobileRegister {
+  display: none;
+}
+
 .mobileIntro,
 .mobileSubtitle,
 .mobileForgot,
@@ -436,10 +440,56 @@
   }
 
   .loginPage :global(.auth-access) {
-    gap: 10px;
-    padding: 0;
-    border: 0;
-    background: transparent;
+    display: none;
+  }
+
+  .mobileRegister {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 12px;
+    padding: 12px 14px;
+    border: 1px solid #d6e4f2;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.88);
+  }
+
+  .mobileRegister p {
+    color: #536b86;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .loginPage .mobileRegister :global(.auth-link-chip) {
+    min-height: 44px;
+    padding-inline: 16px;
+    border-color: #0877e8;
+    border-radius: 11px;
+    background: #0877e8;
+    color: #fff;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+
+  .loginPage .mobileRegister :global(.auth-link-chip:hover) {
+    border-color: #0666ca;
+    background: #0666ca;
+  }
+
+  :global(:root[data-theme='dark']) .mobileRegister {
+    border-color: rgba(148, 163, 184, 0.24);
+    background: rgba(18, 26, 44, 0.92);
+  }
+
+  :global(:root[data-theme='dark']) .mobileRegister p {
+    color: #c8d8ee;
+  }
+
+  :global(:root[data-theme='dark']) .loginPage .mobileRegister :global(.auth-link-chip) {
+    border-color: #0877e8;
+    background: #0877e8;
+    color: #fff;
   }
 
   .loginPage :global(.auth-access-header) {

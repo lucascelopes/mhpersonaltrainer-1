@@ -157,3 +157,26 @@ A autenticação foi exercitada somente no emulador local `demo-mhpersonal-audit
 `npm run build:hosting` passou pela compilação, lint e checagem de tipos e exportou 109 rotas. A varredura dos chunks encontrou zero strings de chave OpenRouter; o marcador de build `hosting-preview-disabled` aparece no bundle. A URL temporária do Firebase respondeu no navegador e permanece válida até 2026-10-30. Nenhum deploy foi feito no canal `live`, e as regras do Firestore não foram alteradas.
 
 Esta é uma rodada de login e de seis rotas do Personal. Ela amplia a cobertura privada anterior, mas não conclui a auditoria de todas as rotas, perfis e fluxos do produto.
+
+# Login e cadastro móvel — QA e publicação
+
+Data: 2026-10-23
+
+Prévia Firebase Hosting: [qa-login-register-20261023](https://profissions-2746d--qa-login-register-20261023-bqww3r8s.web.app/login), versão `de86de85919f424e`, expira em 2026-10-30.
+
+Publicação verificada no canal principal Firebase Hosting e no domínio [mhpersonaltrainer.com.br](https://mhpersonaltrainer.com.br/login). O endereço Firebase padrão também está ativo: [profissions-2746d.web.app](https://profissions-2746d.web.app/login).
+
+## Correção validada
+
+- Em telas de até 960 px, removida a lista repetida de opções de acesso abaixo do formulário de login. Uma faixa compacta “Ainda não tem conta? Criar conta” leva ao seletor de perfil em `/cadastro`.
+- Em desktop, as opções completas de acesso continuam visíveis. O botão de mostrar/ocultar senha e a validação de campos vazios também foram exercitados.
+
+## Verificação da prévia e produção
+
+- 17 rotas públicas verificadas em 320 × 740 e 1440 × 900: 34/34 verificações passaram, sem overflow horizontal, erros de página ou erros de console. Rotas: `/`, `/academia`, `/beneficios`, `/equipe`, `/login`, `/login-aluno`, `/personal-login`, `/academy-login`, `/forgot-password`, `/register`, `/register-personal`, `/register-academy`, `/register-aluno`, `/cadastro`, `/account-deletion`, `/privacy` e `/terms`.
+- A mesma matriz 34/34 passou no domínio de produção após a publicação.
+- Testes adicionais em `/login` nos tamanhos 320, 390, 768, 1024 e 1440 px confirmaram a troca responsiva entre a chamada compacta e as opções desktop. O link de cadastro abriu o seletor de perfil em mobile; mostrar/ocultar senha e mensagem de campos obrigatórios funcionaram.
+- Build de Hosting aprovado: 109 rotas estáticas, lint e checagem de tipos concluídos. O JavaScript exportado não contém padrão de chave OpenRouter e contém o marcador `hosting-preview-disabled`.
+- A publicação alterou apenas Hosting. Nenhuma regra, função, conta ou dado real foi alterado.
+
+Esta rodada valida as rotas públicas e o fluxo de cadastro a partir do login, mas não conclui a auditoria de todas as rotas privadas, perfis e fluxos autenticados.
