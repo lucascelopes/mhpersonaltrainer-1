@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
 import { useAuth } from '@/lib/auth';
+import { omitUndefinedFirestoreFields } from '@/lib/firestorePayload';
 
 type ErrorPayload = {
   type: 'error' | 'unhandledrejection';
@@ -73,6 +74,8 @@ export default function AppErrorReporter() {
 
   useEffect(() => {
     const logError = async (payload: ErrorPayload) => {
+      if (!user?.uid) return;
+
       const key = `${payload.type}-${payload.message}-${payload.code || ''}-${payload.source || ''}`;
       const now = Date.now();
       const last = lastErrorRef.current;
@@ -81,10 +84,12 @@ export default function AppErrorReporter() {
       }
       lastErrorRef.current = { key, at: now };
       try {
-        await addDoc(collection(db, 'appErrors'), {
+        const errorDocument = omitUndefinedFirestoreFields({
           ...payload,
+          userId: user.uid,
           createdAt: serverTimestamp(),
         });
+        await addDoc(collection(db, 'appErrors'), errorDocument);
       } catch (error) {
         console.warn('Falha ao registrar erro do app.', error);
       }

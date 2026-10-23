@@ -32,7 +32,22 @@ async function main() {
     };
     vm.runInThisContext(`(function(exports,require,module){${compiled}\n})`, { filename: source })(serviceModule.exports, serviceRequire, serviceModule);
     const { ensureConversation, sendMessage } = serviceModule.exports;
+    const payloadSource = path.resolve(__dirname, '../lib/firestorePayload.ts');
+    const payloadCompiled = ts.transpileModule(fs.readFileSync(payloadSource, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
+    const payloadModule = { exports: {} };
+    vm.runInThisContext(`(function(exports,require,module){${payloadCompiled}\n})`, { filename: payloadSource })(payloadModule.exports, require, payloadModule);
+    const { omitUndefinedFirestoreFields } = payloadModule.exports;
     const args = { userId: user.uid, userName: 'Synthetic concurrency user', otherUserId: 'support', otherName: 'Support QA', type: 'support' };
+
+    const appError = omitUndefinedFirestoreFields({
+      type: 'error', message: 'Synthetic AppErrorReporter regression', name: undefined,
+      code: undefined, stack: undefined, source: 'qa-emulator', url: 'https://qa.example.test',
+      line: undefined, column: undefined, userId: user.uid, role: undefined,
+      userAgent: 'Synthetic QA', createdAt: serverTimestamp(),
+    });
+    assert.equal(Object.hasOwn(appError, 'code'), false, 'Undefined Firestore fields must be omitted');
+    await addDoc(collection(db, 'appErrors'), appError);
+
     const concurrent = await Promise.all(Array.from({length:8}, () => ensureConversation(args)));
     assert.equal(new Set(concurrent.map((conversation) => conversation.id)).size, 1, 'Concurrent calls must return the same conversation');
     const rows = await getDocs(query(collection(db, 'conversations'), where('participants', 'array-contains', user.uid)));
@@ -64,7 +79,7 @@ async function main() {
     assert.equal(reused.id, legacy.id, 'A legacy conversation must retain its original ID');
     const afterLegacy = await getDocs(query(collection(db, 'conversations'), where('participants', 'array-contains', user.uid)));
     assert.equal(afterLegacy.size, 2, 'Legacy reuse must not create another conversation');
-    console.log(JSON.stringify({projectId, concurrentCalls:8, newConversations:rows.size, messageAndSummaryPersisted:true, nonParticipantReadDenied:true, legacyIdPreserved:true}));
+    console.log(JSON.stringify({projectId, concurrentCalls:8, newConversations:rows.size, messageAndSummaryPersisted:true, nonParticipantReadDenied:true, legacyIdPreserved:true, appErrorFieldsSanitized:true}));
   } finally {
     if (user) await deleteUser(user).catch(() => {});
     // Firestore rules intentionally reserve deletes to admins. The disposable emulator
