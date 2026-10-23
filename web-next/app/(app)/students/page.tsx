@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import PageShell from '@/components/PageShell';
 import { useAuth } from '@/lib/auth';
 import { useDashboardData } from '@/lib/hooks/useDashboardData';
+import PersonalStudentsDashboard from '@/components/personal/PersonalStudentsDashboard';
 import { firestoreHelpers, formatDate, useCollectionData } from '@/lib/firestoreHooks';
 import { generateText } from '@/lib/services/ai';
 import { firestoreService } from '@/lib/services/firestoreService';
@@ -1511,6 +1512,9 @@ export default function StudentsPage() {
     (searchParams.get('adminStudio') === '1' || searchParams.get('adminStudio') === 'true');
   const canUsePromoStudio = isPersonal || isAdminInstagramMode;
   const [query, setQuery] = useState('');
+  useEffect(() => {
+    setQuery(searchParams.get('search') || '');
+  }, [searchParams]);
   const [inviteLink, setInviteLink] = useState('');
   const [inviteFeedback, setInviteFeedback] = useState('');
   const [personalCode, setPersonalCode] = useState('');
@@ -1580,21 +1584,36 @@ export default function StudentsPage() {
   const [promoStickerOpacity, setPromoStickerOpacity] = useState(84);
   const [promoStickerRotation, setPromoStickerRotation] = useState(0);
   const [promoStickerLayer, setPromoStickerLayer] = useState<PromoStickerLayerKey>('back');
+  const adminUsersPath = useMemo(() => (isAdmin ? ['users'] : []), [isAdmin]);
+  const adminUsersConstraints = useMemo(
+    () => (isAdmin ? [firestoreHelpers.limit(80)] : []),
+    [isAdmin]
+  );
   const { data: adminRows, loading: adminLoading } = useCollectionData<UserRow>(
-    ['users'],
-    [firestoreHelpers.limit(80)]
+    adminUsersPath,
+    adminUsersConstraints
   );
   const appInviteBase = process.env.NEXT_PUBLIC_APP_INVITE_URL || 'https://mhpersonaltrainer.com.br/invite';
   const personalCodeNumber = personalCode ? Number(personalCode) : NaN;
   const shouldQueryInvites = isPersonal && personalCode;
   const shouldQueryNumeric = shouldQueryInvites && !Number.isNaN(personalCodeNumber);
+  const inviteRowsStringPath = useMemo(() => (shouldQueryInvites ? ['users'] : []), [shouldQueryInvites]);
+  const inviteRowsStringConstraints = useMemo(
+    () => (shouldQueryInvites ? [firestoreHelpers.where('codigoPersonal', '==', personalCode)] : []),
+    [personalCode, shouldQueryInvites]
+  );
+  const inviteRowsNumberPath = useMemo(() => (shouldQueryNumeric ? ['users'] : []), [shouldQueryNumeric]);
+  const inviteRowsNumberConstraints = useMemo(
+    () => (shouldQueryNumeric ? [firestoreHelpers.where('codigoPersonal', '==', personalCodeNumber)] : []),
+    [personalCodeNumber, shouldQueryNumeric]
+  );
   const { data: inviteRowsString } = useCollectionData<UserRow>(
-    shouldQueryInvites ? ['users'] : [],
-    shouldQueryInvites ? [firestoreHelpers.where('codigoPersonal', '==', personalCode)] : []
+    inviteRowsStringPath,
+    inviteRowsStringConstraints
   );
   const { data: inviteRowsNumber } = useCollectionData<UserRow>(
-    shouldQueryNumeric ? ['users'] : [],
-    shouldQueryNumeric ? [firestoreHelpers.where('codigoPersonal', '==', personalCodeNumber)] : []
+    inviteRowsNumberPath,
+    inviteRowsNumberConstraints
   );
   const pageActions = isAdmin
     ? isAdminInstagramMode
@@ -2336,6 +2355,35 @@ export default function StudentsPage() {
       </div>
     );
   };
+
+  if (isPersonal && !isAdminInstagramMode) {
+    return (
+      <PersonalStudentsDashboard
+        students={filteredCards.map((student) => ({
+          id: student.id,
+          name: student.name,
+          email: student.email,
+          photoUrl: student.photoUrl,
+          status: student.status,
+          createdAt: student.createdAt,
+          lastActive: student.lastActive,
+        }))}
+        total={studentsSummary.total}
+        active={studentsSummary.ativos}
+        inactive={studentsSummary.inativos}
+        pending={studentsSummary.pendentes}
+        personalCode={personalCode}
+        inviteLink={inviteLink}
+        inviteCount={studentsSummary.total}
+        loading={loading}
+        query={query}
+        onQueryChange={setQuery}
+        onCopyLink={() => handleCopyInvite(inviteLink, 'Link copiado!')}
+        onCopyMessage={() => handleCopyInvite(inviteMessage, 'Mensagem copiada!')}
+        feedback={inviteFeedback}
+      />
+    );
+  }
 
   return (
     <PageShell
