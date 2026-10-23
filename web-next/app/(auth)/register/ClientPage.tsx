@@ -121,7 +121,7 @@ export default function RegisterPage() {
           <span>Email</span>
           <input
             type="email"
-            placeholder="seuemail@mhpersonal.com"
+            placeholder="seu@email.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             className="auth-input"

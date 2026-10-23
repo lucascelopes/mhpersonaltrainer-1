@@ -117,7 +117,7 @@ export default function RegisterAlunoPage() {
             autoComplete="email"
             autoCapitalize="none"
             required
-            placeholder="seuemail@mhpersonal.com"
+            placeholder="seu@email.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             className="auth-input"

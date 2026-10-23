@@ -111,7 +111,7 @@ export default function RegisterPersonalPage() {
             type="email"
             autoComplete="email"
             autoCapitalize="none"
-            placeholder="seuemail@mhpersonal.com"
+            placeholder="seu@email.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             className="auth-input"
