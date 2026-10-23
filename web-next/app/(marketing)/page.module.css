@@ -693,25 +693,27 @@
   }
 
   .heroPhoto {
-    min-height: 470px;
+    order: 1;
+    min-height: clamp(340px, 90vw, 470px);
   }
 
   .heroPhoto img {
     transform: scale(1.02);
+    object-position: center 35%;
   }
 
   .heroContent {
-    padding: 55px 22px 0;
+    order: -1;
+    grid-template-rows: auto;
+    padding: 34px 22px 30px;
   }
 
   .heroCopy h1 {
-    font-size: clamp(3.15rem, 15vw, 4.6rem);
+    font-size: clamp(2.35rem, 11.6vw, 4.6rem);
   }
 
   .heroDashboard {
-    width: 108%;
-    height: 250px;
-    margin-left: -4%;
+    display: none;
   }
 
   .outcomes {
