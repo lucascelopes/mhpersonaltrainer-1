@@ -13,6 +13,7 @@ import type { AerobicWorkout, UserWorkout } from '@/lib/types/workout';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { fetchFeedbacksByPersonalCode } from '@/lib/services/feedback';
 import type { FeedbackItem } from '@/lib/types/feedback';
+import PersonalWorkoutsDashboard from '@/components/personal/PersonalWorkoutsDashboard';
 
 interface WorkoutRow {
   id: string;
@@ -77,11 +78,18 @@ export default function WorkoutsPage() {
   const { userId } = useUserScope();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { data: publicWorkouts } = useCollectionData<WorkoutRow>(['treinos'], [firestoreHelpers.limit(20)]);
-  const { data: userWorkouts } = useCollectionData<WorkoutRow>(['users', userId, 'createTreinos'], [firestoreHelpers.limit(20)]);
-  const dashboard = useDashboardData();
   const isPersonal = role === 'personal' || role === 'professor';
   const isStudent = role === 'aluno';
+  const publicWorkoutsPath = useMemo(() => (isPersonal ? [] : ['treinos']), [isPersonal]);
+  const publicWorkoutsConstraints = useMemo(() => (isPersonal ? [] : [firestoreHelpers.limit(20)]), [isPersonal]);
+  const userWorkoutsPath = useMemo(
+    () => (isPersonal || !userId ? [] : ['users', userId, 'createTreinos']),
+    [isPersonal, userId]
+  );
+  const userWorkoutsConstraints = useMemo(() => (isPersonal ? [] : [firestoreHelpers.limit(20)]), [isPersonal]);
+  const { data: publicWorkouts } = useCollectionData<WorkoutRow>(publicWorkoutsPath, publicWorkoutsConstraints);
+  const { data: userWorkouts } = useCollectionData<WorkoutRow>(userWorkoutsPath, userWorkoutsConstraints);
+  const dashboard = useDashboardData();
   const [selectedStudentId, setSelectedStudentId] = useState('');
   const [studentQuery, setStudentQuery] = useState('');
   const [studentWorkouts, setStudentWorkouts] = useState<UserWorkout[]>([]);
@@ -375,6 +383,23 @@ export default function WorkoutsPage() {
           )}
         </div>
       </section>
+    );
+  }
+
+  if (isPersonal) {
+    return (
+      <PersonalWorkoutsDashboard
+        students={visibleStudents}
+        selectedStudent={selectedStudent}
+        selectedStudentId={selectedStudentId}
+        onSelectStudent={setSelectedStudentId}
+        studentQuery={studentQuery}
+        onStudentQueryChange={setStudentQuery}
+        workouts={studentWorkouts}
+        loadingWorkouts={loadingWorkouts}
+        feedbacks={recentFeedbacks}
+        onAssistant={handleAssistantPrompt}
+      />
     );
   }
 
