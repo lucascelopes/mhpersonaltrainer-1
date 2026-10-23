@@ -1,0 +1,56 @@
+.academyLoginPage {
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  :global(.auth-shell):has(.academyLoginPage) {
+    min-height: 100svh;
+    padding: 0;
+  }
+
+  :global(.auth-shell):has(.academyLoginPage) :global(.auth-grid) {
+    display: block;
+    width: min(100%, 480px);
+  }
+
+  :global(.auth-shell):has(.academyLoginPage) :global(.auth-hero) {
+    display: none;
+  }
+
+  :global(.auth-shell):has(.academyLoginPage) :global(.auth-panel) {
+    min-width: 0;
+    padding: 26px 20px 30px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .academyLoginPage {
+    gap: 18px;
+    margin-top: 20px;
+    padding: 24px 20px;
+    border: 1px solid #d5e3f1;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 18px 38px rgba(28, 70, 111, 0.09);
+  }
+
+  .academyLoginPage :global(.auth-card-header h1) {
+    font-size: clamp(1.6rem, 7vw, 2rem);
+    line-height: 1.13;
+  }
+
+  .academyLoginPage :global(.auth-password) {
+    min-width: 0;
+  }
+
+  .academyLoginPage :global(.auth-toggle) {
+    flex: 0 0 auto;
+  }
+
+  :global(:root[data-theme='dark']) .academyLoginPage {
+    border-color: rgba(148, 163, 184, 0.24);
+    background: #121a2c;
+  }
+}

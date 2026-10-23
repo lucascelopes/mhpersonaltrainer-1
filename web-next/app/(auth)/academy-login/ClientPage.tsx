@@ -5,6 +5,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { internalAuthRedirect } from '@/lib/authRedirect';
+import styles from './academy-login.module.css';
 
 export default function AcademyLoginPage() {
   const { login, loginWithGoogle, loginWithApple, logout, isAuthenticated, role } = useAuth();
@@ -88,7 +89,7 @@ export default function AcademyLoginPage() {
   };
 
   return (
-    <div className="auth-card">
+    <div className={`auth-card ${styles.academyLoginPage}`}>
       <div className="auth-card-header">
         <p className="auth-kicker">Portal da academia</p>
         <h1>Entrar no painel da academia</h1>
@@ -101,6 +102,7 @@ export default function AcademyLoginPage() {
           <span>Email</span>
           <input
             type="email"
+            autoComplete="email"
             placeholder="seu@email.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
@@ -112,6 +114,7 @@ export default function AcademyLoginPage() {
           <div className="auth-password">
             <input
               type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
               placeholder="********"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
