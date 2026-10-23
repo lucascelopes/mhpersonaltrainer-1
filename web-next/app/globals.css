@@ -3967,6 +3967,7 @@
   .app-content {
     padding: 36px 40px 80px;
     position: relative;
+    min-width: 0;
   }
 
   .app-content::before {

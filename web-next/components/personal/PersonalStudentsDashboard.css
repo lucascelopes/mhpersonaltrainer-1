@@ -705,6 +705,19 @@
   color: #fff;
 }
 
+:root[data-theme='dark'] .app-content-personal .personal-students-global-search input,
+:root[data-theme='dark'] .app-content-personal .personal-students-list-search input {
+  border: 1px solid #405570;
+  background: #0d192a;
+  color: #e8f0fb;
+}
+
+:root[data-theme='dark'] .app-content-personal .personal-students-global-search input:focus,
+:root[data-theme='dark'] .app-content-personal .personal-students-list-search input:focus {
+  background: #13243a;
+  outline-color: rgba(57, 137, 237, 0.5);
+}
+
 :root[data-theme='dark'] .app-content-personal .personal-students-row:hover {
   background: #1e3755;
 }
