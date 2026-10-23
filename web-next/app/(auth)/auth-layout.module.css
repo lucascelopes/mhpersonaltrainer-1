@@ -6,9 +6,18 @@
   align-items: center;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 960px) {
   .mobileBrand {
     display: inline-flex;
+  }
+
+  :global(.auth-shell):has(.mobileBrand) :global(.auth-hero) {
+    display: none;
+  }
+
+  :global(.auth-shell):has(.mobileBrand) :global(.auth-grid) {
+    width: min(100%, 560px);
+    margin-inline: auto;
   }
 
   :global(.auth-panel:has([data-auth-page="login"])) .mobileBrand {
