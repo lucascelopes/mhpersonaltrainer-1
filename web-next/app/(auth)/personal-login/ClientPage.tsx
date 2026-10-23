@@ -5,6 +5,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { internalAuthRedirect } from '@/lib/authRedirect';
+import styles from '../responsive-login.module.css';
 
 export default function PersonalLoginPage() {
   const { loginAsPersonal, isAuthenticated } = useAuth();
@@ -51,9 +52,9 @@ export default function PersonalLoginPage() {
   };
 
   return (
-    <div className="auth-card">
+    <div className={`auth-card ${styles.responsiveLogin}`}>
       <div className="auth-card-header">
-        <p className="auth-kicker">Area do personal</p>
+        <p className="auth-kicker">Área do personal</p>
         <h1>Entrar no painel profissional</h1>
         <p className="subtle">
           Acesso exclusivo para personal trainer, professor ou admin.
@@ -65,7 +66,7 @@ export default function PersonalLoginPage() {
           <input
             type="email"
             autoComplete="email"
-            placeholder="personal@mhpersonal.com"
+            placeholder="seu@email.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             className="auth-input"

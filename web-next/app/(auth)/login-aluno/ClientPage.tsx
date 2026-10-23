@@ -5,6 +5,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { internalAuthRedirect } from '@/lib/authRedirect';
+import styles from '../responsive-login.module.css';
 
 const resolveRedirect = (redirectParam: string | null) => {
   const destination = internalAuthRedirect(redirectParam, '/app');
@@ -95,7 +96,7 @@ export default function LoginAlunoPage() {
 
   if (mobileAllowed === null) {
     return (
-      <div className="auth-card auth-card--student">
+      <div className={`auth-card auth-card--student ${styles.responsiveLogin}`}>
         <div className="auth-card-header">
           <p className="auth-kicker">Aluno</p>
           <h1>Verificando dispositivo</h1>
@@ -107,7 +108,7 @@ export default function LoginAlunoPage() {
 
   if (!mobileAllowed) {
     return (
-      <div className="auth-card auth-card--student">
+      <div className={`auth-card auth-card--student ${styles.responsiveLogin}`}>
         <div className="auth-card-header">
           <p className="auth-kicker">Aluno</p>
           <h1>Acesso apenas no celular</h1>
@@ -128,7 +129,7 @@ export default function LoginAlunoPage() {
   }
 
   return (
-    <div className="auth-card auth-card--student">
+    <div className={`auth-card auth-card--student ${styles.responsiveLogin}`}>
       <div className="auth-card-header">
         <p className="auth-kicker">Aluno</p>
         <h1>Entrar no painel do aluno</h1>
@@ -139,6 +140,7 @@ export default function LoginAlunoPage() {
           <span>Email</span>
           <input
             type="email"
+            autoComplete="email"
             placeholder="seu@email.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
@@ -150,6 +152,7 @@ export default function LoginAlunoPage() {
           <div className="auth-password">
             <input
               type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
               placeholder="********"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
