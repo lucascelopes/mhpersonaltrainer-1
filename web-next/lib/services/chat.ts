@@ -81,48 +81,19 @@ export async function ensureConversation(params: EnsureConversationParams): Prom
   const db = getFirebaseDb();
   const key = buildKey(params.userId, params.otherUserId);
   const conversationsRef = collection(db, 'conversations');
-  const q = query(conversationsRef, where('key', '==', key), limit(1));
-  const existing = await getDocs(q);
-
-  if (!existing.empty) {
-    const docSnap = existing.docs[0];
-    const data = docSnap.data();
-    const participantInfo: Record<string, ParticipantInfo> = data.participantInfo || {};
-    let shouldUpdate = false;
-    if (!participantInfo[params.userId]) {
-      participantInfo[params.userId] = buildParticipantInfoEntry(params.userName, params.userPhoto);
-      shouldUpdate = true;
-    }
-    if (!participantInfo[params.otherUserId]) {
-      participantInfo[params.otherUserId] = buildParticipantInfoEntry(params.otherName, params.otherPhoto);
-      shouldUpdate = true;
-    }
-    if (shouldUpdate) {
-      await setDoc(
-        doc(db, 'conversations', docSnap.id),
-        { participantInfo },
-        { merge: true }
-      );
-    }
-    return mapConversation(docSnap.id, data);
-  }
-
-  const fallbackSnapshot = await getDocs(
+  const participantConversations = await getDocs(
     query(conversationsRef, where('participants', 'array-contains', params.userId))
   );
-  const fallbackDoc = fallbackSnapshot.docs.find((docSnap) => {
+  const existingConversation = participantConversations.docs.find((docSnap) => {
     const data = docSnap.data();
     const participants = Array.isArray(data.participants) ? data.participants : [];
     return participants.includes(params.otherUserId);
   });
 
-  if (fallbackDoc) {
-    const data = fallbackDoc.data();
-    const participantInfo: Record<string, ParticipantInfo> = data.participantInfo || {};
-    let shouldUpdate = false;
-    if (!data.key) {
-      shouldUpdate = true;
-    }
+  if (existingConversation) {
+    const data = existingConversation.data();
+    const participantInfo: Record<string, ParticipantInfo> = { ...(data.participantInfo || {}) };
+    let shouldUpdate = data.key !== key;
     if (!participantInfo[params.userId]) {
       participantInfo[params.userId] = buildParticipantInfoEntry(params.userName, params.userPhoto);
       shouldUpdate = true;
@@ -133,7 +104,7 @@ export async function ensureConversation(params: EnsureConversationParams): Prom
     }
     if (shouldUpdate) {
       await setDoc(
-        doc(db, 'conversations', fallbackDoc.id),
+        doc(db, 'conversations', existingConversation.id),
         {
           key,
           participantInfo,
@@ -141,7 +112,7 @@ export async function ensureConversation(params: EnsureConversationParams): Prom
         { merge: true }
       );
     }
-    return mapConversation(fallbackDoc.id, data);
+    return mapConversation(existingConversation.id, { ...data, key, participantInfo });
   }
 
   const participantInfo: Record<string, ParticipantInfo> = {
@@ -149,17 +120,18 @@ export async function ensureConversation(params: EnsureConversationParams): Prom
     [params.otherUserId]: buildParticipantInfoEntry(params.otherName, params.otherPhoto),
   };
 
-  const docRef = await addDoc(conversationsRef, {
+  const identity = new TextEncoder().encode(JSON.stringify([params.userId, params.otherUserId].sort()));
+  const digest = await crypto.subtle.digest('SHA-256', identity);
+  const conversationId = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
+  const docRef = doc(conversationsRef, conversationId);
+  await setDoc(docRef, {
     key,
     participants: [params.userId, params.otherUserId],
     type: params.type || 'direct',
     participantInfo,
     createdAt: serverTimestamp(),
-    lastMessage: '',
     lastMessageAt: serverTimestamp(),
-    lastMessageSenderId: '',
-    unreadCount: {},
-  });
+  }, { merge: true });
 
   return {
     id: docRef.id,
