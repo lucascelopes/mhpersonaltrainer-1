@@ -21,6 +21,7 @@ import {
   submitStripeConnectOnboarding,
 } from '@/lib/services/payments';
 import './billing-mobile.css';
+import './billing-workspace.css';
 
 const normalizeConnectError = (message: string) => {
   const normalized = message.toLowerCase();
@@ -34,6 +35,16 @@ const normalizeConnectError = (message: string) => {
     return 'Servico de recebimentos nao configurado.';
   }
   return message;
+};
+
+const getInvoiceReadErrorMessage = (message: string) => {
+  if (/COLLECTION_GROUP_ASC|requires an index/i.test(message)) {
+    return 'As faturas precisam de um índice do Firestore para serem carregadas.';
+  }
+  if (/permission|allow statements|unauthorized|false for|PERMISSION_DENIED/i.test(message)) {
+    return 'Sem permissão para carregar as faturas. Tente novamente ou contate o suporte.';
+  }
+  return 'Não foi possível carregar as faturas agora. Tente novamente.';
 };
 
 const initialConnectForm = {
@@ -550,7 +561,7 @@ export default function AcademyBillingPage() {
                   <p>Filtre por status e aluno para operar rapido.</p>
                 </div>
               </div>
-              {invoicesError && <p className="billing-v10-alert">{invoicesError}</p>}
+              {invoicesError && <p className="billing-v10-alert" role="alert">{getInvoiceReadErrorMessage(invoicesError)}</p>}
               <div className="billing-v10-summary">
                 <div className="billing-v10-chip">
                   <span>Total</span>

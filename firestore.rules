@@ -292,6 +292,12 @@ service cloud.firestore {
       allow read, write: if canAccessUser(userId);
     }
 
+    // A collection-group query cannot infer access from the parent user path.
+    match /{path=**}/pagamentos/{paymentId} {
+      allow get, list: if hasField(resource.data, 'academyCode') &&
+        currentAcademyOwnsCode(resource.data.academyCode);
+    }
+
     match /academyCheckins/{checkinId} {
       allow get, list: if hasField(resource.data, 'academyCode') &&
         currentAcademyOwnsCode(resource.data.academyCode);

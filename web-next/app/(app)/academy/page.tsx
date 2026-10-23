@@ -41,7 +41,17 @@ const getInvoiceErrorMessage = (value: string) => {
   if (value.includes('COLLECTION_GROUP_ASC')) {
     return 'Indice do Firestore necessario para carregar faturas.';
   }
-  return value;
+  if (/permission|allow statements|unauthorized|false for|PERMISSION_DENIED/i.test(value)) {
+    return 'Sem permissão para carregar as faturas.';
+  }
+  return 'Não foi possível carregar as faturas agora. Tente novamente.';
+};
+
+const getAcademyLoadErrorMessage = (value: string) => {
+  if (/permission|allow statements|unauthorized|false for|PERMISSION_DENIED|maximum of \d+ expressions/i.test(value)) {
+    return 'Sem permissão para carregar os dados da academia. Confira o acesso desta conta.';
+  }
+  return 'Não foi possível carregar os dados da academia agora. Tente novamente.';
 };
 
 type CheckinMethod = 'biometria' | 'foto' | 'nfc';
@@ -663,7 +673,7 @@ export default function AcademyDashboardPage() {
           <div className="academy-alert is-danger" style={{ marginBottom: 20 }}>
             <div>
               <strong>Erro ao carregar</strong>
-              <span>{academyError}</span>
+              <span>{getAcademyLoadErrorMessage(academyError)}</span>
             </div>
           </div>
         )}

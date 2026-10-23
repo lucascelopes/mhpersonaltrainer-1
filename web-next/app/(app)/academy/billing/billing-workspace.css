@@ -1,0 +1,132 @@
+.app-shell-academy .academy-billing-v10::before,
+.app-shell-academy .academy-billing-v10 .billing-v10-hero::before,
+.app-shell-academy .academy-billing-v10 .billing-v10-kpi::before,
+.app-shell-academy .academy-billing-v10 .billing-v10-kpi::after {
+  display: none;
+}
+
+.app-shell-academy .academy-billing-v10 .billing-v10-hero {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 20px;
+  padding: 0 0 22px;
+  border: 0;
+  border-bottom: 1px solid var(--billing-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--billing-ink);
+  box-shadow: none;
+  overflow: visible;
+}
+
+.app-shell-academy .academy-billing-v10 .billing-v10-kicker {
+  color: var(--billing-muted);
+  letter-spacing: 0.16em;
+}
+
+.app-shell-academy .academy-billing-v10 .billing-v10-hero-text h2 {
+  color: var(--billing-ink) !important;
+  font-size: clamp(1.55rem, 1.25rem + 0.9vw, 2rem);
+  line-height: 1.18;
+}
+
+.app-shell-academy .academy-billing-v10 .billing-v10-hero-text p {
+  color: var(--billing-muted);
+}
+
+.app-shell-academy .academy-billing-v10 .billing-v10-hero-actions {
+  align-content: end;
+}
+
+.app-shell-academy .academy-billing-v10 .billing-v10-hero-actions .button {
+  border: 1px solid #0b70e1;
+  background: #0b70e1;
+  color: #fff;
+}
+
+.app-shell-academy .academy-billing-v10 .billing-v10-hero-actions .button.secondary,
+.app-shell-academy .academy-billing-v10 .billing-v10-hero-actions .button.ghost {
+  border: 1px solid var(--billing-border);
+  background: var(--billing-surface);
+  color: var(--billing-ink);
+}
+
+.app-shell-academy .academy-billing-v10 .billing-v10-kpis {
+  gap: 0;
+  border: 1px solid var(--billing-border);
+  border-radius: 14px;
+  background: var(--billing-surface);
+  overflow: hidden;
+}
+
+.app-shell-academy .academy-billing-v10 .billing-v10-kpi {
+  gap: 4px;
+  padding: 14px 18px;
+  border: 0;
+  border-right: 1px solid var(--billing-border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.app-shell-academy .academy-billing-v10 .billing-v10-kpi:last-child {
+  border-right: 0;
+}
+
+.app-shell-academy .academy-billing-v10 .billing-v10-card {
+  border: 1px solid var(--billing-border);
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+.app-shell-academy .academy-billing-v10 .billing-v10-card-header {
+  border-bottom-style: solid;
+}
+
+.app-shell-academy .academy-billing-v10 .billing-v10-toolbar {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+@media (max-width: 720px) {
+  .app-shell-academy .academy-billing-v10 .billing-v10-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .app-shell-academy .academy-billing-v10 .billing-v10-hero-text {
+    display: none;
+  }
+
+  .app-shell-academy .academy-billing-v10 .billing-v10-hero-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .app-shell-academy .academy-billing-v10 .billing-v10-hero-actions .button:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .app-shell-academy .academy-billing-v10 .billing-v10-hero-actions .button {
+    min-height: 48px;
+    width: 100%;
+    padding-inline: 8px;
+    line-height: 1.2;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .app-shell-academy .academy-billing-v10 .billing-v10-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .app-shell-academy .academy-billing-v10 .billing-v10-kpi:nth-child(2) {
+    border-right: 0;
+  }
+
+  .app-shell-academy .academy-billing-v10 .billing-v10-kpi:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--billing-border);
+  }
+}
