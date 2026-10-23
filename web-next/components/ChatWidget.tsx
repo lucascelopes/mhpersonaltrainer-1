@@ -1,6 +1,7 @@
 'use client';
 
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { firestoreService, type Aluno } from '@/lib/services/firestoreService';
 import {
@@ -161,6 +162,8 @@ const buildWorkoutRoute = (workoutId: string, studentId?: string) =>
   studentId ? `/workout/${workoutId}?studentId=${studentId}` : `/workout/${workoutId}`;
 
 export default function ChatWidget() {
+  const pathname = usePathname();
+  const isFinancePersonalRoute = pathname === '/financeiro/personal';
   const { user, role } = useAuth();
   const [open, setOpen] = useState(false);
   const [contacts, setContacts] = useState<ContactItem[]>([]);
@@ -186,6 +189,10 @@ export default function ChatWidget() {
   const messagesRef = useRef<HTMLDivElement>(null);
   const autoReplyRef = useRef<Record<string, boolean>>({});
   const autoReplyLastRef = useRef<Record<string, string>>({});
+
+  useEffect(() => {
+    if (isFinancePersonalRoute) setOpen(false);
+  }, [isFinancePersonalRoute]);
 
   const isPersonal = role === 'personal' || role === 'professor' || role === 'admin';
   const isAdmin = role === 'admin';
@@ -819,16 +826,18 @@ export default function ChatWidget() {
     !!activeContact && activeContact.isAssistant && (pendingWorkout || isPersonal);
 
   return (
-    <div className={`chat-widget ${open ? 'open' : ''}`}>
-      <button
-        className="chat-fab"
-        type="button"
-        onClick={() => setOpen((value) => !value)}
-        aria-label="Abrir chat"
-      >
-        Chat
-      </button>
-      {open && (
+    <div className={`chat-widget ${open && !isFinancePersonalRoute ? 'open' : ''}`}>
+      {!isFinancePersonalRoute && (
+        <button
+          className="chat-fab"
+          type="button"
+          onClick={() => setOpen((value) => !value)}
+          aria-label="Abrir chat"
+        >
+          Chat
+        </button>
+      )}
+      {!isFinancePersonalRoute && open && (
         <div className="chat-widget-panel">
           <div className="chat-widget-header">
             {activeContact ? (

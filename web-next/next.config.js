@@ -2,12 +2,14 @@
 const isTauriBuild = process.env.TAURI_BUILD === '1';
 const isHostingBuild = process.env.HOSTING_BUILD === '1';
 const isProduction = process.env.NODE_ENV === 'production';
+const buildCpus = Number(process.env.NEXT_BUILD_CPUS || (isHostingBuild ? '1' : ''));
 
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   experimental: {
     externalDir: true,
+    ...(Number.isInteger(buildCpus) && buildCpus > 0 ? { cpus: buildCpus } : {}),
   },
   distDir: process.env.NEXT_DIST_DIR || '.next',
   images: {

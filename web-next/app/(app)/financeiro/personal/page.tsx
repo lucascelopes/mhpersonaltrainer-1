@@ -297,9 +297,11 @@ export default function FinanceiroPersonalPage() {
 
   return (
     <PageShell
+      className="finance-personal-shell"
       title="Financeiro do personal"
       description="Envie faturas, acompanhe pagamentos e organize repasses."
       breadcrumbs={[{ label: 'Financeiro', href: '/financeiro' }]}
+      actions={[{ label: 'Abrir chat', href: '/chat' }]}
     >
       <UserScopePicker />
       <div className={`finance-personal finance-personal-layout ${styles.page}`}>

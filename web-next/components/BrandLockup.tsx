@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import type { CSSProperties } from 'react';
-import officialLockup from '../../assets/images/PT_transparente.png';
 import styles from './BrandLockup.module.css';
 
 type BrandLockupProps = {
@@ -26,8 +25,11 @@ export default function BrandLockup({
     >
       <Image
         className={styles.image}
-        src={officialLockup}
+        src="/brand/PT_transparente.png"
         alt="MH Personal Trainer"
+        width={8378}
+        height={3333}
+        unoptimized
         priority={priority}
         style={{
           position: 'absolute',

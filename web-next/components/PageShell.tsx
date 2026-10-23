@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 interface PageShellProps {
+  className?: string;
   title: string;
   description?: string;
   breadcrumbs?: { label: string; href?: string }[];
@@ -10,6 +11,7 @@ interface PageShellProps {
 }
 
 export default function PageShell({
+  className,
   title,
   description,
   breadcrumbs,
@@ -18,7 +20,7 @@ export default function PageShell({
   children,
 }: PageShellProps) {
   return (
-    <section>
+    <section className={className}>
       <div className="page-header">
         <div>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
@@ -36,7 +38,7 @@ export default function PageShell({
           {description && <p className="subtle">{description}</p>}
         </div>
         {actions?.length ? (
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <div className="page-header-actions" style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             {actions.map((action) => (
               <Link key={action.href} href={action.href} className="button secondary">
                 {action.label}
