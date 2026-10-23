@@ -36,9 +36,19 @@ A navegação móvel fica fixa no rodapé. A tela foi percorrida até o final pa
 
 Stripe não está conectado no perfil sintético, então o link automático e um pagamento real não foram testados. Esta validação cobre a tela Financeiro do personal e o atalho de chat; não equivale a uma auditoria completa de todas as rotas.
 
+## Publicação nos canais de QA
+
+- `qa-home-mobile-20261023`: versão `08503c85b81b3598`, expira em 2026-10-30.
+- `revisao-20261018`: versão `d9dc81fa3fd6c94c`, expira em 2026-10-30.
+- Em ambos, `/login`, `/financeiro/personal` e `/brand/PT_transparente.png` retornaram HTTP 200.
+- Playwright no canal publicado confirmou a logo carregada em 1280 × 720 e 390 × 844; no celular, a largura do documento permaneceu em 390 px. Console publicado: zero erros e zero avisos.
+- A publicação ficou restrita aos canais temporários de QA; o canal `live` e o domínio principal não foram atualizados.
+
 ## Capturas
 
 - [Desktop 1440 × 900](finance-personal-desktop-1440.png)
 - [Mobile 390 × 844](finance-personal-mobile-390.png)
 - [Mobile 320 × 740](finance-personal-mobile-320.png)
 - [Mobile — formulário e cobranças ao rolar](finance-personal-mobile-bottom-390.png)
+- [Login publicado — desktop 1280 × 720](qa-login-desktop-1280.png)
+- [Login publicado — mobile 390 × 844](qa-login-mobile-390.png)
