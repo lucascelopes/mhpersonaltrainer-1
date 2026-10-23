@@ -126,3 +126,34 @@ Os 15 px de diferença entre o viewport e a largura do documento correspondem à
 - A atualização foi publicada no canal temporário `qa-academia-dark-20261023`. Nenhum deploy foi feito para produção; nenhuma conta ou dado real foi alterado.
 
 Esta rodada cobre a home e três páginas públicas de marketing. Login autenticado, áreas privadas e todos os fluxos do produto continuam fora desta verificação.
+
+# Login de Personal sem código — QA
+
+Data: 2026-10-23
+
+Prévia Firebase Hosting: [qa-personal-auth-20261023](https://profissions-2746d--qa-personal-auth-20261023-9hmx1qdv.web.app/login), versão `9751f9681c8610a7`, expira em 2026-10-30.
+
+## Correção validada
+
+- Perfis de Personal sem `codigoPersonal` agora entram no painel imediatamente; o login não consulta a lista de usuários nem deixa a sessão presa enquanto procura um código.
+- Um código ausente é verificado pelo callable `previewPersonalInvite` já usado no cadastro e reservado com o documento do código em uma transação. Chamadas simultâneas do listener de autenticação compartilham a mesma reserva, e um conflito consulta novamente o perfil antes de tentar outro candidato.
+- Se o serviço de convites estiver indisponível, o acesso continua aberto e o erro de geração fica restrito ao console; falha de atualização de atividade também não encerra a sessão.
+- Respostas atrasadas do carregamento de perfil só atualizam a tela enquanto a conta continua sendo a mesma, evitando restaurar uma sessão antiga após sair ou trocar de usuário.
+
+## Matriz responsiva e de autenticação
+
+| Área/rota | Viewport | Resultado |
+| --- | --- | --- |
+| Prévia `/login` | 1280 × 720 | Carregada no canal QA, tema escuro, sem overflow horizontal. |
+| Prévia `/login` | 390 × 844 | 375 px de conteúdo; opções auxiliares com 48 px de altura, sem overflow. |
+| Prévia `/login` | 320 × 740 | 305 px de conteúdo; campos e botões permanecem dentro da tela. |
+| Login sintético e `/app` | 320 × 740 e desktop | Conta de teste criada sem código entrou; código novo apareceu no painel e ficou salvo no perfil e no índice `personalCodes` do emulador. |
+| `/students`, `/workouts`, `/schedule`, `/financeiro/personal`, `/profile` | 320 × 740 | Todas carregaram; largura do documento 305 px, sem overflow horizontal ou tela de erro. |
+| Mesmas rotas privadas | 1440 × 900 | Todas carregaram sem overflow ou tela de erro; Financeiro exibiu os cartões de seleção e Stripe em duas colunas. |
+| Financeiro do Personal | claro e escuro, desktop e mobile | Superfícies acompanham o tema; nenhuma superfície branca ampla no conteúdo escuro. |
+
+A autenticação foi exercitada somente no emulador local `demo-mhpersonal-audit`, com perfis e códigos sintéticos. Não foi iniciado login com conta de Personal real nem alterado dado de produção. O console não teve erros novos após a correção; os avisos de conflito observados pertencem à primeira versão do teste antes da reserva única e não se repetiram no reteste.
+
+`npm run build:hosting` passou pela compilação, lint e checagem de tipos e exportou 109 rotas. A varredura dos chunks encontrou zero strings de chave OpenRouter; o marcador de build `hosting-preview-disabled` aparece no bundle. A URL temporária do Firebase respondeu no navegador e permanece válida até 2026-10-30. Nenhum deploy foi feito no canal `live`, e as regras do Firestore não foram alteradas.
+
+Esta é uma rodada de login e de seis rotas do Personal. Ela amplia a cobertura privada anterior, mas não conclui a auditoria de todas as rotas, perfis e fluxos do produto.

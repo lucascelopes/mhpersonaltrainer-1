@@ -21,6 +21,7 @@ import {
   getDocs,
   limit,
   query,
+  runTransaction,
   setDoc,
   updateDoc,
   where,
@@ -32,6 +33,7 @@ import { firestoreService } from './services/firestoreService';
 import { notifyUserLoginSecurityAlert } from './services/notificationCenter';
 import { inviteErrorMessage, registerStudentWithInvite } from './services/personalInvite';
 import { academyRegistrationErrorMessage, registerAcademyWithCode } from './services/academyRegistration';
+import { generateAvailablePersonalCode } from './services/personalCode';
 
 interface AuthContextValue extends AuthState {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
@@ -91,12 +93,6 @@ const normalizeHorario = (value: any) => {
   return hasAny ? horario : undefined;
 };
 
-const isMissingCode = (value?: string | number | null) => {
-  if (value === null || value === undefined) return true;
-  const text = String(value).trim();
-  return text === '' || text === '0';
-};
-
 const normalizePersonalCodeValue = (value: any): number | null => {
   if (value === null || value === undefined) return null;
   const text = String(value).trim();
@@ -104,6 +100,8 @@ const normalizePersonalCodeValue = (value: any): number | null => {
   const numeric = Number(text);
   return Number.isNaN(numeric) ? null : numeric;
 };
+
+const isMissingCode = (value?: string | number | null) => normalizePersonalCodeValue(value) === null;
 
 const resolvePersonalCode = async (
   uid: string,
@@ -137,35 +135,66 @@ const resolvePersonalCode = async (
   return { code: null, needsSync: false };
 };
 
-const generateNumericCode = (digits: number) => {
-  const min = 10 ** (digits - 1);
-  const max = 10 ** digits - 1;
-  return Math.floor(min + Math.random() * (max - min + 1));
-};
+const pendingPersonalCodeAssignments = new Map<string, Promise<number>>();
 
-const isCodeInUse = async (field: 'codigoPersonal' | 'codigoAcademia', code: number) => {
-  const usersRef = collection(db, 'users');
-  const asText = String(code);
-  const snapshots = await Promise.all([
-    getDocs(query(usersRef, where(field, '==', code), limit(1))),
-    getDocs(query(usersRef, where(field, '==', asText), limit(1))),
-  ]);
-  return snapshots.some((snapshot) => !snapshot.empty);
-};
+const assignMissingPersonalCode = (uid: string) => {
+  const pendingAssignment = pendingPersonalCodeAssignments.get(uid);
+  if (pendingAssignment) return pendingAssignment;
 
-const generateUniqueCode = async (field: 'codigoPersonal' | 'codigoAcademia', digits: number) => {
-  for (let attempt = 0; attempt < 10; attempt += 1) {
-    const candidate = generateNumericCode(digits);
-    if (!(await isCodeInUse(field, candidate))) {
-      return candidate;
+  const assignment = (async () => {
+    const userRef = doc(db, 'users', uid);
+
+    for (let attempt = 0; attempt < 12; attempt += 1) {
+      const candidate = await generateAvailablePersonalCode();
+      let reservedCode: number | null;
+      try {
+        reservedCode = await runTransaction(db, async (transaction) => {
+          const codeRef = doc(db, 'personalCodes', String(candidate));
+          const [userSnapshot, codeSnapshot] = await Promise.all([
+            transaction.get(userRef),
+            transaction.get(codeRef),
+          ]);
+          if (!userSnapshot.exists()) throw new Error('Perfil não encontrado para reservar o código.');
+
+          const currentCode = normalizePersonalCodeValue(userSnapshot.data().codigoPersonal);
+          if (currentCode !== null) return currentCode;
+          if (codeSnapshot.exists() && codeSnapshot.data().uid !== uid) return null;
+
+          transaction.update(userRef, { codigoPersonal: candidate });
+          if (!codeSnapshot.exists()) {
+            transaction.set(codeRef, {
+              uid,
+              code: String(candidate),
+              owner: userRef,
+            });
+          }
+          return candidate;
+        });
+      } catch (error) {
+        const errorCode = typeof error === 'object' && error && 'code' in error ? String(error.code) : '';
+        if (errorCode !== 'failed-precondition' && errorCode !== 'aborted') throw error;
+
+        const latestUser = await getDoc(userRef);
+        const currentCode = latestUser.exists()
+          ? normalizePersonalCodeValue(latestUser.data().codigoPersonal)
+          : null;
+        if (currentCode !== null) return currentCode;
+        continue;
+      }
+
+      if (reservedCode !== null) return reservedCode;
     }
-  }
-  const fallbackSeed = String(Date.now()).slice(-digits);
-  const fallback = Number(fallbackSeed.padStart(digits, '1'));
-  if (!(await isCodeInUse(field, fallback))) {
-    return fallback;
-  }
-  return generateNumericCode(digits);
+
+    throw new Error('Não foi possível reservar um código de personal.');
+  })();
+
+  const trackedAssignment = assignment.finally(() => {
+    if (pendingPersonalCodeAssignments.get(uid) === trackedAssignment) {
+      pendingPersonalCodeAssignments.delete(uid);
+    }
+  });
+  pendingPersonalCodeAssignments.set(uid, trackedAssignment);
+  return trackedAssignment;
 };
 
 const resolveRole = (user: User | null): UserRole | null => {
@@ -347,31 +376,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       try {
         const userData = await fetchUserDoc(firebaseUser.uid);
-        if (!mounted) return;
+        if (!mounted || auth.currentUser?.uid !== firebaseUser.uid) return;
         if (userData) {
-          const updates: Record<string, any> = {
-            last_active_time: serverTimestamp(),
-          };
-          let nextUser = userData;
-
-          if (userData.academyAccount && isMissingCode(userData.codigoAcademia)) {
-            const academyCode = await generateUniqueCode('codigoAcademia', 5);
-            updates.codigoAcademia = academyCode;
-            nextUser = { ...nextUser, codigoAcademia: academyCode };
-          }
-
+          setUserState(userData);
           if (userData.professorAccount && isMissingCode(userData.codigoPersonal)) {
-            const personalCode = await generateUniqueCode('codigoPersonal', 4);
-            updates.codigoPersonal = personalCode;
-            nextUser = { ...nextUser, codigoPersonal: personalCode };
+            try {
+              const codigoPersonal = await assignMissingPersonalCode(firebaseUser.uid);
+              if (mounted && auth.currentUser?.uid === firebaseUser.uid) {
+                setUserState({ ...userData, codigoPersonal });
+              }
+            } catch (error) {
+              console.warn('Não foi possível gerar o código do personal durante o login.', error);
+            }
           }
-
-          setUserState(nextUser);
-          await updateDoc(doc(db, 'users', firebaseUser.uid), updates);
+          await updateDoc(doc(db, 'users', firebaseUser.uid), { last_active_time: serverTimestamp() })
+            .catch((error) => console.warn('Não foi possível atualizar a atividade de login.', error));
         } else {
           await ensureUserDocument(firebaseUser);
           const refreshed = await fetchUserDoc(firebaseUser.uid);
-          if (!mounted) return;
+          if (!mounted || auth.currentUser?.uid !== firebaseUser.uid) return;
           setUserState(refreshed);
         }
       } catch (error) {
