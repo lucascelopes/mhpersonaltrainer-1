@@ -18,6 +18,7 @@ import {
 import type { PaymentRecord } from '@/lib/types/finance';
 import { isPaymentPaid } from '@/lib/paymentStatus';
 import { parseBrazilianMoneyInput } from '@/lib/financeAmount';
+import { isValidPaymentLink } from '@/lib/paymentLink';
 import styles from './page.module.css';
 
 const STRIPE_FEE_RATE = 0.1;
@@ -204,6 +205,11 @@ export default function FinanceiroPersonalPage() {
     }
 
     const recurringValue = Number(invoiceRecurring || 0);
+    const manualCheckoutUrl = invoiceCheckoutUrl.trim();
+    if (manualCheckoutUrl && !isValidPaymentLink(manualCheckoutUrl)) {
+      setInvoiceError('Informe um link de pagamento HTTPS válido.');
+      return;
+    }
     setInvoiceLoading(true);
     const payload: Omit<PaymentRecord, 'id'> = {
       valorDaCombranca: amount,
@@ -212,7 +218,7 @@ export default function FinanceiroPersonalPage() {
       repetirPMes: recurringValue > 0 ? recurringValue : undefined,
       diaDoPagamento: dueDay,
       datas: [new Date()],
-      checkoutUrl: invoiceCheckoutUrl.trim() || undefined,
+      checkoutUrl: manualCheckoutUrl || undefined,
       personalCode: user?.codigoPersonal,
     };
 
@@ -225,7 +231,7 @@ export default function FinanceiroPersonalPage() {
       }
       invoiceCreated = true;
 
-      let checkoutUrl = invoiceCheckoutUrl.trim();
+      let checkoutUrl = manualCheckoutUrl;
       let checkoutFailed = false;
       if (invoiceAutoStripe && stripeConnected && stripeReady && !checkoutUrl && user?.uid) {
         const stripeAmount = Math.round(amount * 100);

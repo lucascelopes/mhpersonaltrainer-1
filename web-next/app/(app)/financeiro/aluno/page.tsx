@@ -7,6 +7,7 @@ import { formatDate, useCollectionData, useUserScope } from '@/lib/firestoreHook
 import { formatCurrency } from '@/lib/services/payments';
 import type { PaymentRecord } from '@/lib/types/finance';
 import { isPaymentPaid } from '@/lib/paymentStatus';
+import { isValidPaymentLink } from '@/lib/paymentLink';
 
 interface PaymentRow {
   id: string;
@@ -74,7 +75,7 @@ export default function FinanceiroAlunoPage() {
   }, [payments]);
 
   const handleOpenPayment = (url?: string) => {
-    if (!url || typeof window === 'undefined') return;
+    if (!url || !isValidPaymentLink(url) || typeof window === 'undefined') return;
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
@@ -157,16 +158,16 @@ export default function FinanceiroAlunoPage() {
                   )}
                   {!payment.pago && (
                     <div className="finance-payment-actions">
-                      {payment.checkoutUrl ? (
+                      {isValidPaymentLink(payment.checkoutUrl) ? (
                         <button
                           type="button"
                           className="button secondary sm"
                           onClick={() => handleOpenPayment(payment.checkoutUrl)}
                         >
-                          Pagar com Stripe
+                          Abrir link de pagamento
                         </button>
                       ) : (
-                        <span className="finance-payment-hint">Aguardando link do personal</span>
+                        <span className="finance-payment-hint">{payment.checkoutUrl ? 'Peça um link de pagamento válido ao personal' : 'Aguardando link do personal'}</span>
                       )}
                     </div>
                   )}
