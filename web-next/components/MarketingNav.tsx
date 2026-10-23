@@ -1,60 +1,41 @@
-﻿import Link from 'next/link';
+import Link from 'next/link';
 import MobileAwareLink from '@/components/MobileAwareLink';
-import ThemeToggle from '@/components/ThemeToggle';
+import BrandLockup from '@/components/BrandLockup';
 import styles from './MarketingNav.module.css';
 
 const navItems = [
-  { href: '/', label: 'Inicio' },
-  { href: '/#demo', label: 'Demo' },
-  { href: '/#workstation', label: 'Operacao' },
-  { href: '/#assistente', label: 'Assistente IA' },
+  { href: '/', label: 'Início' },
+  { href: '/#produto', label: 'Funcionalidades' },
   { href: '/#planos', label: 'Planos' },
-  { href: '/academia', label: 'Academia' },
+  { href: '/equipe', label: 'Sobre' },
 ];
 
 export default function MarketingNav() {
   return (
     <header className={styles.navShell}>
       <div className={`container ${styles.navInner}`}>
-        <Link href="/" className={styles.brand}>
-          <span className={styles.brandMark}>MH</span>
-          <span className={styles.brandText}>
-            <span className={styles.brandTitle}>Personal</span>
-            <span className={styles.brandSub}>Trainer</span>
-          </span>
+        <Link href="/" className={styles.brand} aria-label="MH Personal Trainer - Início">
+          <BrandLockup className={styles.logoFrame} width={139} height={43} surface="light" priority />
         </Link>
 
-        <nav className={styles.navLinks}>
-          <div className={styles.navMenu}>
-            {navItems.map((item) => (
-              <Link key={item.href} href={item.href} className={styles.navLink}>
-                {item.label}
-              </Link>
-            ))}
-          </div>
-
-          <div className={styles.navActions}>
-            <ThemeToggle compact iconOnly className={`${styles.themeToggle} marketing-nav-theme-toggle`} />
-            <MobileAwareLink href="/login" mobilePath="/login" className={styles.loginBtn}>
-              Entrar
-            </MobileAwareLink>
-            <MobileAwareLink href="/cadastro" className={styles.ctaBtn}>
-              Criar conta
-            </MobileAwareLink>
-          </div>
+        <nav className={styles.navMenu} aria-label="Navegação principal">
+          {navItems.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
         </nav>
-      </div>
 
-      <div className={styles.navMetaBar}>
-        <div className="container">
-          <div className={styles.metaTrack}>
-            <span>Aluno: Android + Web mobile</span>
-            <span>Personal: Windows + Web + Android</span>
-            <span>Academia: Windows + Web instalavel</span>
-            <span>Assistente inteligente em treino, avaliacao e conversa</span>
-            <span>iOS em breve</span>
-          </div>
+        <div className={styles.actions}>
+          <MobileAwareLink href="/login" mobilePath="/login" className={styles.loginBtn}>Entrar</MobileAwareLink>
+          <Link href="/cadastro" className={styles.ctaBtn}>
+            Criar conta
+          </Link>
         </div>
+
+        <details className={styles.mobileMenu}>
+          <summary>Explorar o site</summary>
+          <nav aria-label="Navegação principal no celular">
+            {navItems.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
+            <Link href="/cadastro">Criar conta</Link>
+          </nav>
+        </details>
       </div>
     </header>
   );
