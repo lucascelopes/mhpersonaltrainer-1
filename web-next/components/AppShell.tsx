@@ -28,10 +28,11 @@ export default function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className={clsx('app-shell', { 'app-shell-personal': isPersonal })}>
+    <div className={clsx('app-shell', { 'app-shell-personal': isPersonal, 'app-shell-academy': role === 'academy' })}>
       <AppSidebar />
       <main className={clsx('app-content', { 'app-content-personal': isPersonal })}>{children}</main>
       {isPersonal ? <PersonalBottomNav /> : null}
+      {role === 'academy' ? <RoleBottomNav role="academy" /> : null}
       <ChatWidget />
       <ToastCenter />
       {isAdmin ? <AdminProfileCompletionSheet /> : null}

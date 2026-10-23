@@ -3,6 +3,29 @@
 .role-bottom-nav-backdrop,
 .role-bottom-nav-panel { display: none; }
 @media (max-width: 640px) {
+  .app-shell-academy,
+  .app-shell-admin {
+    overflow-x: clip;
+  }
+
+  .app-shell.app-shell-academy .sidebar,
+  .app-shell.app-shell-admin .sidebar {
+    position: fixed !important;
+    inset: 0 0 auto !important;
+    display: flex !important;
+    background: rgba(255, 254, 250, .97) !important;
+  }
+
+  .app-shell.app-shell-academy .sidebar-beta,
+  .app-shell.app-shell-admin .sidebar-beta {
+    display: none !important;
+  }
+
+  :root[data-theme='dark'] .app-shell.app-shell-academy .sidebar,
+  :root[data-theme='dark'] .app-shell.app-shell-admin .sidebar {
+    background: #142338 !important;
+  }
+
   .app-shell-student .student-function-row {
     grid-auto-flow: row;
     grid-auto-columns: auto;
@@ -64,7 +87,7 @@
     overflow-wrap: anywhere;
   }
   .app-shell-student { padding-top: 60px !important; }
-  .app-shell-student .sidebar {
+  :is(.app-shell-student, .app-shell-academy, .app-shell-admin) .sidebar {
     height: 60px !important;
     grid-template-rows: 52px !important;
   }
@@ -329,40 +352,45 @@
     box-shadow: 0 4px 18px rgba(16, 43, 80, .045);
   }
 
-  .app-shell-student .sidebar-top,
-  .app-shell-student .sidebar-brand-row,
-  .app-shell-student .sidebar-brand {
+  :is(.app-shell-student, .app-shell-academy, .app-shell-admin) .sidebar-top,
+  :is(.app-shell-student, .app-shell-academy, .app-shell-admin) .sidebar-brand-row,
+  :is(.app-shell-student, .app-shell-academy, .app-shell-admin) .sidebar-brand {
     display: flex;
     min-width: 0;
     align-items: center;
   }
 
-  .app-shell-student .sidebar-brand {
+  :is(.app-shell-student, .app-shell-academy, .app-shell-admin) .sidebar-brand {
     width: 132px;
   }
 
-  .app-shell-student .sidebar-brand img {
+  :is(.app-shell-student, .app-shell-academy, .app-shell-admin) .sidebar-brand [data-brand-surface] {
+    width: 132px !important;
+    height: 43px !important;
+  }
+
+  :is(.app-shell-student, .app-shell-academy, .app-shell-admin) .sidebar-brand img {
     width: 128px;
     height: 41px;
     object-fit: contain;
     filter: none !important;
   }
 
-  .app-shell-student .sidebar-nav,
-  .app-shell-student .sidebar-footer,
-  .app-shell-student .sidebar-user,
-  .app-shell-student .sidebar-brand-subtitle {
+  :is(.app-shell-student, .app-shell-academy, .app-shell-admin) .sidebar-nav,
+  :is(.app-shell-student, .app-shell-academy, .app-shell-admin) .sidebar-footer,
+  :is(.app-shell-student, .app-shell-academy, .app-shell-admin) .sidebar-user,
+  :is(.app-shell-student, .app-shell-academy, .app-shell-admin) .sidebar-brand-subtitle {
     display: none !important;
   }
 
-  .app-shell-student .sidebar-actions {
+  :is(.app-shell-student, .app-shell-academy, .app-shell-admin) .sidebar-actions {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin: 0;
+    margin: 0 0 0 auto;
   }
 
-  .app-shell-student .sidebar-logout {
+  :is(.app-shell-student, .app-shell-academy, .app-shell-admin) .sidebar-logout {
     flex: 0 0 auto;
     min-height: 40px;
     margin: 0;
@@ -375,7 +403,7 @@
     font-weight: 700;
   }
 
-  .app-shell-student .sidebar-theme-toggle {
+  :is(.app-shell-student, .app-shell-academy, .app-shell-admin) .sidebar-theme-toggle {
     min-width: 40px;
     min-height: 40px;
     border-color: #ccdaeb;
@@ -383,17 +411,17 @@
     background: #f5f9ff;
   }
 
-  :root[data-theme='dark'] .app-shell-student .sidebar {
+  :root[data-theme='dark'] :is(.app-shell-student, .app-shell-academy, .app-shell-admin) .sidebar {
     border-color: #26384e;
     background: #142338;
   }
 
-  :root[data-theme='dark'] .app-shell-student .sidebar-brand img {
+  :root[data-theme='dark'] :is(.app-shell-student, .app-shell-academy, .app-shell-admin) .sidebar-brand img {
     filter: brightness(0) invert(1) !important;
   }
 
-  :root[data-theme='dark'] .app-shell-student .sidebar-logout,
-  :root[data-theme='dark'] .app-shell-student .sidebar-theme-toggle {
+  :root[data-theme='dark'] :is(.app-shell-student, .app-shell-academy, .app-shell-admin) .sidebar-logout,
+  :root[data-theme='dark'] :is(.app-shell-student, .app-shell-academy, .app-shell-admin) .sidebar-theme-toggle {
     border-color: #3b526c;
     color: #e5edf8;
     background: #20354e;

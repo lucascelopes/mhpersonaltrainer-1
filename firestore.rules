@@ -98,6 +98,18 @@ service cloud.firestore {
         isTruthy(userData(request.auth.uid).admin);
     }
 
+    // Backfill academyCodes for legacy academies before deploying these rules.
+    function linkedToCurrentAcademy(data) {
+      return signedIn() &&
+        userExists(request.auth.uid) &&
+        isTruthy(userData(request.auth.uid).academyAccount) &&
+        hasField(userData(request.auth.uid), 'codigoAcademia') &&
+        hasField(data, 'codigoAcademia') &&
+        exists(/databases/$(database)/documents/academyCodes/$(string(userData(request.auth.uid).codigoAcademia))) &&
+        get(/databases/$(database)/documents/academyCodes/$(string(userData(request.auth.uid).codigoAcademia))).data.uid == request.auth.uid &&
+        string(data.codigoAcademia) == string(userData(request.auth.uid).codigoAcademia);
+    }
+
     function isExplicitPersonal(uid) {
       return signedIn() && userExists(uid) && isExplicitPersonalData(userData(uid));
     }
@@ -148,7 +160,8 @@ service cloud.firestore {
     }
 
     function canListUser(data) {
-      return isAdmin() ||
+      return linkedToCurrentAcademy(data) ||
+        isAdmin() ||
         (linkedToCurrentPersonal(data)) ||
         (signedIn() && isExplicitPersonalData(data));
     }
