@@ -52,7 +52,7 @@ const normalizePayment = (row: PaymentRow): PaymentRecord => {
     id: row.id,
     valorDaCombranca: row.valorDaCombranca ?? row.valor ?? 0,
     todoDiaDoMes: row.todoDiaDoMes ?? row.diaDoPagamento ?? undefined,
-    descricao: row.descricao ?? 'Cobranca',
+    descricao: row.descricao ?? 'Cobrança',
     pago: isPaymentPaid(row),
     repetirPMes: row.repetirPMes,
     diaDoPagamento: row.diaDoPagamento,
@@ -140,7 +140,7 @@ export default function FinanceiroPersonalPage() {
   useEffect(() => {
     if (!isPersonal || !user?.uid || !stripeReady) {
       setStripeStatus(null);
-      setStripeMessage(stripeReady ? '' : 'Stripe nao configurado.');
+      setStripeMessage(stripeReady ? '' : 'Stripe não configurado.');
       return;
     }
 
@@ -155,7 +155,7 @@ export default function FinanceiroPersonalPage() {
       .catch(() => {
         if (!active) return;
         setStripeStatus(null);
-        setStripeMessage('Nao foi possivel verificar o Stripe.');
+        setStripeMessage('Não foi possível verificar o Stripe.');
       })
       .finally(() => {
         if (!active) return;
@@ -193,13 +193,13 @@ export default function FinanceiroPersonalPage() {
     }
     const amount = parseBrazilianMoneyInput(invoiceAmount);
     if (!amount || amount <= 0) {
-      setInvoiceError('Informe um valor valido.');
+      setInvoiceError('Informe um valor válido.');
       return;
     }
     const description = invoiceDescription.trim() || 'Fatura do personal';
     const dueDay = invoiceDueDay ? Number(invoiceDueDay) : undefined;
     if (dueDay !== undefined && (!Number.isInteger(dueDay) || dueDay < 1 || dueDay > 31)) {
-      setInvoiceError('Dia de vencimento invalido.');
+      setInvoiceError('Dia de vencimento inválido.');
       return;
     }
 
@@ -220,7 +220,7 @@ export default function FinanceiroPersonalPage() {
     try {
       const result = await createPaymentForUser(selectedStudentId, payload);
       if (result.error || !result.data) {
-        setInvoiceError(result.error || 'Nao foi possivel criar a fatura.');
+        setInvoiceError(result.error || 'Não foi possível criar a fatura.');
         return;
       }
       invoiceCreated = true;
@@ -260,10 +260,10 @@ export default function FinanceiroPersonalPage() {
 
       setInvoiceMessage(
         checkoutFailed
-          ? 'Fatura criada, mas o link do Stripe nao foi salvo. Confira a cobranca antes de reenviar.'
+          ? 'Fatura criada, mas o link do Stripe não foi salvo. Confira a cobrança antes de reenviar.'
           : checkoutUrl
           ? 'Fatura criada e pronta para pagamento.'
-          : 'Fatura criada. O aluno vera no app.'
+          : 'Fatura criada. O aluno verá no app.'
       );
       setInvoiceAmount('');
       setInvoiceDescription('');
@@ -274,7 +274,7 @@ export default function FinanceiroPersonalPage() {
       setInvoiceError(
         invoiceCreated
           ? 'Fatura criada, mas ocorreu um erro depois. Confira a lista antes de tentar novamente.'
-          : 'Nao foi possivel criar a fatura. Tente novamente.'
+          : 'Não foi possível criar a fatura. Tente novamente.'
       );
     } finally {
       setInvoiceLoading(false);
@@ -313,7 +313,7 @@ export default function FinanceiroPersonalPage() {
                 <strong>{formatCurrency(taxaPlataforma)}</strong>
               </div>
               <div className="finance-summary-card">
-                <span>Liquido estimado</span>
+                <span>Líquido estimado</span>
                 <strong>{formatCurrency(liquidoEstimado)}</strong>
               </div>
           </div>
@@ -325,7 +325,7 @@ export default function FinanceiroPersonalPage() {
               <div className="finance-card-header">
                 <div>
                   <h3>Nova fatura</h3>
-                  <p className="subtle">Crie cobrancas que aparecem no financeiro do aluno.</p>
+                  <p className="subtle">Crie cobranças que aparecem no financeiro do aluno.</p>
                 </div>
                 {selectedStudent && (
                   <span className="finance-student-chip">
@@ -337,7 +337,7 @@ export default function FinanceiroPersonalPage() {
               {selectedStudent ? <>
               <div className="finance-invoice-form">
                 <label className="finance-field">
-                  <span>Descricao</span>
+                  <span>Descrição</span>
                   <input
                     className="finance-input"
                     placeholder="Ex: Mensalidade do plano premium"
@@ -368,13 +368,13 @@ export default function FinanceiroPersonalPage() {
                   />
                 </label>
                 <label className="finance-field">
-                  <span>Recorrencia</span>
+                  <span>Recorrência</span>
                   <select
                     className="finance-input"
                     value={invoiceRecurring}
                     onChange={(event) => setInvoiceRecurring(event.target.value)}
                   >
-                    <option value="0">Unica</option>
+                    <option value="0">Única</option>
                     <option value="1">Mensal</option>
                     <option value="3">Trimestral</option>
                     <option value="6">Semestral</option>
@@ -391,7 +391,7 @@ export default function FinanceiroPersonalPage() {
                     onChange={(event) => setInvoiceAutoStripe(event.target.checked)}
                     disabled={!stripeConnected}
                   />
-                  <span>Gerar link automatico no Stripe</span>
+                  <span>Gerar link automático no Stripe</span>
                 </label>
                 {!invoiceAutoStripe && (
                   <input
@@ -403,14 +403,14 @@ export default function FinanceiroPersonalPage() {
                 )}
               </div>
               {!stripeConnected && (
-                <p className="finance-hint">Conecte o Stripe para gerar links automaticos.</p>
+                <p className="finance-hint">Conecte o Stripe para gerar links automáticos.</p>
               )}
 
               <div className="finance-invoice-actions">
                 <div className="finance-invoice-preview">
                   <span>Resumo da fatura</span>
                   <strong>{formatCurrency(amountPreview)}</strong>
-                  <small>Essa cobranca aparece no app do aluno.</small>
+                  <small>Essa cobrança aparece no app do aluno.</small>
                 </div>
                 <button
                   type="button"
@@ -439,7 +439,7 @@ export default function FinanceiroPersonalPage() {
             <div className="portal-card finance-card finance-section">
               <div className="finance-card-header">
                 <div>
-                  <h3>Cobrancas do aluno</h3>
+                  <h3>Cobranças do aluno</h3>
                   <p className="subtle">Acompanhe status, valores e links enviados.</p>
                 </div>
                 {selectedStudent && (
@@ -449,13 +449,13 @@ export default function FinanceiroPersonalPage() {
                 )}
               </div>
               {isPersonal && !selectedStudentId && (
-                <p className="subtle">Selecione um aluno para ver cobrancas.</p>
+                <p className="subtle">Selecione um aluno para ver cobranças.</p>
               )}
               {!isPersonal && !targetUserId && (
                 <p className="subtle">Informe um UID para listar pagamentos.</p>
               )}
               {targetUserId && orderedPayments.length === 0 && (
-                <p className="subtle">Nenhuma cobranca encontrada.</p>
+                <p className="subtle">Nenhuma cobrança encontrada.</p>
               )}
               {targetUserId && orderedPayments.length > 0 && (
                 <div className="finance-payments-grid">
@@ -466,7 +466,7 @@ export default function FinanceiroPersonalPage() {
                           <span className={`finance-payment-tag ${payment.pago ? 'is-paid' : 'is-pending'}`}>
                             {payment.pago ? 'Pago' : 'Pendente'}
                           </span>
-                          <strong>{payment.descricao || 'Cobranca'}</strong>
+                          <strong>{payment.descricao || 'Cobrança'}</strong>
                         </div>
                         <span className="finance-payment-value">
                           {formatCurrency(payment.valorDaCombranca || 0)}
@@ -510,7 +510,7 @@ export default function FinanceiroPersonalPage() {
                 </select>
               ) : (
                 <div className="finance-empty">
-                  <p className="subtle">Nenhum aluno vinculado ao seu codigo.</p>
+                  <p className="subtle">Nenhum aluno vinculado ao seu código.</p>
                   <Link href="/students" className="students-action">
                     Gerar convite
                   </Link>
@@ -527,7 +527,7 @@ export default function FinanceiroPersonalPage() {
                   </div>
                   <div>
                     <strong>{selectedStudent.nome}</strong>
-                    <p className="subtle">{selectedStudent.email || 'Email nao informado'}</p>
+                    <p className="subtle">{selectedStudent.email || 'E-mail não informado'}</p>
                   </div>
                 </div>
               )}
