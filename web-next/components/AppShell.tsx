@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/auth';
 import AppSidebar from '@/components/AppSidebar';
 import ChatWidget from '@/components/ChatWidget';
 import ToastCenter from '@/components/ToastCenter';
-import StudentBottomNav from '@/components/StudentBottomNav';
+import RoleBottomNav from '@/components/RoleBottomNav';
 import PersonalBottomNav from '@/components/PersonalBottomNav';
 import AdminProfileCompletionSheet from '@/components/admin/AdminProfileCompletionSheet';
 
@@ -18,9 +18,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   if (isStudent) {
     return (
-      <div className="student-shell">
-        <main className="student-content">{children}</main>
-        <StudentBottomNav />
+      <div className="app-shell app-shell-student student-shell">
+        <AppSidebar />
+        <main className="app-content student-content">{children}</main>
+        <RoleBottomNav role="student" />
         <ToastCenter />
       </div>
     );

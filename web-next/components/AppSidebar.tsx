@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
+import BrandLockup from '@/components/BrandLockup';
 import { useAuth } from '@/lib/auth';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useAiAccessStatus } from '@/lib/hooks/useAiAccessStatus';
 import type { UserRole } from '@/lib/types/user';
+import { Star } from '@phosphor-icons/react';
 
 type SidebarItem = {
   href: string;
@@ -30,13 +32,13 @@ const personalSections: SidebarSection[] = [
     ],
   },
   {
-    title: 'Gestao',
+    title: 'Gestão',
     items: [
       { href: '/schedule', label: 'Agenda' },
-      { href: '/evaluations', label: 'Avaliacoes' },
+      { href: '/evaluations', label: 'Avaliações' },
       { href: '/documents', label: 'Documentos' },
       { href: '/financeiro', label: 'Financeiro' },
-      { href: '/notifications', label: 'Notificacoes' },
+      { href: '/notifications', label: 'Notificações' },
     ],
   },
   {
@@ -63,13 +65,13 @@ const academySections: SidebarSection[] = [
     ],
   },
   {
-    title: 'Vinculos',
+    title: 'Vínculos',
     items: [{ href: '/academy/linking', label: 'Vincular' }],
   },
   {
     title: 'Controle',
     items: [
-      { href: '/academy/checkins', label: 'Historico de entradas' },
+      { href: '/academy/checkins', label: 'Histórico de entradas' },
       { href: '/academy/access', label: 'Credenciais' },
     ],
   },
@@ -87,13 +89,16 @@ const studentSections: SidebarSection[] = [
   {
     title: 'Aluno',
     items: [
-      { href: '/app', label: 'Inicio' },
+      { href: '/app', label: 'Início' },
       { href: '/workouts', label: 'Treinos' },
-      { href: '/evaluations', label: 'Avaliacoes' },
+      { href: '/evaluations', label: 'Avaliações' },
       { href: '/progress', label: 'Progresso' },
+      { href: '/schedule', label: 'Agenda' },
+      { href: '/feedbacks', label: 'Feedbacks' },
       { href: '/chat', label: 'Chat' },
-      { href: '/financeiro', label: 'Financeiro' },
+      { href: '/financeiro/aluno', label: 'Financeiro' },
       { href: '/documents/aluno', label: 'Arquivos' },
+      { href: '/notifications', label: 'Notificações' },
       { href: '/profile', label: 'Perfil' },
     ],
   },
@@ -101,25 +106,35 @@ const studentSections: SidebarSection[] = [
 
 const adminSections: SidebarSection[] = [
   {
-    title: 'Admin',
+    title: 'Visão geral',
     items: [
       { href: '/admin', label: 'Resumo' },
-      { href: '/admin/users', label: 'Usuarios' },
+      { href: '/admin/dashboard', label: 'Dashboard' },
+      { href: '/admin/academy', label: 'Academias' },
+      { href: '/admin/students', label: 'Alunos' },
+      { href: '/admin/manage-students', label: 'Gestão de alunos' },
+      { href: '/admin/treinors', label: 'Treinadores' },
+    ],
+  },
+  {
+    title: 'Operação',
+    items: [
+      { href: '/admin/users', label: 'Usuários' },
       { href: '/admin/support', label: 'Suporte' },
       { href: '/admin/instagram', label: 'Posts Instagram (IA)' },
-      { href: '/admin/emails', label: 'Emails do dominio' },
-      { href: '/notifications/admin', label: 'Notificacoes no app', premium: true },
-      { href: '/admin/treinors', label: 'Colecao de Treinos' },
+      { href: '/admin/emails', label: 'E-mails do domínio' },
+      { href: '/notifications/admin', label: 'Notificações no app', premium: true },
+      { href: '/admin/kabam', label: 'Kabam' },
     ],
+  },
+  {
+    title: 'Conta',
+    items: [{ href: '/profile', label: 'Perfil' }],
   },
 ];
 
 function SidebarPremiumStar() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 2.6l2.7 5.6 6.2.9-4.5 4.4 1 6.2L12 16.8 6.6 19.7l1-6.2L3 9.1l6.2-.9L12 2.6z" />
-    </svg>
-  );
+  return <Star weight="fill" aria-hidden="true" />;
 }
 
 export default function AppSidebar() {
@@ -184,9 +199,8 @@ export default function AppSidebar() {
     <aside className="sidebar">
       <div className="sidebar-top">
         <div className="sidebar-brand-row">
-          <Link href="/" className="sidebar-brand">
-            <span className="sidebar-brand-mark">MH</span>
-            <span className="sidebar-brand-text">Personal</span>
+          <Link href={isAcademy ? '/academy' : isAdmin ? '/admin' : '/app'} className="sidebar-brand" aria-label="MH Personal Trainer, início">
+            <BrandLockup width={184} height={52} priority />
           </Link>
           {showMiniAiStatus ? (
             <Link

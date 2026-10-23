@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import AuthGate from '@/components/AuthGate';
 import AppShell from '@/components/AppShell';
+import '@/components/RoleBottomNav.css';
 import './student-dark-surfaces.css';
 import './personal-portal-dark-theme.css';
 

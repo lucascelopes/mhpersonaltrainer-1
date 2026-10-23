@@ -2,6 +2,12 @@
   min-width: 0;
 }
 
+.page :global(.finance-method-card),
+.page :global(.finance-payment-card) {
+  background: var(--portal-surface);
+  color: var(--portal-ink);
+}
+
 .paymentCard,
 .paymentHeader,
 .paymentTitle,
