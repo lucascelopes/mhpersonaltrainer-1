@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import PageShell from '@/components/PageShell';
 import { useAuth } from '@/lib/auth';
 import { getSubscriptionStatus, subscriptionPlans, formatCurrency } from '@/lib/services/payments';
+import styles from './page.module.css';
 
 const formatDateLabel = (value?: any) => {
   if (!value) return '-';
@@ -89,16 +90,16 @@ export default function SubscriptionPage() {
   return (
     <PageShell
       title="Assinatura do assistente"
-      description="Assinatura via Stripe e renovacoes automaticas."
+      description="Assinatura via Stripe e renovações automáticas."
       breadcrumbs={[{ label: 'Financeiro', href: '/financeiro' }]}
     >
-      <div className="subscription-layout">
+      <div className={`subscription-layout ${styles.page}`}>
         <section className="portal-card portal-card--highlight subscription-hero">
           <div className="subscription-hero-copy">
             <p className="portal-pill">Stripe</p>
             <h2>Controle sua assinatura do assistente em um painel claro.</h2>
             <p className="subtle">
-              Veja status, renovacoes e escolha o plano ideal para manter os recursos de IA ativos.
+              Veja o status e as renovações e escolha o plano ideal para manter os recursos de IA ativos.
             </p>
             <div className="subscription-hero-actions">
               <Link href="/financeiro/plans" className="button">
@@ -111,11 +112,19 @@ export default function SubscriptionPage() {
           </div>
           <div className="subscription-status-card">
             <div>
-              <h3>Resumo rapido</h3>
-              <p className="subtle">Informacoes principais do Stripe.</p>
+              <h3>Resumo rápido</h3>
+              <p className="subtle">Informações principais do Stripe.</p>
             </div>
-            {loading && <p className="subtle">Carregando assinatura...</p>}
-            {error && <p className="subscription-alert is-error">{error}</p>}
+            {loading && (
+              <p className="subtle" role="status" aria-live="polite">
+                Carregando assinatura...
+              </p>
+            )}
+            {error && (
+              <p className="subscription-alert is-error" role="alert">
+                {error}
+              </p>
+            )}
             {!loading && !error && (
               <div className="subscription-metrics">
                 {statusItems.map((item) => (
@@ -127,7 +136,7 @@ export default function SubscriptionPage() {
               </div>
             )}
             <div className="subscription-note">
-              O pagamento e as faturas sao processados pelo Stripe.
+              O pagamento e as faturas são processados pelo Stripe.
             </div>
           </div>
         </section>
@@ -152,8 +161,9 @@ export default function SubscriptionPage() {
                 <a
                   href={plan.paymentLink}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="button secondary"
+                  aria-label={`Assinar plano ${plan.name} com Stripe (abre em nova aba)`}
                 >
                   Assinar com Stripe
                 </a>

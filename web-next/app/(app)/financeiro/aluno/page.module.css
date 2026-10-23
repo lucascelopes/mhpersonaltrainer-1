@@ -1,0 +1,60 @@
+.page {
+  min-width: 0;
+}
+
+.paymentCard,
+.paymentHeader,
+.paymentTitle,
+.paymentActions {
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  .page .paymentCard {
+    padding: 12px;
+  }
+
+  .page .paymentHeader {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 8px;
+  }
+
+  .page .paymentTitle {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 6px 8px;
+  }
+
+  .paymentDescription,
+  .paymentMeta,
+  .paymentHint {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .page .paymentValue {
+    justify-self: start;
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .paymentMeta {
+    margin: 0;
+  }
+
+  .page .paymentActions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .paymentButton {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+  }
+}

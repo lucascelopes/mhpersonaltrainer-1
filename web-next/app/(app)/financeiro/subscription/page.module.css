@@ -1,0 +1,67 @@
+.page {
+  min-width: 0;
+}
+
+.page :global(.subscription-hero),
+.page :global(.subscription-status-card),
+.page :global(.subscription-metrics),
+.page :global(.subscription-plan-grid),
+.page :global(.subscription-plan-card),
+.page :global(.subscription-plan-header),
+.page :global(.subscription-plan-features) {
+  min-width: 0;
+}
+
+.page :global(.subscription-plan-header > *),
+.page :global(.subscription-plan-features > *) {
+  overflow-wrap: anywhere;
+}
+
+.page :global(.subscription-hero-actions .button),
+.page :global(.subscription-plan-card > .button) {
+  min-height: 48px;
+  justify-content: center;
+  text-align: center;
+}
+
+.page :global(.subscription-alert) {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .page :global(.subscription-hero-actions) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page :global(.subscription-hero-actions .button),
+  .page :global(.subscription-plan-card > .button) {
+    width: 100%;
+  }
+
+  .page :global(.subscription-plan-grid) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page :global(.subscription-plan-card.is-featured) {
+    padding-top: 52px;
+  }
+
+  .page :global(.subscription-metrics) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .page :global(.subscription-metrics > div) {
+    min-width: 0;
+  }
+
+  .page :global(.subscription-metrics strong) {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 360px) {
+  .page :global(.subscription-metrics) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

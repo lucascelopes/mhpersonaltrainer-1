@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import PageShell from '@/components/PageShell';
 import { subscriptionPlans, formatCurrency } from '@/lib/services/payments';
+import styles from './page.module.css';
 
 export default function FinancePlansPage() {
   return (
@@ -11,13 +12,13 @@ export default function FinancePlansPage() {
       description="Escolha o plano ideal para manter o assistente ativo."
       breadcrumbs={[{ label: 'Financeiro', href: '/financeiro' }]}
     >
-      <div className="subscription-plans">
+      <div className={`subscription-plans ${styles.page}`}>
         <section className="portal-card portal-card--highlight subscription-hero">
           <div className="subscription-hero-copy">
             <p className="portal-pill">Assinatura</p>
-            <h2>Planos com Stripe e cobranca automatica.</h2>
+            <h2>Planos com Stripe e cobrança automática.</h2>
             <p className="subtle">
-              Compare beneficios, escolha o ciclo ideal e ative o plano do assistente.
+              Compare benefícios, escolha o ciclo ideal e ative o plano do assistente.
             </p>
             <div className="subscription-hero-actions">
               <Link href="/financeiro/subscription" className="button secondary">
@@ -50,8 +51,9 @@ export default function FinancePlansPage() {
                 <a
                   href={plan.paymentLink}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="button secondary"
+                  aria-label={`Assinar plano ${plan.name} com Stripe (abre em nova aba)`}
                 >
                   Assinar com Stripe
                 </a>

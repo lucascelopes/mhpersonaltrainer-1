@@ -8,6 +8,7 @@ import { formatCurrency } from '@/lib/services/payments';
 import type { PaymentRecord } from '@/lib/types/finance';
 import { isPaymentPaid } from '@/lib/paymentStatus';
 import { isValidPaymentLink } from '@/lib/paymentLink';
+import styles from './page.module.css';
 
 interface PaymentRow {
   id: string;
@@ -83,17 +84,17 @@ export default function FinanceiroAlunoPage() {
     <PageShell
       title="Financeiro do aluno"
       description="Pagamentos, faturas e status do aluno."
-      breadcrumbs={[{ label: 'Financeiro', href: '/financeiro' }]}
+      breadcrumbs={[{ label: 'Painel', href: '/app' }]}
     >
       <UserScopePicker />
-      <div className="finance-aluno">
+      <div className={`finance-aluno ${styles.page}`}>
         <div className="finance-summary-grid">
           <div className="finance-summary-card">
             <span>Total pendente</span>
             <strong>{formatCurrency(totalPendente)}</strong>
           </div>
           <div className="finance-summary-card">
-            <span>Proximo vencimento</span>
+            <span>Próximo vencimento</span>
             <strong>{proximoVencimento ? `Dia ${proximoVencimento}` : '-'}</strong>
           </div>
         </div>
@@ -101,15 +102,15 @@ export default function FinanceiroAlunoPage() {
         <div className="card finance-section">
           <div className="finance-card-header">
             <div>
-              <h3>Metodos de pagamento</h3>
-              <p className="subtle">Opcoes disponiveis para quitar cobrancas.</p>
+              <h3>Métodos de pagamento</h3>
+              <p className="subtle">Opções disponíveis para quitar cobranças.</p>
             </div>
           </div>
           <div className="finance-methods">
             <div className="finance-method-card">
               <div className="finance-method-icon">CC</div>
               <div>
-                <strong>Cartao de credito</strong>
+                <strong>Cartão de crédito</strong>
                 <p className="subtle">Em breve</p>
               </div>
             </div>
@@ -126,48 +127,50 @@ export default function FinanceiroAlunoPage() {
         <div className="card finance-section">
           <div className="finance-card-header">
             <div>
-              <h3>Cobrancas</h3>
+              <h3>Cobranças</h3>
               <p className="subtle">Lista completa de pagamentos pendentes ou pagos.</p>
             </div>
           </div>
           {!userId && <p className="subtle">Informe um UID para listar pagamentos.</p>}
-          {userId && orderedPayments.length === 0 && <p className="subtle">Nenhuma cobranca encontrada.</p>}
+          {userId && orderedPayments.length === 0 && <p className="subtle">Nenhuma cobrança encontrada.</p>}
           {userId && orderedPayments.length > 0 && (
             <div className="finance-payments-grid">
               {orderedPayments.map((payment) => (
-                <div key={payment.id} className="finance-payment-card">
-                  <div className="finance-payment-header">
-                    <div className="finance-payment-title">
+                <div key={payment.id} className={`finance-payment-card ${styles.paymentCard}`}>
+                  <div className={`finance-payment-header ${styles.paymentHeader}`}>
+                    <div className={`finance-payment-title ${styles.paymentTitle}`}>
                       <span className={`finance-payment-tag ${payment.pago ? 'is-paid' : 'is-pending'}`}>
                         {payment.pago ? 'Pago' : 'Pendente'}
                       </span>
-                      <strong>{payment.descricao || 'Cobranca'}</strong>
+                      <strong className={styles.paymentDescription}>{payment.descricao || 'Cobrança'}</strong>
                     </div>
-                    <span className="finance-payment-value">
+                    <span className={`finance-payment-value ${styles.paymentValue}`}>
                       {formatCurrency(payment.valorDaCombranca || 0)}
                     </span>
                   </div>
-                  <p className="finance-payment-meta">
+                  <p className={`finance-payment-meta ${styles.paymentMeta}`}>
                     Vencimento {payment.todoDiaDoMes ? `dia ${payment.todoDiaDoMes}` : '-'}
                   </p>
                   {payment.datas?.[0] && (
-                    <p className="finance-payment-meta">Registrado em {formatDate(payment.datas[0])}</p>
+                    <p className={`finance-payment-meta ${styles.paymentMeta}`}>Registrado em {formatDate(payment.datas[0])}</p>
                   )}
                   {payment.stripeStatus && (
-                    <p className="finance-payment-meta">Stripe: {payment.stripeStatus}</p>
+                    <p className={`finance-payment-meta ${styles.paymentMeta}`}>Stripe: {payment.stripeStatus}</p>
                   )}
                   {!payment.pago && (
-                    <div className="finance-payment-actions">
+                    <div className={`finance-payment-actions ${styles.paymentActions}`}>
                       {isValidPaymentLink(payment.checkoutUrl) ? (
                         <button
                           type="button"
-                          className="button secondary sm"
+                          className={`button secondary sm ${styles.paymentButton}`}
                           onClick={() => handleOpenPayment(payment.checkoutUrl)}
                         >
                           Abrir link de pagamento
                         </button>
                       ) : (
-                        <span className="finance-payment-hint">{payment.checkoutUrl ? 'Peça um link de pagamento válido ao personal' : 'Aguardando link do personal'}</span>
+                        <span className={`finance-payment-hint ${styles.paymentHint}`}>
+                          {payment.checkoutUrl ? 'Peça um link de pagamento válido ao personal' : 'Aguardando link do personal'}
+                        </span>
                       )}
                     </div>
                   )}
