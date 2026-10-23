@@ -1,0 +1,470 @@
+.composer {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid #d9e4f1;
+  border-radius: 22px;
+  background: #f3f8fd;
+  color: #16355d;
+}
+
+.header,
+.libraryHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.header h3,
+.libraryHeader h4,
+.templateHeader h4,
+.selectedSection h4 {
+  margin: 0;
+  color: #112e55;
+  font-size: 1.05rem;
+  font-weight: 750;
+  line-height: 1.3;
+}
+
+.header p,
+.libraryHeader p,
+.templateHeader p {
+  margin: 4px 0 0;
+  color: #506984;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.count,
+.libraryHeader > span {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #e1effb;
+  color: #173a64;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.templateGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.templateHeader {
+  padding-top: 14px;
+  border-top: 1px solid #d4e0ec;
+}
+
+.templateHeader h4 {
+  font-size: 0.96rem;
+}
+
+.template {
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #d6e1ee;
+  border-radius: 17px;
+  background: #fff;
+  color: #142f54;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.template:hover {
+  transform: translateY(-2px);
+  border-color: #6c9bc9;
+  box-shadow: 0 9px 22px rgb(24 54 90 / 10%);
+}
+
+.template:focus-visible,
+.exercise button:focus-visible,
+.customExercise button:focus-visible,
+.remove:focus-visible {
+  outline: 3px solid #3a8fd1;
+  outline-offset: 2px;
+}
+
+.templateActive {
+  border-color: #236da8;
+  box-shadow: 0 0 0 2px rgb(35 109 168 / 15%);
+}
+
+.template > img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1.72 / 1;
+  object-fit: cover;
+  object-position: 50% 37%;
+  background: #dce7f2;
+}
+
+.templateContent {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+}
+
+.templateTitle {
+  display: block;
+  color: #112e55;
+  font-size: 0.98rem;
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.templateDescription {
+  color: #536d89;
+  font-size: 0.83rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.templateMeta {
+  color: #1b578c;
+  font-size: 0.77rem;
+  font-weight: 750;
+}
+
+.libraryHeader {
+  align-items: center;
+  padding-top: 2px;
+}
+
+.libraryHeader h4,
+.selectedSection h4 {
+  font-size: 0.96rem;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 0.45fr);
+  gap: 9px;
+}
+
+.filters input,
+.filters select,
+.customExercise input,
+.metrics input {
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 1px solid #c9d7e6;
+  border-radius: 12px;
+  background: #fff;
+  color: #173456;
+  font: inherit;
+  font-size: 0.92rem;
+}
+
+.filters input::placeholder,
+.customExercise input::placeholder,
+.metrics input::placeholder {
+  color: #667d95;
+  opacity: 1;
+}
+
+.filters input:focus,
+.filters select:focus,
+.customExercise input:focus,
+.metrics input:focus {
+  outline: 3px solid rgb(58 143 209 / 22%);
+  border-color: #3a8fd1;
+}
+
+.customExercise {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 9px;
+}
+
+.customExercise button,
+.exercise button {
+  min-height: 48px;
+  padding: 8px 13px;
+  border: 1px solid #183e69;
+  border-radius: 12px;
+  background: #173b67;
+  color: #fff;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.customExercise button:disabled,
+.exercise button:disabled {
+  border-color: #c5d4e3;
+  background: #e5edf5;
+  color: #4f6780;
+  cursor: default;
+}
+
+.library {
+  display: grid;
+  gap: 8px;
+  max-height: 380px;
+  padding: 2px 4px 2px 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.exercise {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid #d9e4ef;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.exercise > img,
+.selectedExercise > img {
+  display: block;
+  width: 62px;
+  height: 62px;
+  border-radius: 10px;
+  object-fit: cover;
+  object-position: 50% 36%;
+  background: #dce7f2;
+}
+
+.exerciseCopy,
+.selectedCopy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.exerciseCopy strong,
+.selectedCopy > strong {
+  overflow-wrap: anywhere;
+  color: #16375f;
+  font-size: 0.9rem;
+  font-weight: 750;
+  line-height: 1.3;
+}
+
+.exerciseCopy span {
+  overflow: hidden;
+  color: #536d89;
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.message {
+  margin: 0;
+  padding: 18px 14px;
+  border: 1px dashed #b8c9da;
+  border-radius: 14px;
+  background: #fff;
+  color: #405c78;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.loadMore {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #9db7d1;
+  border-radius: 12px;
+  background: #fff;
+  color: #173d68;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.loadActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.loadMore:hover {
+  border-color: #4c82b4;
+  background: #f8fbff;
+}
+
+.selectedSection {
+  display: grid;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid #d4e0ec;
+}
+
+.selectedList {
+  display: grid;
+  gap: 10px;
+}
+
+.selectedExercise {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #d2dfeb;
+  border-radius: 15px;
+  background: #fff;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(55px, 1fr));
+  gap: 7px;
+  margin-top: 6px;
+}
+
+.metrics label {
+  display: grid;
+  gap: 3px;
+  color: #526a83;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.metrics input {
+  min-height: 40px;
+  padding: 7px 8px;
+  border-radius: 9px;
+  font-size: 0.82rem;
+}
+
+.remove {
+  min-height: 48px;
+  padding: 7px 9px;
+  border: 1px solid #c8d4e0;
+  border-radius: 10px;
+  background: #f7faff;
+  color: #294a70;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 700px) {
+  .composer {
+    gap: 14px;
+    padding: 16px 13px;
+    border-radius: 18px;
+  }
+
+  .header {
+    flex-direction: column;
+  }
+
+  .templateGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .template {
+    display: grid;
+    grid-template-columns: 102px minmax(0, 1fr);
+    min-height: 104px;
+  }
+
+  .template > img {
+    width: 102px;
+    height: 100%;
+    min-height: 104px;
+    aspect-ratio: auto;
+  }
+
+  .templateContent {
+    align-content: center;
+    padding: 10px 12px;
+  }
+
+  .filters {
+    grid-template-columns: 1fr;
+  }
+
+  .filters input,
+  .filters select,
+  .customExercise input {
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  .exercise {
+    grid-template-columns: 54px minmax(0, 1fr);
+    gap: 8px;
+    padding: 7px;
+  }
+
+  .exercise > img,
+  .selectedExercise > img {
+    width: 54px;
+    height: 58px;
+  }
+
+  .exercise > img {
+    grid-row: span 2;
+    align-self: start;
+  }
+
+  .exercise button {
+    grid-column: 2;
+    width: 100%;
+    min-height: 48px;
+    padding: 7px 9px;
+    font-size: 0.76rem;
+  }
+
+  .customExercise {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .customExercise button {
+    width: 100%;
+  }
+
+  .selectedExercise {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .selectedExercise > img {
+    width: 48px;
+    height: 52px;
+  }
+
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .metrics input {
+    min-height: 48px;
+  }
+
+  .remove {
+    grid-column: 2;
+    justify-self: start;
+    min-height: 48px;
+  }
+}

@@ -37,6 +37,7 @@ export interface UserWorkout {
   carga?: WorkoutMetricValue[];
   intervalo?: WorkoutMetricValue[];
   videoUrls?: string[];
+  fotoUrls?: string[];
   arquivos?: boolean;
   diasDaSemana?: string[];
   data?: Date;

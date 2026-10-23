@@ -29,6 +29,7 @@ import {
   updateWorkout,
 } from '@/lib/services/workouts';
 import type { Exercise, UserWorkout } from '@/lib/types/workout';
+import { getMHWorkoutPhoto } from '@/lib/workoutPhotos';
 import { useSearchParams, usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import {
@@ -56,6 +57,8 @@ interface WorkoutDetail {
   carga?: Array<number | string>;
   intervalo?: Array<number | string>;
   videoUrls?: string[];
+  fotoUrls?: string[];
+  exercicios?: Array<{ exerciseId?: string }>;
   obsInstrucao?: string;
   lastCompletedAt?: Date;
   updatedAt?: Date;
@@ -1240,6 +1243,11 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
         carga: workout.carga?.[index],
         intervalo: workout.intervalo?.[index],
         videoUrl: workout.videoUrls?.[index],
+        photoUrl: workout.fotoUrls?.[index] || getMHWorkoutPhoto(
+          String(name || ''),
+          '',
+          workout.exercicios?.[index]?.exerciseId
+        ),
       }))
       .filter((item) => item.name);
   }, [workout]);

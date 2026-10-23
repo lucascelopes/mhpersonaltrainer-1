@@ -1,39 +1,43 @@
 import type { Metadata } from 'next';
-import { Manrope, Merriweather, Oswald, Sora, Space_Grotesk } from 'next/font/google';
+import localFont from 'next/font/local';
 import Script from 'next/script';
 import './globals.css';
 import Providers from '@/components/Providers';
 import PwaRegistrar from '@/components/PwaRegistrar';
 import { DEFAULT_DESCRIPTION, SITE_NAME, SITE_URL, absoluteUrl } from '@/lib/seo';
 
-const manrope = Manrope({
-  subsets: ['latin'],
+const manrope = localFont({
+  src: './fonts/manrope.woff2',
+  weight: '200 800',
   variable: '--font-body',
   display: 'swap',
 });
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
+const spaceGrotesk = localFont({
+  src: './fonts/space-grotesk.woff2',
+  weight: '300 700',
   variable: '--font-display',
   display: 'swap',
 });
 
-const sora = Sora({
-  subsets: ['latin'],
+const sora = localFont({
+  src: './fonts/sora.woff2',
+  weight: '100 800',
   variable: '--font-sora',
   display: 'swap',
 });
 
-const oswald = Oswald({
-  subsets: ['latin'],
+const oswald = localFont({
+  src: './fonts/oswald.woff2',
+  weight: '200 700',
   variable: '--font-oswald',
   display: 'swap',
 });
 
-const merriweather = Merriweather({
-  subsets: ['latin'],
+const merriweather = localFont({
+  src: './fonts/merriweather-400.woff2',
+  weight: '400 700',
   variable: '--font-editorial',
-  weight: ['400', '700'],
   display: 'swap',
 });
 
