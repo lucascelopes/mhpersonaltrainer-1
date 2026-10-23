@@ -108,7 +108,7 @@ export default function RegisterAcademyPage() {
           <span>Email</span>
           <input
             type="email"
-            placeholder="contato@mhpersonal.com"
+            placeholder="seu@email.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             className="auth-input"
@@ -146,7 +146,7 @@ export default function RegisterAcademyPage() {
         )}
       </form>
       <div className="auth-links auth-links--account">
-        <span className="subtle">Ja tem conta?</span>
+        <span className="subtle">Já tem conta?</span>
         <Link href="/academy-login" className="auth-link">
           Entrar no painel
         </Link>

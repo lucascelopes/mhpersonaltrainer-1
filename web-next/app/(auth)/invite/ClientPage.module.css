@@ -1,0 +1,17 @@
+.links :global(.auth-link),
+.retry {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+}
+.existing {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+.existing .back {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+}
