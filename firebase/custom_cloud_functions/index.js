@@ -67,5 +67,10 @@ const notificationAiDispatcher = require("./notification_ai_dispatcher.js");
 exports.runNotificationAssistantAutoDispatch =
   notificationAiDispatcher.runNotificationAssistantAutoDispatch;
 
+const personalInvites = require('./personal_invites.js');
+exports.previewPersonalInvite = personalInvites.previewPersonalInvite;
+exports.registerStudentWithInvite = personalInvites.registerStudentWithInvite;
+exports.claimPersonalInvite = personalInvites.claimPersonalInvite;
+
 const academyRegistration = require('./academy_registration.js');
 exports.registerAcademyWithCode = academyRegistration.registerAcademyWithCode;
