@@ -52,3 +52,37 @@ Stripe não está conectado no perfil sintético, então o link automático e um
 - [Mobile — formulário e cobranças ao rolar](finance-personal-mobile-bottom-390.png)
 - [Login publicado — desktop 1280 × 720](qa-login-desktop-1280.png)
 - [Login publicado — mobile 390 × 844](qa-login-mobile-390.png)
+
+# Login — transição de tema dos links auxiliares — QA
+
+Data: 2026-10-23
+
+Rota: `/login`
+
+Prévia Firebase Hosting: [qa-login-theme-20261023](https://profissions-2746d--qa-login-theme-20261023-gs3i0hzp.web.app/login), versão `ac49e4dd4bd79adb`, expira em 2026-10-30.
+
+## Correção validada
+
+- Removida a animação do fundo dos links “Criar conta” e “Entrar” nas opções auxiliares. Ao mudar do tema escuro para o claro, o fundo agora troca junto com o cartão, sem o estado intermediário escuro e com baixo contraste que aparecia na captura.
+- A cor da borda ainda pode animar; o fundo e o texto passam imediatamente para a paleta do tema ativo.
+
+## Matriz visual hospedada
+
+| Viewport | Largura do documento | Link auxiliar no tema claro | Resultado |
+| --- | ---: | --- | --- |
+| 320 × 740 | 320 px | 48 px de altura | Sem overflow; tema claro e escuro coerentes |
+| 390 × 844 | 390 px | 48 px de altura | Sem overflow; tema claro e escuro coerentes |
+| 472 × 270 | 472 px | 48 px de altura | Sem overflow; sem estado intermediário escuro |
+| 768 × 1024 | 768 px | 48 px de altura | Sem overflow; tema claro e escuro coerentes |
+| 1024 × 768 | 1024 px | 48 px de altura | Sem overflow |
+| 1280 × 900 | 1280 px | 48 px de altura | Sem overflow |
+
+Os campos de e-mail e senha mantiveram altura de 49 px nos viewports móveis. Console e erros de página no navegador: zero. O CSS gerado foi verificado e não anima `background-color`; a compilação de Hosting exportou 109 rotas e passou pela checagem de tipos. Nenhuma chave OpenRouter foi encontrada no JavaScript estático.
+
+## Capturas
+
+- [320 × 740](login-theme-transition-320.png)
+- [390 × 844](login-theme-transition-390.png)
+- [472 × 270](login-theme-transition-472.png)
+
+Esta validação cobre o login e a transição de tema dos links auxiliares; não representa auditoria concluída de todas as rotas do aplicativo.
