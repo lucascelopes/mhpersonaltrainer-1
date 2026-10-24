@@ -180,3 +180,33 @@ Publicação verificada no canal principal Firebase Hosting e no domínio [mhper
 - A publicação alterou apenas Hosting. Nenhuma regra, função, conta ou dado real foi alterado.
 
 Esta rodada valida as rotas públicas e o fluxo de cadastro a partir do login, mas não conclui a auditoria de todas as rotas privadas, perfis e fluxos autenticados.
+
+# Painéis Admin, Academia e Aluno — responsividade e tema — QA
+
+Data: 2026-10-24
+
+## Correções desta rodada
+
+- Admin em telas estreitas: a navegação mantém largura utilizável dentro do painel, a área de versão deixa de comprimir os links e os elementos decorativos do resumo deixam de aumentar a página. Gráficos ocultos não acrescentam largura enquanto aguardam interação.
+- Academia: o brilho decorativo do painel e do cabeçalho fica contido no cartão em celular.
+- Aluno: cartões da home, atalhos e estados vazios usam superfícies e texto do tema escuro. O estado sem treinos também mantém contraste no tema escuro; o tema claro preserva a paleta clara.
+
+## Matriz responsiva autenticada
+
+Contas sintéticas foram usadas somente com Auth e Firestore Emulator local (`demo-mhpersonal-audit`). Nenhuma conta, regra ou dado real foi alterado.
+
+| Perfil e rota | Viewports | Resultado |
+| --- | --- | --- |
+| Admin `/admin` e `/admin/users` | 320 × 740, 390 × 844 e 1440 × 900 | Navegação visível e sem overflow horizontal do documento. |
+| Academia `/academy` | 320 × 740, 390 × 844 e 1440 × 900 | Sem overflow horizontal; glow contido no painel. A conta sintética entrou, mas a base isolada não tinha registros operacionais, então o painel exibiu aviso de carregamento. |
+| Aluno `/app` | 320 × 740 e 390 × 844 | Sem overflow horizontal; cartões escuros legíveis. |
+| Aluno `/workouts` | 320 × 740 | Estado vazio legível nos temas claro e escuro; sem overflow horizontal. |
+
+## Build e publicação
+
+- Build Hosting aprovado: 109 rotas estáticas; compilação, lint e checagem de tipos concluídos. O export contém 745 arquivos. A varredura não encontrou chave OpenRouter no JavaScript publicado.
+- Publicação concluída apenas em Firebase Hosting no projeto `profissions-2746d`. Versão `10c2e1d231eab601`, release live `1792840224862000` em 2026-10-24 11:10 UTC.
+- `https://mhpersonaltrainer.com.br/`, `/login` e o Hosting padrão responderam HTTP 200. O CSS servido pelo domínio contém as correções de tema do aluno, do estado vazio de treinos e do layout mobile da academia.
+- O endereço escrito como `mhpersonaltrainer.dcom.br` não tem registro DNS; o domínio publicado é `mhpersonaltrainer.com.br`.
+
+Esta rodada corrige e verifica as superfícies listadas, mas não representa auditoria completa de todos os módulos, perfis ou fluxos autenticados.
