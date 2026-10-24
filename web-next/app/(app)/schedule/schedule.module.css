@@ -15,6 +15,7 @@
   min-height: 118px;
   margin-bottom: 16px;
 }
+.intro h1,
 .intro h2 {
   margin: 0 0 3px;
   color: #092147;
@@ -128,6 +129,7 @@
 .monthDay small { color: #597698; font-size: .67rem; }
 .page :is(button, a):focus-visible { outline: 3px solid #66adff; outline-offset: 2px; }
 :global(:root[data-theme='dark']) .page { color: #e8f1ff; }
+:global(:root[data-theme='dark']) .intro h1,
 :global(:root[data-theme='dark']) .intro h2,
 :global(:root[data-theme='dark']) .headStats strong,
 :global(:root[data-theme='dark']) .panelHeading h3 { color: #f2f7ff; }

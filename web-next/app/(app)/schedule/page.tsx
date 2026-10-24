@@ -514,7 +514,7 @@ export default function SchedulePage() {
         <div className={styles.scope}><UserScopePicker /></div>
         <header className={styles.overview}>
           <div className={styles.intro}>
-            <h2>{isStudent ? 'Minha agenda' : 'Agenda'}</h2>
+            <h1>{isStudent ? 'Minha agenda' : 'Agenda'}</h1>
             <p>{isStudent ? 'Acompanhe seus treinos, avaliações e horários combinados com seu personal.' : 'Organize seus compromissos, otimize seu tempo e continue fazendo a diferença na vida dos seus alunos.'}</p>
           </div>
           <div className={styles.headStats} aria-label="Resumo da semana">

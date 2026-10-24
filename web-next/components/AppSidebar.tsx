@@ -202,30 +202,30 @@ export default function AppSidebar() {
           <Link href={isAcademy ? '/academy' : isAdmin ? '/admin' : '/app'} className="sidebar-brand" aria-label="MH Personal Trainer, início">
             <BrandLockup width={184} height={52} surface="dark" priority />
           </Link>
-          {showMiniAiStatus ? (
-            <Link
-              href={aiStatusHref}
-              className={clsx('sidebar-brand-ai-mini', {
-                'is-premium': hasPremium || aiAccess.premium,
-              })}
-              title={
-                aiAccess.premium
-                  ? 'Plano Premium: IA ilimitada'
-                  : aiAccess.loading
-                  ? 'Atualizando creditos de IA'
-                  : `${Math.max(0, aiAccess.remaining ?? 0)} creditos de IA restantes hoje`
-              }
-              aria-label="Abrir assinatura e creditos de IA"
-            >
-              <span className="sidebar-brand-ai-mini-icon">
-                <SidebarPremiumStar />
-              </span>
-              <span className="sidebar-brand-ai-mini-label">{miniAiLabel}</span>
-              <span className="sidebar-brand-ai-mini-value">{miniAiValue}</span>
-            </Link>
-          ) : null}
         </div>
         <span className="sidebar-brand-subtitle">Portal web</span>
+        {showMiniAiStatus ? (
+          <Link
+            href={aiStatusHref}
+            className={clsx('sidebar-brand-ai-mini', {
+              'is-premium': hasPremium || aiAccess.premium,
+            })}
+            title={
+              aiAccess.premium
+                ? 'Plano Premium: IA ilimitada'
+                : aiAccess.loading
+                ? 'Atualizando creditos de IA'
+                : `${Math.max(0, aiAccess.remaining ?? 0)} creditos de IA restantes hoje`
+            }
+            aria-label="Abrir assinatura e creditos de IA"
+          >
+            <span className="sidebar-brand-ai-mini-icon">
+              <SidebarPremiumStar />
+            </span>
+            <span className="sidebar-brand-ai-mini-label">{miniAiLabel}</span>
+            <span className="sidebar-brand-ai-mini-value">{miniAiValue}</span>
+          </Link>
+        ) : null}
         {isAcademy && (
           <div className="sidebar-beta">
             <span className="sidebar-beta-pill">Beta</span>
